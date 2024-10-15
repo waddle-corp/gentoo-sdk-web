@@ -240,7 +240,7 @@ class FloatingButton {
     }
 
     updateParameter(props) {
-        this.commentType = props.type;
+        this.type = props.type;
         // this.floatingCount += 1;
         this.enableExpandTimer('off');
         this.fetchFloatingComment(this.itemId, this.userId, props.type)
