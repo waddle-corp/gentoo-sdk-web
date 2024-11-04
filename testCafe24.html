@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="/floating-button-sdk.css"> -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K6R9Z9D8EP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-K6R9Z9D8EP', { 'debug_mode': true });
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5VRNPTQW');</script>
+    <!-- End Google Tag Manager -->
+    <title>Document</title>
+</head>
+<body>
+    <script src="./sdk-cafe24.js">
+        // (function (global, document) {var w = global;if (w.GentooIO) {return w.console.error("GentooIO script included twice");};var fb = null;var ge = function () {ge.c(arguments);};ge.q = [];ge.c = function (args) {ge.q.push(args)};ge.process = function (args) {var method = args[0];var params = args[1];if (method === 'boot') {fb = new w.FloatingButton(params);} else if (method === 'update') {fb.updateParameter(params);};};w.GentooIO = ge;function l() {if (w.GentooIOInitialized) {return};w.GentooIOInitialized = true;var s = document.createElement("script");s.type = "text/javascript";s.async = true;s.src = "/floating-button-sdk.js";s.onload = () => {while(ge.q.length) {var args = ge.q.shift();ge.process(args);};var sc = document.getElementById('gentoo-sc');if (sc) {sc.addEventListener("scroll", handleScroll)};};var x = document.getElementsByTagName("script")[0];if (x.parentNode) {x.parentNode.insertBefore(s, x)};};function handleScroll() {var sc = document.getElementById('gentoo-sc');var st = sc.scrollTop;var dh = sc.scrollHeight - sc.clientHeight;var sp = st / dh;if (sp >= 0.6) {console.log('sp >= 0.6', st, dh, sp);ge.process(['update', {type: 'needs'}]);sc.removeEventListener('scroll', handleScroll);}};if (document.readyState === "complete") {l();} else {w.addEventListener("DOMContentLoaded", l);w.addEventListener("load", l);};}) (window, document);
+        // (
+        //     function (global, document) {
+        //         var w = global;
+        //         if (w.GentooIO) { 
+        //             return w.console.error("GentooIO script included twice"); 
+        //         }; 
+
+        //         // Function to inject CSS
+        //         function injectCSS(href) {
+        //             // Check if the CSS is already injected
+        //             var existingLink = document.querySelector('link[href="' + href + '"]');
+        //             if (existingLink) {
+        //             return;
+        //             }
+            
+        //             var link = document.createElement("link");
+        //             link.rel = "stylesheet";
+        //             link.href = href;
+        //             link.type = "text/css";
+        //             link.onload = function() {
+        //             console.log("GentooIO CSS loaded successfully.");
+        //             };
+        //             link.onerror = function() {
+        //             console.error("Failed to load GentooIO CSS.");
+        //             };
+        //             document.head.appendChild(link);
+        //         }
+            
+        //         // Inject the CSS automatically
+        //         injectCSS("https://dn8zc3bzjh1kn.cloudfront.net/floating-button-sdk.min.css");
+        
+        //         var fb = null; 
+        //         var ge = function () { 
+        //             ge.c(arguments); 
+        //         }; 
+        //         ge.q = []; 
+        //         ge.c = function (args) { 
+        //             ge.q.push(args) 
+        //         }; 
+        //         ge.process = function (args) { 
+        //             var method = args[0]; 
+        //             var params = args[1]; 
+        //             if (method === 'boot') { 
+        //                 fb = new w.FloatingButton(params); 
+        //             } else if (method === 'update') { 
+        //                 fb.updateParameter(params); 
+        //             } else if (method === 'unmount') {
+        //                 fb.destroy();
+        //             }
+        //         }; 
+        //         w.GentooIO = ge; 
+        //         function l() { 
+        //             if (w.GentooIOInitialized) { return }; 
+        //             w.GentooIOInitialized = true; 
+        //             var s = document.createElement("script"); 
+        //             s.type = "text/javascript"; 
+        //             s.async = true; 
+        //             s.src = "/floating-button-sdk.js"; 
+        //             s.onload = () => { 
+        //                 while (ge.q.length) { 
+        //                     var args = ge.q.shift();
+        //                     ge.process(args); 
+        //                 };  
+        //                 var sl = () => {handleScroll(w, sl)}
+        //                 w.addEventListener("scroll", sl) 
+        //                 w.addEventListener("message", ()=>{})
+        //             }; 
+        //             var x = document.getElementsByTagName("script")[0]; 
+        //             if (x.parentNode) { 
+        //                 x.parentNode.insertBefore(s, x) 
+        //             }; 
+        //         }; 
+        //         function handleScroll(tn, sl) {  
+        //             var st = tn.scrollY; 
+        //             var dh = document.getElementById('gentoo-sc').clientHeight;
+        //             var sp = st / (dh - tn.innerHeight); 
+        //             if (sp >= 0.6) { 
+        //                 ge.process(['update', { type: 'needs' }]); 
+        //                 tn.removeEventListener('scroll', sl); 
+        //             } 
+        //         }; 
+        //         if (document.readyState === "complete") { 
+        //             l(); 
+        //         } else { 
+        //             w.addEventListener("DOMContentLoaded", l); 
+        //             w.addEventListener("load", l); 
+        //         };
+        //     }
+        // )(window, document);
+
+
+        // GentooIO('boot', {
+        //     clientId: 'dlst',
+        //     udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
+        //     authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
+        //     itemId: '31900',
+        // })
+
+        // GentooIO('unmount', {});
+    </script>
+    <div>
+        <div id='gentoo-sc'>
+            <div style="display: flex; flex-direction: column; align-items: stretch; height: 100%;">
+                <div style="width: 100%; height: 400px; background: skyblue;">
+                    box1
+                </div>
+                <div style="display: flex; width: 100%; height: fit-content";>
+                    <div style="flex: 1; height: 300px; background: cornflowerblue;">
+                        box2
+                    </div>
+                    <div style="flex: 1; height: 300px; background: cornsilk;">
+                        box3
+                    </div>
+                </div>
+                <div style="width: 100%; height: 800px; background: skyblue;">
+                    box4
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
