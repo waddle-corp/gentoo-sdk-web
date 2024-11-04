@@ -4,7 +4,7 @@ class FloatingButton {
         this.udid = props.udid;
         this.authCode = props.authCode;
         this.itemId = props.itemId || '23310';
-        this.type = props.type || 'this';
+        this.type = props.type || 'default';
         this.userId = '';
         this.floatingComment = [];
         this.floatingProduct = {};
@@ -18,9 +18,9 @@ class FloatingButton {
         this.keys;
         this.commentType;
         this.isDestroyed = false;
-        this.needsTimer = setTimeout(() => {
+        this.needsTimer = ( this.type !== 'default' && setTimeout(() => {
             this.updateParameter({type: 'needs'});
-        }, 10000);
+        }, 10000))
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -69,7 +69,7 @@ class FloatingButton {
                         } else {
                             // client variable required in chatUrl for the future
                             this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                            if (!this.isDestroyed) this.init('basic', 'basic', this.chatUrl);
+                            if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
                         }
                     }).catch(error => {
                         console.error(`Error while constructing FloatingButton: ${error}`);
@@ -253,7 +253,7 @@ class FloatingButton {
                 } else {
                     // client variable required in chatUrl for the future
                     this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                    if (!this.isDestroyed) this.init('basic', 'basic', this.chatUrl);
+                    if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
                 }
             }).catch(error => {
                 console.error(`Error while constructing FloatingButton: ${error}`);
@@ -324,6 +324,7 @@ class FloatingButton {
     }
 
     async fetchFloatingComment(itemId, userId, type) {
+        console.log('type, ', type);
         try {
             // URL에 itemId를 포함시켜 GET 요청 보내기
             const url = `${this.domains.recommend}?itemId=${itemId}&userId=${userId}&commentType=${type}`;
@@ -426,16 +427,19 @@ class FloatingButton {
     }
 
     enableExpandTimer(mode) {
-        if (this.needsTimer) {
-            clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
-        }
-        if (mode === 'on') {
-            this.needsTimer = setTimeout(() => {
-                this.updateParameter({type: 'needs'});
-            }, 10000);
-        }
-        else if (mode === 'off') {
-            clearTimeout(this.needsTimer);  // 타이머 클리어
+        if (this.type === 'default') return;
+        else {
+            if (this.needsTimer) {
+                clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
+            }
+            if (mode === 'on') {
+                this.needsTimer = setTimeout(() => {
+                    this.updateParameter({type: 'needs'});
+                }, 10000);
+            }
+            else if (mode === 'off') {
+                clearTimeout(this.needsTimer);  // 타이머 클리어
+            }
         }
     }
 
