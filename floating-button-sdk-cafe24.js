@@ -84,13 +84,13 @@ class FloatingButton {
     }    
     
     init(itemId, type, chatUrl) {
-        window.gtag('event', 'GentooPopped', {
-            event_category: 'SDKFloatingRendered',
-            event_label: 'SDK floating button is rendered',
-            itemId: this.itemId,
-            clientId: this.clientId,
-            type: this.type,
-        })
+        // window.gtag('event', 'GentooPopped', {
+        //     event_category: 'SDKFloatingRendered',
+        //     event_label: 'SDK floating button is rendered',
+        //     itemId: this.itemId,
+        //     clientId: this.clientId,
+        //     type: this.type,
+        // })
         this.logEvent('SDKFloatingRendered');
         this.remove(this.button, this.expandedButton, this.iframeContainer);
         this.itemId = itemId;
@@ -444,14 +444,14 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        window.gtag('event', 'iconClicked', {
-            event_category: 'SDKFloatingClicked',
-            event_label: 'User clicked SDK floating button',
-            itemId: this.itemId,
-            clientId: this.clientId,
-            type: this.type,
-            commentType: (this.type === 'this' ? this.commentType : ''),
-        })
+        // window.gtag('event', 'iconClicked', {
+        //     event_category: 'SDKFloatingClicked',
+        //     event_label: 'User clicked SDK floating button',
+        //     itemId: this.itemId,
+        //     clientId: this.clientId,
+        //     type: this.type,
+        //     commentType: (this.type === 'this' ? this.commentType : ''),
+        // })
         this.logEvent('SDKFloatingClicked');
         this.enableExpandTimer('off');
         
