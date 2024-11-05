@@ -56,7 +56,7 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
-        (function(CAFE24API) {
+        ((CAFE24API) => {
             // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
             console.log('mall Id', CAFE24API.MALL_ID);
             this.partnerId = CAFE24API.MALL_ID;
