@@ -1,9 +1,11 @@
 class FloatingButton {
     constructor(props) {
         this.clientId = props.clientId;
+        this.partnerType;
+        this.partnerId;
         this.udid = props.udid;
         this.authCode = props.authCode;
-        this.itemId = props.itemId || '23310';
+        this.itemId = props.itemId || 'general';
         this.type = props.type || 'default';
         this.userId = '';
         this.floatingComment = [];
@@ -54,29 +56,38 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
+        (function(CAFE24API) {
+            // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
+            console.log('mall Id', CAFE24API.MALL_ID);
+         
+         })(CAFE24API.init({
+             client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
+             version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
+         }));
+        this.chatUrl = `chatroute/cafe24?ptid=${partnerId}&cbid=${chatbotId}&ch=${false}&i=${false}`;
+        // this.handleAuth(this.udid, this.authCode)
+        //     .then(userId => {
+        //         this.userId = userId;
+        //         this.fetchFloatingComment(this.itemId, this.userId, this.type)
+        //             .then(floatingComment => {
+        //                 console.log('comment', floatingComment[0]);
+        //                 if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+        //                     this.floatingComment = floatingComment[0];
+        //                     this.commentType = floatingComment[1];
+        //                     this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
+        //                     if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+        //                 } else {
+        //                     // client variable required in chatUrl for the future
+        //                     this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
+        //                     if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
+        //                 }
+        //             }).catch(error => {
+        //                 console.error(`Error while constructing FloatingButton: ${error}`);
+        //             })
+        //     }).catch(error => {
+        //         console.error(`Error while calling handleAuth func: ${error}`);
+        //     })
         
-        this.handleAuth(this.udid, this.authCode)
-            .then(userId => {
-                this.userId = userId;
-                this.fetchFloatingComment(this.itemId, this.userId, this.type)
-                    .then(floatingComment => {
-                        console.log('comment', floatingComment[0]);
-                        if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-                            this.floatingComment = floatingComment[0];
-                            this.commentType = floatingComment[1];
-                            this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-                            if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-                        } else {
-                            // client variable required in chatUrl for the future
-                            this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                            if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
-                        }
-                    }).catch(error => {
-                        console.error(`Error while constructing FloatingButton: ${error}`);
-                    })
-            }).catch(error => {
-                console.error(`Error while calling handleAuth func: ${error}`);
-            })
 
         this.prevPosition = null;
         this.scrollPosition = 0;
@@ -298,30 +309,30 @@ class FloatingButton {
         // Any other cleanup operations
     }
 
-    async handleAuth(udid, authCode) {
-        if (udid === 'test') {
-            return parseInt(Math.random()*1e9);
-        }
-        try {
-            const response = await fetch(
-                this.domains.auth, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
-                        'udid': udid,
-                        'authCode': authCode,
-                    },
-                    body: '',
-                }
-            );
-            const result = await response.json();
-            return result.body.randomId
-        } catch (error) {
-            console.error(`Error while calling auth API: ${error.message}`);
-            return null
-        }
-    }
+    // async handleAuth(udid, authCode) {
+    //     if (udid === 'test') {
+    //         return parseInt(Math.random()*1e9);
+    //     }
+    //     try {
+    //         const response = await fetch(
+    //             this.domains.auth, {
+    //                 method: "POST",
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'x-api-key': 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+    //                     'udid': udid,
+    //                     'authCode': authCode,
+    //                 },
+    //                 body: '',
+    //             }
+    //         );
+    //         const result = await response.json();
+    //         return result.body.randomId
+    //     } catch (error) {
+    //         console.error(`Error while calling auth API: ${error.message}`);
+    //         return null
+    //     }
+    // }
 
     async fetchFloatingComment(itemId, userId, type) {
         console.log('type, ', type);
