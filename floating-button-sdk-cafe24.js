@@ -60,6 +60,14 @@ class FloatingButton {
             // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
             console.log('mall Id', CAFE24API.MALL_ID);
             this.partnerId = CAFE24API.MALL_ID;
+
+            CAFE24API.getCustomerIDInfo(function(err, res) {
+                if (err) {
+                    console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
+                } else {
+                    console.log('getCustomerIdInfo res: ', res);
+                }
+            });
          
          })(CAFE24API.init({
              client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
