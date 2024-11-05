@@ -65,7 +65,7 @@ class FloatingButton {
              client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
              version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
          }));
-        this.chatUrl = `chatroute/cafe24?ptid=${partnerId}&cbid=${1}&ch=${false}&i=${false}`;
+        this.chatUrl = `chatroute/cafe24?ptid=${this.partnerId}&cbid=${1}&ch=${false}&i=${false}`;
         // this.handleAuth(this.udid, this.authCode)
         //     .then(userId => {
         //         this.userId = userId;
