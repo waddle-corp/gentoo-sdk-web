@@ -88,7 +88,7 @@ class FloatingButton {
                     this.floatingComment = '베테랑 점원 젠투에게 물어보고 구매하세요';
                 }
                 // partnerId에 지금은 mallId가 들어가있음, 실제 partnerId로 변환해서 받아오는 과정 필요.
-                this.chatUrl = `chatroute/${this.partnerType}?ptid=${this.partnerId}&cbid=${1}&ch=${this.isMobileDevice}&i=${false}&cuid=${this.chatUserId}`;
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&cbid=${1}&ch=${this.isMobileDevice}&i=${false}&cuid=${this.chatUserId}`;
                 if (!this.isDestroyed) this.init('general', this.type, this.chatUrl);
             }).catch(error => {
                 console.error(`Error while constructing FloatingButton: ${error}`);
