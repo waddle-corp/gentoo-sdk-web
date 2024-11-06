@@ -65,7 +65,7 @@ class FloatingButton {
                 if (err) {
                     console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
                 } else {
-                    console.log('getCustomerIdInfo res: ', res);
+                    console.log('getCustomerIdInfo res: ', res.id, res.id.guest_id, res.id['guest_id']);
                     if (res.id.memberId) {
                         this.chatUserId = res.id.member_id;
                     } else {
