@@ -67,9 +67,9 @@ class FloatingButton {
                 } else {
                     console.log('getCustomerIdInfo res: ', res);
                     if (res.id.memberId) {
-                        this.chatUserId = res.id.memberId;
+                        this.chatUserId = res.id.member_id;
                     } else {
-                        this.chatUserId = res.id.guestId;
+                        this.chatUserId = res.id.guest_id;
                     }
                 }
             });
