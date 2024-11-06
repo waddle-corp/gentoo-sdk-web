@@ -3,6 +3,7 @@ class FloatingButton {
         this.clientId = props.clientId;
         this.partnerType;
         this.partnerId;
+        this.chatUserId;
         this.udid = props.udid;
         this.authCode = props.authCode;
         this.itemId = props.itemId || 'general';
@@ -66,6 +67,11 @@ class FloatingButton {
                     console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
                 } else {
                     console.log('getCustomerIdInfo res: ', res);
+                    if (res.memberId) {
+                        this.chatUserId = res.memberId;
+                    } else {
+                        this.chatUserId = res.guestId;
+                    }
                 }
             });
          
@@ -73,7 +79,7 @@ class FloatingButton {
              client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
              version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
          }));
-        this.chatUrl = `chatroute/cafe24?ptid=${this.partnerId}&cbid=${1}&ch=${false}&i=${false}`;
+        this.chatUrl = `chatroute/cafe24?ptid=${this.partnerId}&cbid=${1}&ch=${false}&i=${false}&cuid=${this.chatUserId}`;
         // this.handleAuth(this.udid, this.authCode)
         //     .then(userId => {
         //         this.userId = userId;
