@@ -66,10 +66,10 @@ class FloatingButton {
                     console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
                 } else {
                     console.log('getCustomerIdInfo res: ', res);
-                    if (res.memberId) {
-                        this.chatUserId = res.memberId;
+                    if (res.id.memberId) {
+                        this.chatUserId = res.id.memberId;
                     } else {
-                        this.chatUserId = res.guestId;
+                        this.chatUserId = res.id.guestId;
                     }
                 }
             });
