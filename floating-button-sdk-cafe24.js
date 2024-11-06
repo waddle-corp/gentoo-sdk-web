@@ -1,7 +1,6 @@
 class FloatingButton {
     constructor(props) {
-        this.clientId = props.clientId;
-        this.partnerType;
+        this.partnerType = props.partnerType;
         this.partnerId;
         this.chatUserId;
         this.udid = props.udid;
@@ -79,7 +78,23 @@ class FloatingButton {
              client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
              version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
          }));
-        this.chatUrl = `chatroute/cafe24?ptid=${this.partnerId}&cbid=${1}&ch=${false}&i=${false}&cuid=${this.chatUserId}`;
+
+        this.fetchFloatingComment(this.itemId, this.chatUserId, this.type)
+            .then(floatingComment => {
+                console.log('comment', floatingComment[0]);
+                if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+                    this.floatingComment = floatingComment[0];
+                    this.commentType = floatingComment[1];
+                } else {
+                    this.floatingComment = '베테랑 점원 젠투에게 물어보고 구매하세요';
+                }
+                // partnerId에 지금은 mallId가 들어가있음, 실제 partnerId로 변환해서 받아오는 과정 필요.
+                this.chatUrl = `chatroute/${this.partnerType}?ptid=${this.partnerId}&cbid=${1}&ch=${this.isMobileDevice}&i=${false}&cuid=${this.chatUserId}`;
+                if (!this.isDestroyed) this.init('general', this.type, this.chatUrl);
+            }).catch(error => {
+                console.error(`Error while constructing FloatingButton: ${error}`);
+            })
+
         // this.handleAuth(this.udid, this.authCode)
         //     .then(userId => {
         //         this.userId = userId;
@@ -114,7 +129,7 @@ class FloatingButton {
         //     event_category: 'SDKFloatingRendered',
         //     event_label: 'SDK floating button is rendered',
         //     itemId: this.itemId,
-        //     clientId: this.clientId,
+        //     partnerType: this.partnerType,
         //     type: this.type,
         // })
         this.logEvent('SDKFloatingRendered');
@@ -269,21 +284,21 @@ class FloatingButton {
         this.type = props.type;
         // this.floatingCount += 1;
         this.enableExpandTimer('off');
-        this.fetchFloatingComment(this.itemId, this.userId, props.type)
-            .then(floatingComment => {
-                if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-                    this.floatingComment = floatingComment[0];
-                    this.commentType = floatingComment[1];
-                    this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-                    if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-                } else {
-                    // client variable required in chatUrl for the future
-                    this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                    if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
-                }
-            }).catch(error => {
-                console.error(`Error while constructing FloatingButton: ${error}`);
-            })
+        // this.fetchFloatingComment(this.itemId, this.userId, props.type)
+        //     .then(floatingComment => {
+        //         if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+        //             this.floatingComment = floatingComment[0];
+        //             this.commentType = floatingComment[1];
+        //             this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
+        //             if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+        //         } else {
+        //             // client variable required in chatUrl for the future
+        //             this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
+        //             if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
+        //         }
+        //     }).catch(error => {
+        //         console.error(`Error while constructing FloatingButton: ${error}`);
+        //     })
     }
 
     remove() {
@@ -401,7 +416,7 @@ class FloatingButton {
                 event_category: event,
                 visitorId: this.userId,
                 itemId: this.itemId,
-                clientId: `${this.clientId}_${loc}`,
+                partnerType: `${this.partnerType}_${loc}`,
                 channelId: this.isMobileDevice ? 'mobile' : 'web',
             }
 
@@ -474,7 +489,7 @@ class FloatingButton {
         //     event_category: 'SDKFloatingClicked',
         //     event_label: 'User clicked SDK floating button',
         //     itemId: this.itemId,
-        //     clientId: this.clientId,
+        //     partnerType: this.partnerType,
         //     type: this.type,
         //     commentType: (this.type === 'this' ? this.commentType : ''),
         // })

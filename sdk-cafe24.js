@@ -81,8 +81,5 @@
 )(window, document);
 
 GentooIO('boot', {
-    clientId: 'dlst',
-    udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
-    authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
-    itemId: '31900',
+    partnerType: 'cafe24',
 })
