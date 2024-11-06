@@ -61,16 +61,14 @@ class FloatingButton {
             console.log('mall Id', CAFE24API.MALL_ID);
             this.partnerId = CAFE24API.MALL_ID;
 
-            CAFE24API.getCustomerIDInfo(function(err, res) {
+            CAFE24API.getCustomerIDInfo((err, res) => {
                 if (err) {
                     console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
                 } else {
-                    console.log('getCustomerIdInfo res: ', res.id, res.id.guest_id, res.id['guest_id']);
                     if (res.id.member_id) {
                         this.chatUserId = res.id.member_id;
                     } else {
-                        console.log('inner guest id: ', res.id.guest_id, res.id['guest_id']);
-                        this.chatUserId = res.id.guest_id;
+                        this.chatUserId = res.id['guest_id'];
                     }
                 }
             });
