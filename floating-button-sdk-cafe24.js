@@ -56,27 +56,29 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
-        ((CAFE24API) => {
-            // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
-            console.log('mall Id', CAFE24API.MALL_ID);
-            this.partnerId = CAFE24API.MALL_ID;
-
-            CAFE24API.getCustomerIDInfo((err, res) => {
-                if (err) {
-                    console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
-                } else {
-                    if (res.id.member_id) {
-                        this.chatUserId = res.id.member_id;
+        if (false) {
+            ((CAFE24API) => {
+                // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
+                console.log('mall Id', CAFE24API.MALL_ID);
+                this.partnerId = CAFE24API.MALL_ID;
+    
+                CAFE24API.getCustomerIDInfo((err, res) => {
+                    if (err) {
+                        console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
                     } else {
-                        this.chatUserId = res.id['guest_id'];
+                        if (res.id.member_id) {
+                            this.chatUserId = res.id.member_id;
+                        } else {
+                            this.chatUserId = res.id['guest_id'];
+                        }
                     }
-                }
-            });
-         
-         })(CAFE24API.init({
-             client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
-             version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
-         }));
+                });
+             
+             })(CAFE24API.init({
+                 client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
+                 version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
+             }));
+        }
 
         this.fetchFloatingComment(this.itemId, this.chatUserId, this.type)
             .then(floatingComment => {
@@ -163,8 +165,12 @@ class FloatingButton {
 
         // Create floating button
         this.button = document.createElement('div');
-        this.button.className = `floating-button-common ${this.floatingComment.length > 0 ? 'button-image-shrink' : 'button-image'}`;
+        this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
+
+        // Editable button position, need to get variables for pos data
+        // this.button.style.bottom = '110px';
+        // this.button.style.right = '110px';
         document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.button);
 
@@ -172,14 +178,29 @@ class FloatingButton {
         this.logEvent('SDKFloatingRendered');
 
         if(this.floatingCount < 2 && this.floatingComment.length > 0) {
-            this.expandedButton = document.createElement('div');
-            this.expandedButton.className = 'expanded-button';
-            this.expandedText = document.createElement('p');
-            this.expandedButton.appendChild(this.expandedText);
-            this.expandedText.innerText = this.floatingComment || '...';
-            this.expandedText.className = 'expanded-text';
-            document.body.appendChild(this.expandedButton);
-            this.floatingCount += 1;
+            setTimeout(() => {
+                this.expandedButton = document.createElement('div');
+                this.expandedButton.className = 'expanded-area';
+                this.expandedText = document.createElement('p');
+                this.expandedButton.appendChild(this.expandedText);
+                this.expandedText.className = 'expanded-area-text';
+                document.body.appendChild(this.expandedButton);
+                // this.expandedText.innerText = this.floatingComment || '...';
+                // 각 글자를 1초 간격으로 추가하기 위한 함수
+                let i = 0;
+                const addLetter = () => {
+                    if (i < this.floatingComment.length) {
+                        this.expandedText.innerText += this.floatingComment[i];
+                        i++;
+                        setTimeout(addLetter, 1000/this.floatingComment.length); // 1초마다 호출
+                    }
+                };
+
+                // 첫 호출 시작
+                addLetter();
+                this.floatingCount += 1;
+                // this.init(this.itemId, this.type, this.chatUrl)
+            }, 3000)
         }
         
 
@@ -196,8 +217,8 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
-                if (this.expandedButton) this.expandedButton.className = 'expanded-button hide';
-                this.button.className = 'floating-button-common button-image-close';
+                if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
+                this.button.className = 'floating-button-common button-image-close-mr';
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
@@ -210,8 +231,8 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
-                this.expandedButton.className = 'expanded-button hide';
-                this.button.className = 'floating-button-common button-image-close';
+                this.expandedButton.className = 'expanded-area hide';
+                this.button.className = 'floating-button-common button-image-close-mr';
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
@@ -224,7 +245,7 @@ class FloatingButton {
             setTimeout(() => {
                 if (this.expandedButton) {
                     this.expandedButton.innerText = '';
-                    this.expandedButton.style.width = '50px';
+                    // this.expandedButton.style.width = '50px';
                     this.expandedButton.style.padding = 0;
                     this.expandedButton.style.border = 'none';
                     this.expandedButton.style.boxShadow = 'none';
@@ -232,7 +253,7 @@ class FloatingButton {
                 if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                     this.button.className = 'floating-button-common button-image';
                 }
-            }, [3000])
+            }, [700000])
             if (this.type !== 'needs' && this.floatingComment.length < 1) {
                 this.enableExpandTimer('on');
             }
