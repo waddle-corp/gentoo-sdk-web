@@ -56,7 +56,7 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
-        if (false) {
+        // if (false) {
             ((CAFE24API) => {
                 // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
                 console.log('mall Id', CAFE24API.MALL_ID);
@@ -78,7 +78,7 @@ class FloatingButton {
                  client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
                  version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
              }));
-        }
+        // }
 
         this.fetchFloatingComment(this.itemId, this.chatUserId, this.type)
             .then(floatingComment => {
