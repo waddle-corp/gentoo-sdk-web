@@ -1,10 +1,12 @@
 class FloatingButton {
     constructor(props) {
-        this.clientId = props.clientId;
+        this.partnerType = props.partnerType;
+        this.partnerId;
+        this.chatUserId;
         this.udid = props.udid;
         this.authCode = props.authCode;
-        this.itemId = props.itemId || '23310';
-        this.type = props.type || 'this';
+        this.itemId = props.itemId || 'general';
+        this.type = props.type || 'default';
         this.userId = '';
         this.floatingComment = [];
         this.floatingProduct = {};
@@ -18,9 +20,9 @@ class FloatingButton {
         this.keys;
         this.commentType;
         this.isDestroyed = false;
-        this.needsTimer = setTimeout(() => {
+        this.needsTimer = ( this.type !== 'default' && setTimeout(() => {
             this.updateParameter({type: 'needs'});
-        }, 10000);
+        }, 10000))
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -54,29 +56,69 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
-        
-        this.handleAuth(this.udid, this.authCode)
-            .then(userId => {
-                this.userId = userId;
-                this.fetchFloatingComment(this.itemId, this.userId, this.type)
-                    .then(floatingComment => {
-                        console.log('comment', floatingComment[0]);
-                        if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-                            this.floatingComment = floatingComment[0];
-                            this.commentType = floatingComment[1];
-                            this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-                            if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+        // if (false) {
+            ((CAFE24API) => {
+                // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
+                console.log('mall Id', CAFE24API.MALL_ID);
+                this.partnerId = CAFE24API.MALL_ID;
+    
+                CAFE24API.getCustomerIDInfo((err, res) => {
+                    if (err) {
+                        console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
+                    } else {
+                        if (res.id.member_id) {
+                            this.chatUserId = res.id.member_id;
                         } else {
-                            // client variable required in chatUrl for the future
-                            this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                            if (!this.isDestroyed) this.init('basic', 'basic', this.chatUrl);
+                            this.chatUserId = res.id['guest_id'];
                         }
-                    }).catch(error => {
-                        console.error(`Error while constructing FloatingButton: ${error}`);
-                    })
+                    }
+                });
+             
+             })(CAFE24API.init({
+                 client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
+                 version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
+             }));
+        // }
+
+        this.fetchFloatingComment(this.itemId, this.chatUserId, this.type)
+            .then(floatingComment => {
+                console.log('comment', floatingComment[0]);
+                if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+                    this.floatingComment = floatingComment[0];
+                    this.commentType = floatingComment[1];
+                } else {
+                    this.floatingComment = '베테랑 점원 젠투에게 물어보고 구매하세요';
+                }
+                // partnerId에 지금은 mallId가 들어가있음, 실제 partnerId로 변환해서 받아오는 과정 필요.
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&cbid=${37}&ch=${this.isMobileDevice}&i=${false}&cuid=${this.chatUserId}`;
+                if (!this.isDestroyed) this.init('general', this.type, this.chatUrl);
             }).catch(error => {
-                console.error(`Error while calling handleAuth func: ${error}`);
+                console.error(`Error while constructing FloatingButton: ${error}`);
             })
+
+        // this.handleAuth(this.udid, this.authCode)
+        //     .then(userId => {
+        //         this.userId = userId;
+        //         this.fetchFloatingComment(this.itemId, this.userId, this.type)
+        //             .then(floatingComment => {
+        //                 console.log('comment', floatingComment[0]);
+        //                 if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+        //                     this.floatingComment = floatingComment[0];
+        //                     this.commentType = floatingComment[1];
+        //                     this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
+        //                     if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+        //                 } else {
+        //                     // client variable required in chatUrl for the future
+        //                     this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
+        //                     if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
+        //                 }
+        //             }).catch(error => {
+        //                 console.error(`Error while constructing FloatingButton: ${error}`);
+        //             })
+        //     }).catch(error => {
+        //         console.error(`Error while calling handleAuth func: ${error}`);
+        //     })
+        
 
         this.prevPosition = null;
         this.scrollPosition = 0;
@@ -84,13 +126,13 @@ class FloatingButton {
     }    
     
     init(itemId, type, chatUrl) {
-        window.gtag('event', 'GentooPopped', {
-            event_category: 'SDKFloatingRendered',
-            event_label: 'SDK floating button is rendered',
-            itemId: this.itemId,
-            clientId: this.clientId,
-            type: this.type,
-        })
+        // window.gtag('event', 'GentooPopped', {
+        //     event_category: 'SDKFloatingRendered',
+        //     event_label: 'SDK floating button is rendered',
+        //     itemId: this.itemId,
+        //     partnerType: this.partnerType,
+        //     type: this.type,
+        // })
         this.logEvent('SDKFloatingRendered');
         this.remove(this.button, this.expandedButton, this.iframeContainer);
         this.itemId = itemId;
@@ -123,8 +165,12 @@ class FloatingButton {
 
         // Create floating button
         this.button = document.createElement('div');
-        this.button.className = `floating-button-common ${this.floatingComment.length > 0 ? 'button-image-shrink' : 'button-image'}`;
+        this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
+
+        // Editable button position, need to get variables for pos data
+        // this.button.style.bottom = '110px';
+        // this.button.style.right = '110px';
         document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.button);
 
@@ -132,14 +178,29 @@ class FloatingButton {
         this.logEvent('SDKFloatingRendered');
 
         if(this.floatingCount < 2 && this.floatingComment.length > 0) {
-            this.expandedButton = document.createElement('div');
-            this.expandedButton.className = 'expanded-button';
-            this.expandedText = document.createElement('p');
-            this.expandedButton.appendChild(this.expandedText);
-            this.expandedText.innerText = this.floatingComment || '...';
-            this.expandedText.className = 'expanded-text';
-            document.body.appendChild(this.expandedButton);
-            this.floatingCount += 1;
+            setTimeout(() => {
+                this.expandedButton = document.createElement('div');
+                this.expandedButton.className = 'expanded-area';
+                this.expandedText = document.createElement('p');
+                this.expandedButton.appendChild(this.expandedText);
+                this.expandedText.className = 'expanded-area-text';
+                document.body.appendChild(this.expandedButton);
+                // this.expandedText.innerText = this.floatingComment || '...';
+                // 각 글자를 1초 간격으로 추가하기 위한 함수
+                let i = 0;
+                const addLetter = () => {
+                    if (i < this.floatingComment.length) {
+                        this.expandedText.innerText += this.floatingComment[i];
+                        i++;
+                        setTimeout(addLetter, 1000/this.floatingComment.length); // 1초마다 호출
+                    }
+                };
+
+                // 첫 호출 시작
+                addLetter();
+                this.floatingCount += 1;
+                // this.init(this.itemId, this.type, this.chatUrl)
+            }, 3000)
         }
         
 
@@ -156,8 +217,8 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
-                if (this.expandedButton) this.expandedButton.className = 'expanded-button hide';
-                this.button.className = 'floating-button-common button-image-close';
+                if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
+                this.button.className = 'floating-button-common button-image-close-mr';
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
@@ -170,8 +231,8 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
-                this.expandedButton.className = 'expanded-button hide';
-                this.button.className = 'floating-button-common button-image-close';
+                this.expandedButton.className = 'expanded-area hide';
+                this.button.className = 'floating-button-common button-image-close-mr';
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
@@ -184,7 +245,7 @@ class FloatingButton {
             setTimeout(() => {
                 if (this.expandedButton) {
                     this.expandedButton.innerText = '';
-                    this.expandedButton.style.width = '50px';
+                    // this.expandedButton.style.width = '50px';
                     this.expandedButton.style.padding = 0;
                     this.expandedButton.style.border = 'none';
                     this.expandedButton.style.boxShadow = 'none';
@@ -192,7 +253,7 @@ class FloatingButton {
                 if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                     this.button.className = 'floating-button-common button-image';
                 }
-            }, [3000])
+            }, [700000])
             if (this.type !== 'needs' && this.floatingComment.length < 1) {
                 this.enableExpandTimer('on');
             }
@@ -243,21 +304,21 @@ class FloatingButton {
         this.type = props.type;
         // this.floatingCount += 1;
         this.enableExpandTimer('off');
-        this.fetchFloatingComment(this.itemId, this.userId, props.type)
-            .then(floatingComment => {
-                if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-                    this.floatingComment = floatingComment[0];
-                    this.commentType = floatingComment[1];
-                    this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-                    if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-                } else {
-                    // client variable required in chatUrl for the future
-                    this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-                    if (!this.isDestroyed) this.init('basic', 'basic', this.chatUrl);
-                }
-            }).catch(error => {
-                console.error(`Error while constructing FloatingButton: ${error}`);
-            })
+        // this.fetchFloatingComment(this.itemId, this.userId, props.type)
+        //     .then(floatingComment => {
+        //         if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
+        //             this.floatingComment = floatingComment[0];
+        //             this.commentType = floatingComment[1];
+        //             this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
+        //             if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+        //         } else {
+        //             // client variable required in chatUrl for the future
+        //             this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
+        //             if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
+        //         }
+        //     }).catch(error => {
+        //         console.error(`Error while constructing FloatingButton: ${error}`);
+        //     })
     }
 
     remove() {
@@ -298,32 +359,33 @@ class FloatingButton {
         // Any other cleanup operations
     }
 
-    async handleAuth(udid, authCode) {
-        if (udid === 'test') {
-            return parseInt(Math.random()*1e9);
-        }
-        try {
-            const response = await fetch(
-                this.domains.auth, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
-                        'udid': udid,
-                        'authCode': authCode,
-                    },
-                    body: '',
-                }
-            );
-            const result = await response.json();
-            return result.body.randomId
-        } catch (error) {
-            console.error(`Error while calling auth API: ${error.message}`);
-            return null
-        }
-    }
+    // async handleAuth(udid, authCode) {
+    //     if (udid === 'test') {
+    //         return parseInt(Math.random()*1e9);
+    //     }
+    //     try {
+    //         const response = await fetch(
+    //             this.domains.auth, {
+    //                 method: "POST",
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'x-api-key': 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+    //                     'udid': udid,
+    //                     'authCode': authCode,
+    //                 },
+    //                 body: '',
+    //             }
+    //         );
+    //         const result = await response.json();
+    //         return result.body.randomId
+    //     } catch (error) {
+    //         console.error(`Error while calling auth API: ${error.message}`);
+    //         return null
+    //     }
+    // }
 
     async fetchFloatingComment(itemId, userId, type) {
+        console.log('type, ', type);
         try {
             // URL에 itemId를 포함시켜 GET 요청 보내기
             const url = `${this.domains.recommend}?itemId=${itemId}&userId=${userId}&commentType=${type}`;
@@ -371,10 +433,10 @@ class FloatingButton {
             const url = this.domains.log;
 
             const payload = {
-                event_category: String(event),
-                visitorId: String(this.userId),
-                itemId: String(this.itemId),
-                clientId: `${this.clientId}_${loc}`,
+                event_category: event,
+                visitorId: this.userId,
+                itemId: this.itemId,
+                partnerType: `${this.partnerType}_${loc}`,
                 channelId: this.isMobileDevice ? 'mobile' : 'web',
             }
 
@@ -426,28 +488,31 @@ class FloatingButton {
     }
 
     enableExpandTimer(mode) {
-        if (this.needsTimer) {
-            clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
-        }
-        if (mode === 'on') {
-            this.needsTimer = setTimeout(() => {
-                this.updateParameter({type: 'needs'});
-            }, 10000);
-        }
-        else if (mode === 'off') {
-            clearTimeout(this.needsTimer);  // 타이머 클리어
+        if (this.type === 'default') return;
+        else {
+            if (this.needsTimer) {
+                clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
+            }
+            if (mode === 'on') {
+                this.needsTimer = setTimeout(() => {
+                    this.updateParameter({type: 'needs'});
+                }, 10000);
+            }
+            else if (mode === 'off') {
+                clearTimeout(this.needsTimer);  // 타이머 클리어
+            }
         }
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        window.gtag('event', 'iconClicked', {
-            event_category: 'SDKFloatingClicked',
-            event_label: 'User clicked SDK floating button',
-            itemId: this.itemId,
-            clientId: this.clientId,
-            type: this.type,
-            commentType: (this.type === 'this' ? this.commentType : ''),
-        })
+        // window.gtag('event', 'iconClicked', {
+        //     event_category: 'SDKFloatingClicked',
+        //     event_label: 'User clicked SDK floating button',
+        //     itemId: this.itemId,
+        //     partnerType: this.partnerType,
+        //     type: this.type,
+        //     commentType: (this.type === 'this' ? this.commentType : ''),
+        // })
         this.logEvent('SDKFloatingClicked');
         this.enableExpandTimer('off');
         
