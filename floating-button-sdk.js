@@ -371,9 +371,9 @@ class FloatingButton {
             const url = this.domains.log;
 
             const payload = {
-                event_category: event,
-                visitorId: this.userId,
-                itemId: this.itemId,
+                event_category: String(event),
+                visitorId: String(this.userId),
+                itemId: String(this.itemId),
                 clientId: `${this.clientId}_${loc}`,
                 channelId: this.isMobileDevice ? 'mobile' : 'web',
             }
