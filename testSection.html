@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/floating-button-sdk.css">
+    <link rel="stylesheet" href="/recommend-section-sdk-cafe24.css">
     <link rel="stylesheet" href="/global.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-K6R9Z9D8EP"></script>
@@ -48,7 +48,7 @@
                     var method = args[0]; 
                     var params = args[1]; 
                     if (method === 'boot') { 
-                        fb = new w.FloatingButton(params); 
+                        fb = new w.RecommendSection(params); 
                     } else if (method === 'update') { 
                         fb.updateParameter(params); 
                     } else if (method === 'unmount') {
@@ -62,29 +62,20 @@
                     var s = document.createElement("script"); 
                     s.type = "text/javascript"; 
                     s.async = true; 
-                    s.src = "/floating-button-sdk.js"; 
+                    s.src = "/recommend-section-sdk-cafe24.js"; 
                     s.onload = () => { 
                         while (ge.q.length) { 
                             var args = ge.q.shift();
                             ge.process(args); 
                         };  
-                        var sl = () => {handleScroll(w, sl)}
-                        w.addEventListener("scroll", sl) 
+                        // var sl = () => {handleScroll(w, sl)}
+                        // w.addEventListener("scroll", sl) 
                         w.addEventListener("message", ()=>{})
                     }; 
                     var x = document.getElementsByTagName("script")[0]; 
                     if (x.parentNode) { 
                         x.parentNode.insertBefore(s, x) 
                     }; 
-                }; 
-                function handleScroll(tn, sl) {  
-                    var st = tn.scrollY; 
-                    var dh = document.getElementById('gentoo-sc').clientHeight;
-                    var sp = st / (dh - tn.innerHeight); 
-                    if (sp >= 0.6) { 
-                        ge.process(['update', { type: 'needs' }]); 
-                        tn.removeEventListener('scroll', sl); 
-                    } 
                 }; 
                 if (document.readyState === "complete") { 
                     l(); 
@@ -96,12 +87,12 @@
         )(window, document);
 
 
-        GentooIO('boot', {
-            clientId: 'dlst',
-            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
-            authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
-            itemId: '31900',
-        })
+        // GentooIO('boot', {
+        //     clientId: 'dlst',
+        //     udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
+        //     authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
+        //     itemId: '31900',
+        // })
 
         // GentooIO('unmount', {});
     </script>
@@ -110,6 +101,17 @@
             <div style="display: flex; flex-direction: column; align-items: stretch; height: 100%;">
                 <div style="width: 100%; height: 400px; background: skyblue;">
                     box1
+                </div>
+                <div id="gentoo-recommend-section">
+                    <script>
+                        GentooIO('boot', {
+                            clientId: 'dlst',
+                            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
+                            authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
+                            itemId: '31900',
+                            container: 'gentoo-recommend-section',
+                        })
+                    </script>
                 </div>
                 <div style="display: flex; width: 100%; height: fit-content";>
                     <div style="flex: 1; height: 300px; background: cornflowerblue;">
