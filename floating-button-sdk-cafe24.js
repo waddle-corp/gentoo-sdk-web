@@ -1,15 +1,23 @@
 class FloatingButton {
     constructor(props) {
         this.partnerType = props.partnerType;
-        this.partnerId;
+        this.partnerId = props.partnerId;
+        this.chatbotId = props.chatbotId;
         this.chatUserId;
         this.udid = props.udid;
         this.authCode = props.authCode;
         this.itemId = props.itemId || 'general';
+        this.displayLocation;
         this.type = props.type || 'default';
         this.userId = '';
         this.floatingComment = [];
         this.floatingProduct = {};
+        this.floatingPos = {
+            top: null,
+            bottom: 200,
+            left: null,
+            right: 0,
+        }
         this.chatUrl = '';
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -56,7 +64,7 @@ class FloatingButton {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         }
-        // if (false) {
+        if (false) {
             ((CAFE24API) => {
                 // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
                 console.log('mall Id', CAFE24API.MALL_ID);
@@ -78,7 +86,7 @@ class FloatingButton {
                  client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
                  version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
              }));
-        // }
+        }
 
         this.fetchFloatingComment(this.itemId, this.chatUserId, this.type)
             .then(floatingComment => {
@@ -91,7 +99,13 @@ class FloatingButton {
                 }
                 // partnerId에 지금은 mallId가 들어가있음, 실제 partnerId로 변환해서 받아오는 과정 필요.
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&cbid=${37}&ch=${this.isMobileDevice}&i=${false}&cuid=${this.chatUserId}`;
-                if (!this.isDestroyed) this.init('general', this.type, this.chatUrl);
+                this.fetchPosition(this.partnerId, this.chatbotId)
+                    .then(pos => {
+                        this.floatingPos.bottom = pos.bottom;
+                        this.floatingPos.right = pos.right;
+                        if (this.partnerType === 'cafe24') {this.itemId = this.getProductNo()};
+                        if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
+                });
             }).catch(error => {
                 console.error(`Error while constructing FloatingButton: ${error}`);
             })
@@ -133,6 +147,7 @@ class FloatingButton {
         //     partnerType: this.partnerType,
         //     type: this.type,
         // })
+        console.log('init itemId', itemId);
         this.logEvent('SDKFloatingRendered');
         this.remove(this.button, this.expandedButton, this.iframeContainer);
         this.itemId = itemId;
@@ -164,15 +179,19 @@ class FloatingButton {
         // this.targetElem.appendChild(this.iframeContainer);
 
         // Create floating button
+        this.floatingContainer = document.createElement('div');
+        this.floatingContainer.className = `floating-container`;
+        this.floatingContainer.style.bottom = `${this.floatingPos.bottom}px`;
+        this.floatingContainer.style.right = `${this.floatingPos.right}px`;
         this.button = document.createElement('div');
         this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
 
         // Editable button position, need to get variables for pos data
-        // this.button.style.bottom = '110px';
-        // this.button.style.right = '110px';
         document.body.appendChild(this.iframeContainer);
-        document.body.appendChild(this.button);
+        document.body.appendChild(this.floatingContainer);
+        this.floatingContainer.appendChild(this.button);
+        // document.body.appendChild(this.button);
 
         // Log when finishing UI rendering
         this.logEvent('SDKFloatingRendered');
@@ -184,8 +203,7 @@ class FloatingButton {
                 this.expandedText = document.createElement('p');
                 this.expandedButton.appendChild(this.expandedText);
                 this.expandedText.className = 'expanded-area-text';
-                document.body.appendChild(this.expandedButton);
-                // this.expandedText.innerText = this.floatingComment || '...';
+                this.floatingContainer.appendChild(this.expandedButton);
                 // 각 글자를 1초 간격으로 추가하기 위한 함수
                 let i = 0;
                 const addLetter = () => {
@@ -199,7 +217,6 @@ class FloatingButton {
                 // 첫 호출 시작
                 addLetter();
                 this.floatingCount += 1;
-                // this.init(this.itemId, this.type, this.chatUrl)
             }, 3000)
         }
         
@@ -428,6 +445,28 @@ class FloatingButton {
         }
     }
 
+    async fetchPosition(partnerId, chatbotId) {
+        console.log('fetchPosition called');
+        try {
+            const url = `https://slch7uufzk.execute-api.ap-northeast-2.amazonaws.com/api/chatbot/v1/${partnerId}/${chatbotId}`;
+            const payload = {
+                partnerId: partnerId,
+                chatbotId: chatbotId,
+            }
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // body: JSON.stringify(payload),
+            })
+            const res = await response.json();
+            return res.position;
+        } catch (error) {
+            console.error(`Error while calling fetchPosition API: ${error}`)
+        }
+    }
+
     async logEvent(event, loc) {
         try {
             const url = this.domains.log;
@@ -553,18 +592,56 @@ class FloatingButton {
         return width;
     }
 
-    // replaceAmpersand(obj) {
-    //     // 객체의 각 키에 대해 순회
-    //     for (let key in obj) {
-    //         if (typeof obj[key] === 'string') {
-    //             // 값이 문자열인 경우 &를 @@으로 치환
-    //             obj[key] = obj[key].replace(/&/g, '@@');
-    //         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-    //             // 값이 객체나 배열인 경우 재귀적으로 함수 호출
-    //             this.replaceAmpersand(obj[key]);
-    //         }
-    //     }
-    // }
+    /**
+     * 현재 URL 또는 주어진 URL에서 product_no 값을 추출하는 함수
+     * 
+     * @param {string} [urlString=window.location.href] - 분석할 URL 문자열
+     * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
+     */
+    getProductNo(urlString = window.location.href) {
+        console.log('urlString: ', urlString)
+        
+        if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
+        else if (urlString.includes('/category')) {this.displayLocation === 'PRODUCT_LIST'}
+        else {this.displayLocation === 'HOME'}
+
+        try {
+            // URL 객체 생성
+            const url = new URL(urlString);
+    
+            // 1. 쿼리 파라미터에서 product_no 추출 시도
+            const productNoFromQuery = url.searchParams.get('product_no');
+            console.log('productNoFromQuery', productNoFromQuery);
+            if (productNoFromQuery) {
+                return productNoFromQuery;
+            }
+    
+            // 2. 경로 기반 URL에서 product_no 추출 시도
+            const path = url.pathname;
+            console.log('path', path);
+    
+            /**
+             * 정규 표현식 설명:
+             * ^\/product\/            - '/product/'로 시작
+             * [^\/]+\/                - 상품명 (슬래시가 아닌 문자들) 다음에 슬래시
+             * ([^\/]+)\/              - product_no 캡처 그룹 (슬래시가 아닌 문자들) 다음에 슬래시
+             * category\/[^\/]+\/      - '/category/' 다음에 category_no 그리고 슬래시
+             * display\/[^\/]+\/?$     - '/display/' 다음에 display_group_no 그리고 슬래시 또는 끝
+             */
+            const regex = /^\/product\/[^\/]+\/([^\/]+)\/category\/[^\/]+\/display\/[^\/]+\/?$/;
+    
+            const match = path.match(regex);
+            if (match && match[1]) {
+                return match[1];
+            }
+    
+            // 3. 찾을 수 없는 경우 null 반환
+            return null;
+        } catch (error) {
+            console.error('Invalid URL:', error);
+            return null;
+        }
+    }
 }
 
 // Export as a global variable

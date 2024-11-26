@@ -1,5 +1,9 @@
 (
     function (global, document) {
+        const script = document.currentScript;
+        const urlParams = new URLSearchParams(script.src.split('?')[1]);
+        const partnerId = urlParams.get('ptid');
+        const chatbotId = urlParams.get('cbid');
         var w = global;
         if (w.GentooIO) { 
             return w.console.error("GentooIO script included twice"); 
@@ -27,8 +31,8 @@
         }
     
         // Inject the CSS automatically
-        injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
-        // injectCSS('./floating-button-sdk-cafe24.css');
+        // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+        injectCSS('./floating-button-sdk-cafe24.css');
   
         var fb = null; 
         var ge = function () { 
@@ -41,6 +45,9 @@
         ge.process = function (args) { 
             var method = args[0]; 
             var params = args[1]; 
+            params['partnerId'] = partnerId;
+            params['chatbotId'] = chatbotId;
+            console.log('params, ', params)
             if (method === 'boot') { 
                 fb = new w.FloatingButton(params); 
             } else if (method === 'update') { 
@@ -56,15 +63,13 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js"; 
-            // s.src = "./floating-button-sdk-cafe24.js";
+            // s.src = "https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js"; 
+            s.src = "./floating-button-sdk-cafe24.js";
             s.onload = () => { 
                 while (ge.q.length) { 
                     var args = ge.q.shift();
                     ge.process(args); 
                 };  
-                var sl = () => {handleScroll(w, sl)}
-                w.addEventListener("scroll", sl) 
                 w.addEventListener("message", ()=>{})
             }; 
             var x = document.getElementsByTagName("script")[0]; 

@@ -29,33 +29,33 @@
 </head>
 <body>
     <script>
-        // (function (global, document) {var w = global;if (w.GentooIO) {return w.console.error("GentooIO script included twice");};var fb = null;var ge = function () {ge.c(arguments);};ge.q = [];ge.c = function (args) {ge.q.push(args)};ge.process = function (args) {var method = args[0];var params = args[1];if (method === 'boot') {fb = new w.FloatingButton(params);} else if (method === 'update') {fb.updateParameter(params);};};w.GentooIO = ge;function l() {if (w.GentooIOInitialized) {return};w.GentooIOInitialized = true;var s = document.createElement("script");s.type = "text/javascript";s.async = true;s.src = "/floating-button-sdk.js";s.onload = () => {while(ge.q.length) {var args = ge.q.shift();ge.process(args);};var sc = document.getElementById('gentoo-sc');if (sc) {sc.addEventListener("scroll", handleScroll)};};var x = document.getElementsByTagName("script")[0];if (x.parentNode) {x.parentNode.insertBefore(s, x)};};function handleScroll() {var sc = document.getElementById('gentoo-sc');var st = sc.scrollTop;var dh = sc.scrollHeight - sc.clientHeight;var sp = st / dh;if (sp >= 0.6) {console.log('sp >= 0.6', st, dh, sp);ge.process(['update', {type: 'needs'}]);sc.removeEventListener('scroll', handleScroll);}};if (document.readyState === "complete") {l();} else {w.addEventListener("DOMContentLoaded", l);w.addEventListener("load", l);};}) (window, document);
+        // (function (global, document) {var w = global;if (w.GentooIO) {return w.console.error("GentooIO script included twice");};var rs = null;var ge = function () {grs.c(arguments);};grs.q = [];grs.c = function (args) {grs.q.push(args)};grs.process = function (args) {var method = args[0];var params = args[1];if (method === 'boot') {rs = new w.FloatingButton(params);} else if (method === 'update') {rs.updateParameter(params);};};w.GentooIO = ge;function l() {if (w.GentooIOInitialized) {return};w.GentooIOInitialized = true;var s = document.createElement("script");s.type = "text/javascript";s.async = true;s.src = "/floating-button-sdk.js";s.onload = () => {while(grs.q.length) {var args = grs.q.shift();grs.process(args);};var sc = document.getElementById('gentoo-sc');if (sc) {sc.addEventListener("scroll", handleScroll)};};var x = document.getElementsByTagName("script")[0];if (x.parentNode) {x.parentNode.insertBefore(s, x)};};function handleScroll() {var sc = document.getElementById('gentoo-sc');var st = sc.scrollTop;var dh = sc.scrollHeight - sc.clientHeight;var sp = st / dh;if (sp >= 0.6) {console.log('sp >= 0.6', st, dh, sp);grs.process(['update', {type: 'needs'}]);sc.removeEventListener('scroll', handleScroll);}};if (document.readyState === "complete") {l();} else {w.addEventListener("DOMContentLoaded", l);w.addEventListener("load", l);};}) (window, document);
         (
             function (global, document) {
                 var w = global;
-                if (w.GentooIO) { 
-                    return w.console.error("GentooIO script included twice"); 
+                if (w.GentooRS) { 
+                    return w.console.error("GentooRS script included twice"); 
                 }; 
-                var fb = null; 
-                var ge = function () { 
-                    ge.c(arguments); 
+                var rs = null; 
+                var grs = function () { 
+                    grs.c(arguments); 
                 }; 
-                ge.q = []; 
-                ge.c = function (args) { 
-                    ge.q.push(args) 
+                grs.q = []; 
+                grs.c = function (args) { 
+                    grs.q.push(args) 
                 }; 
-                ge.process = function (args) { 
+                grs.process = function (args) { 
                     var method = args[0]; 
                     var params = args[1]; 
                     if (method === 'boot') { 
-                        fb = new w.RecommendSection(params); 
+                        rs = new w.RecommendSection(params); 
                     } else if (method === 'update') { 
-                        fb.updateParameter(params); 
+                        rs.updateParameter(params); 
                     } else if (method === 'unmount') {
-                        fb.destroy();
+                        rs.destroy();
                     }
                 }; 
-                w.GentooIO = ge; 
+                w.GentooRS = grs; 
                 function l() { 
                     if (w.GentooIOInitialized) { return }; 
                     w.GentooIOInitialized = true; 
@@ -64,9 +64,9 @@
                     s.async = true; 
                     s.src = "/recommend-section-sdk-cafe24.js"; 
                     s.onload = () => { 
-                        while (ge.q.length) { 
-                            var args = ge.q.shift();
-                            ge.process(args); 
+                        while (grs.q.length) { 
+                            var args = grs.q.shift();
+                            grs.process(args); 
                         };  
                         // var sl = () => {handleScroll(w, sl)}
                         // w.addEventListener("scroll", sl) 
@@ -104,7 +104,7 @@
                 </div>
                 <div id="gentoo-recommend-section">
                     <script>
-                        GentooIO('boot', {
+                        GentooRS('boot', {
                             clientId: 'dlst',
                             udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
                             authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',

@@ -5,6 +5,8 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.itemId = props.itemId || '23310';
         this.type = props.type || 'this';
+        this.displayLocation = props.displayLocation || 'HOME';
+        //TODO: constant file for display location code
         this.userId = '';
         this.floatingComment = [];
         this.floatingProduct = {};
