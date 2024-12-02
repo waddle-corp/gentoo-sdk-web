@@ -35,7 +35,7 @@ class FloatingButton {
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
-                auth: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/auth',
+                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
                 recommend: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/dlst/recommend',
                 log: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/userEvent',
             }
@@ -56,7 +56,7 @@ class FloatingButton {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             // this.hostSrc = 'https://accio-webclient-git-feat-gent-670-waddle.vercel.app';
             this.domains = {
-                auth: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/auth',
+                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
                 recommend: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/dlst/recommend',
                 log: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/userEvent',
             }
@@ -110,30 +110,6 @@ class FloatingButton {
                 console.error(`Error while constructing FloatingButton: ${error}`);
             })
 
-        // this.handleAuth(this.udid, this.authCode)
-        //     .then(userId => {
-        //         this.userId = userId;
-        //         this.fetchFloatingComment(this.itemId, this.userId, this.type)
-        //             .then(floatingComment => {
-        //                 console.log('comment', floatingComment[0]);
-        //                 if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-        //                     this.floatingComment = floatingComment[0];
-        //                     this.commentType = floatingComment[1];
-        //                     this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-        //                     if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-        //                 } else {
-        //                     // client variable required in chatUrl for the future
-        //                     this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-        //                     if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
-        //                 }
-        //             }).catch(error => {
-        //                 console.error(`Error while constructing FloatingButton: ${error}`);
-        //             })
-        //     }).catch(error => {
-        //         console.error(`Error while calling handleAuth func: ${error}`);
-        //     })
-        
-
         this.prevPosition = null;
         this.scrollPosition = 0;
         this.scrollDir = '';
@@ -154,11 +130,18 @@ class FloatingButton {
         this.type = type;
         this.chatUrl = chatUrl;
 
+        // Create UI elements after data is ready
+        this.createUIElements();
+
+        // Log when finishing UI rendering
+        this.logEvent('SDKFloatingRendered');
+    }
+
+    // Separate UI creation into its own method for clarity
+    createUIElements() {
         // Create iframe elements
-        // this.targetElem = document.getElementsByClassName('floating-button-common')[0];
         this.dimmedBackground = document.createElement('div');
         this.dimmedBackground.className = 'dimmed-background hide';
-        // this.dimmedBackground.className = 'dimmed-background';
         this.iframeContainer = document.createElement('div');
         this.iframeContainer.className = 'iframe-container iframe-container-hide';
         
@@ -174,9 +157,7 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        // this.iframeContainer.appendChild(this.dimmedBackground);
         document.body.appendChild(this.dimmedBackground);
-        // this.targetElem.appendChild(this.iframeContainer);
 
         // Create floating button
         this.floatingContainer = document.createElement('div');
@@ -191,7 +172,6 @@ class FloatingButton {
         document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.floatingContainer);
         this.floatingContainer.appendChild(this.button);
-        // document.body.appendChild(this.button);
 
         // Log when finishing UI rendering
         this.logEvent('SDKFloatingRendered');
@@ -217,9 +197,8 @@ class FloatingButton {
                 // 첫 호출 시작
                 addLetter();
                 this.floatingCount += 1;
-            }, 3000)
+            }, 3000);
         }
-        
 
         this.elems = {
             iframeContainer: this.iframeContainer,
@@ -229,6 +208,11 @@ class FloatingButton {
             expandedButton: this.expandedButton,
         }
 
+        // Add event listeners
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
         // Button click event
         var buttonClickHandler = (e) => {
             e.stopPropagation();
@@ -262,7 +246,6 @@ class FloatingButton {
             setTimeout(() => {
                 if (this.expandedButton) {
                     this.expandedButton.innerText = '';
-                    // this.expandedButton.style.width = '50px';
                     this.expandedButton.style.padding = 0;
                     this.expandedButton.style.border = 'none';
                     this.expandedButton.style.boxShadow = 'none';

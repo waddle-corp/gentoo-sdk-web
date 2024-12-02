@@ -1,26 +1,35 @@
-/* floating-button-sdk.min.css */
-.floating-button-common {
+.floating-container {
+    width: fit-content;
+    height: fit-content;
     position: fixed;
-    bottom: 110px;
-    right: 16px;
+    bottom: 66px;
+    right: 0;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.floating-button-common {
+    /* position: fixed;
+    bottom: 66px;
+    right: 0px; */
     background-size: contain;
     color: white;
     border: none;
     cursor: pointer;
     z-index: 1000;
 
-    @media screen and (min-width: 600px) {
-        bottom: 90px;
-        right: 24px;
-    }
+    /* @media screen and (min-width: 600px) {
+        bottom: 66px;
+        right: 0px;
+    } */
 }
 
 .button-image {
-    width: 54px;
-    height: 54px;
-    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
-    border-radius: 50%;
-    background-image: url('public/img/units/floating-gentoo.png');
+    width: 78px;
+    height: 80px;
+    /* box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
+    border-radius: 50%; */
+    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif');
 }
 
 .button-image-close {
@@ -36,7 +45,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('/img/units/sdk-floating-close.png');
+    background-image: url('public/img/units/sdk-floating-close.png');
     margin-right: 24px;
 }
 
@@ -53,7 +62,7 @@
     right: 16px;
     width: fit-content;
     max-width: 300px;
-    max-height: 50px;
+    height: 50px;
     background: #fff;
     border: 1px solid #222;
     border-radius: 795px;
@@ -74,6 +83,54 @@
     }
 }
 
+.expanded-area-shrink {
+    position: fixed;
+    bottom: 70px;
+    right: 78px;
+    width: 0;
+    height: fit-content;
+    padding: 0;
+    background-color: #222;
+    border-radius: 12px 0 12px 12px;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.expanded-area {
+    /* position: fixed;
+    bottom: 70px;
+    right: 78px; */
+    width: fit-content;
+    height: fit-content;
+    padding: 12px 14px;
+    margin-top: 20px;
+    background-color: #222;
+    border-radius: 12px 0 12px 12px;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: all 0.5s;
+}
+
+.expanded-area-text {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 600;
+    width: fit-content;
+    max-width: 220px;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    white-space: pre-wrap;
+    -webkit-line-clamp: 2; 
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
 .expanded-text {
     font-family: "pretendard";
     font-size: 14px;
@@ -84,7 +141,8 @@
     display: -webkit-box;
     margin: 0;
     cursor: pointer;
-    -webkit-line-clamp: 1; 
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
 }
 
