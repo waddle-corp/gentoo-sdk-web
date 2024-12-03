@@ -75,8 +75,8 @@ class FloatingButton {
                 version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
             }));
 
-        this.partnerId='672c5e9d45c48a1e578efae4';
-        this.chatUserId='1234567890';
+        // this.partnerId='672c5e9d45c48a1e578efae4';
+        // this.chatUserId='1234567890';
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
