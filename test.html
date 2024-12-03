@@ -138,16 +138,19 @@
             }
         )(window, document);
 
-
+        // Initialize GentooIO parameters
         GentooIO('boot', {
-            partnerType: 'dlst',
-            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
+            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed', // optional, only for dlst
             authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
             partnerId: '6718be2310310e41ab5276ef',
+            itemId: '1234', // optional, only @PRODUCT_DETAIL page
+            displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
         })
 
+        // Render Floating Button
         GentooIO('init', {});
 
+        // Send Log
         GentooIO('sendLog', {
             eventCategory: 'purchase-complete',
             partnerId: '6718be2310310e41ab5276ef',
