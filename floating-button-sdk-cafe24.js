@@ -51,29 +51,29 @@ class FloatingButton {
         }
 
         // fetch cafe24 mallId
-        // ((CAFE24API) => {
-        //     // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
-        //     this.partnerId = CAFE24API.MALL_ID;
+        ((CAFE24API) => {
+            // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
+            this.partnerId = CAFE24API.MALL_ID;
 
-        //     CAFE24API.getCustomerIDInfo((err, res) => {
-        //         if (err) {
-        //             console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
-        //         } else {
-        //             if (res.id.member_id) {
-        //                 this.chatUserId = res.id.member_id;
-        //             } else {
-        //                 this.chatUserId = res.id['guest_id'];
-        //             }
-        //         }
-        //     });
+            CAFE24API.getCustomerIDInfo((err, res) => {
+                if (err) {
+                    console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
+                } else {
+                    if (res.id.member_id) {
+                        this.chatUserId = res.id.member_id;
+                    } else {
+                        this.chatUserId = res.id['guest_id'];
+                    }
+                }
+            });
             
-        //     })(CAFE24API.init({
-        //         client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
-        //         version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
-        //     }));
+            })(CAFE24API.init({
+                client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
+                version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
+            }));
 
-        this.partnerId='672c5e9d45c48a1e578efae4';
-        this.chatUserId='1234567890';
+        // this.partnerId='672c5e9d45c48a1e578efae4';
+        // this.chatUserId='1234567890';
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
@@ -166,13 +166,13 @@ class FloatingButton {
             products: [],
         });
 
-        window.gtag('event', 'GentooPopped', {
-            event_category: 'SDKFloatingRendered',
-            event_label: 'SDK floating button is rendered',
-            itemId: this.itemId,
-            clientId: this.partnerId,
-            type: this.type,
-        });
+        // window.gtag('event', 'GentooPopped', {
+        //     event_category: 'SDKFloatingRendered',
+        //     event_label: 'SDK floating button is rendered',
+        //     itemId: this.itemId,
+        //     clientId: this.partnerId,
+        //     type: this.type,
+        // });
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
