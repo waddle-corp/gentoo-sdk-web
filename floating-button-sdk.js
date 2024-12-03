@@ -4,7 +4,7 @@ class FloatingButton {
         if (!props.partnerId || !props.authCode || !props.udid) {
             throw new Error('Missing required parameters: partnerId, authCode, and udid are required');
         }
-
+        this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
         this.udid = props.udid;
@@ -24,9 +24,9 @@ class FloatingButton {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-                recommend: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/dlst/recommend',
                 log: 'https://7u6bc0lsf4.execute-api.ap-northeast-2.amazonaws.com/userEvent',
                 chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
+                floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
@@ -35,9 +35,9 @@ class FloatingButton {
             this.hostSrc = 'https://demo.gentooai.com';
             this.domains = {
                 auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
-                recommend: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/dlst/recommend',
                 log: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/userEvent',
                 chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
+                floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
             }
             this.keys = {
                 log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
@@ -46,9 +46,9 @@ class FloatingButton {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-                recommend: 'https://hg5eey52l4.execute-api.ap-northeast-2.amazonaws.com/dev/dlst/recommend',
                 log: 'https://7u6bc0lsf4.execute-api.ap-northeast-2.amazonaws.com/userEvent',
                 chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
+                floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
@@ -94,25 +94,10 @@ class FloatingButton {
             if (!this.floatingData) {
                 throw new Error('Failed to fetch floating data');
             }
-
-            window.gtag('event', 'GentooPopped', {
-                event_category: 'SDKFloatingRendered',
-                event_label: 'SDK floating button is rendered',
-                itemId: this.itemId,
-                clientId: this.partnerId,
-                type: this.type,
-            });
-            
-            this.logEvent({
-                eventCategory: 'SDKFloatingRendered',
-                partnerId: this.partnerId,
-                chatUserId: this.chatUserId,
-                products: [],
-            });
             
             this.remove(this.button, this.expandedButton, this.iframeContainer);
             
-            this.chatUrl = `${this.hostSrc}/chatroute/gentoo?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
 
             // Create UI elements after data is ready
             this.createUIElements();
@@ -157,6 +142,21 @@ class FloatingButton {
         document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.floatingContainer);
         this.floatingContainer.appendChild(this.button);
+
+        this.logEvent({
+            eventCategory: 'SDKFloatingRendered',
+            partnerId: this.partnerId,
+            chatUserId: this.chatUserId,
+            products: [],
+        });
+
+        window.gtag('event', 'GentooPopped', {
+            event_category: 'SDKFloatingRendered',
+            event_label: 'SDK floating button is rendered',
+            itemId: this.itemId,
+            clientId: this.partnerId,
+            type: this.type,
+        });
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
@@ -317,9 +317,10 @@ class FloatingButton {
         this.button = null;
         this.expandedButton = null;
         this.iframeContainer = null;
+        this.floatingContainer = null;
         this.chatUserId = null;
-        this.floatingComment = null;
-        this.floatingProduct = null;
+        this.floatingData = null;
+        this.chatbotData = null;
         this.chatUrl = null;
 
         console.log('FloatingButton instance destroyed');
@@ -357,7 +358,7 @@ class FloatingButton {
 
     async fetchChatUserId (userToken, udid = '') {
         try {
-            const url = this.domains.auth + `?userToken=${userToken}&udid=${udid}`;
+            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -372,7 +373,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const url = `https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot/${partnerId}`;
+            const url = `${this.domains.chatbot}/${partnerId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -386,14 +387,13 @@ class FloatingButton {
 
     async fetchFloatingData (partnerId) {
         try {
-            const url = `https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating/${partnerId}?displayLocation=HOME`;
+            const url = `${this.domains.floating}/${partnerId}?displayLocation=HOME`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
             });
 
             const res = await response.json();
-            console.log('fetchFloatingData res: ', res);
             return res;
         } catch (error) {
             console.error(`Error while calling fetchFloatingData API: ${error}`)
@@ -454,7 +454,12 @@ class FloatingButton {
             type: this.type,
             commentType: (this.type === 'this' ? this.commentType : ''),
         })
-        // this.logEvent('SDKFloatingClicked');
+        this.logEvent({
+            eventCategory: 'SDKFloatingClicked',
+            partnerId: this.partnerId,
+            chatUserId: this.chatUserId,
+            products: [],
+        });
         this.enableExpandTimer('off');
         
         var isChatOpenState = {
@@ -506,7 +511,6 @@ class FloatingButton {
                 chatUserId: String(this.chatUserId),
                 products: input.products,
             }
-            console.log('chatUserId, ', this.chatUserId);
 
             return this.logEvent(payload);
         } catch (error) {
