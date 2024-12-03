@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/floating-button-sdk.css">
+    <link rel="stylesheet" href="/global.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-K6R9Z9D8EP"></script>
     <script>
@@ -46,12 +47,55 @@
                 ge.process = function (args) { 
                     var method = args[0]; 
                     var params = args[1]; 
+                    
+                    // Allow boot method anytime
                     if (method === 'boot') { 
-                        fb = new w.FloatingButton(params); 
-                    } else if (method === 'update') { 
-                        fb.updateParameter(params); 
-                    } else if (method === 'unmount') {
-                        fb.destroy();
+                        try {
+                            fb = new w.FloatingButton(params); 
+                        } catch (error) {
+                            console.error('Failed to create FloatingButton instance:', error);
+                        }
+                        return;
+                    }
+                    
+                    // For all other methods, ensure FloatingButton instance exists
+                    if (!fb) {
+                        console.error('GentooIO: Must call boot() before using this method');
+                        return;
+                    }
+
+                    // Process other methods
+                    switch (method) {
+                        case 'init':
+                            if (typeof fb.init === 'function') {
+                                Promise.resolve(fb.init()).catch(error => {
+                                    console.error('Failed to initialize GentooIO:', error);
+                                });
+                            }
+                            break;
+                        case 'update':
+                            if (typeof fb.updateParameter === 'function') {
+                                Promise.resolve(fb.updateParameter(params)).catch(error => {
+                                    console.error('Failed to update GentooIO parameters:', error);
+                                });
+                            }
+                            break;
+                        case 'unmount':
+                            if (typeof fb.destroy === 'function') {
+                                Promise.resolve(fb.destroy()).catch(error => {
+                                    console.error('Failed to unmount GentooIO:', error);
+                                });
+                            }
+                            break;
+                        case 'sendLog':
+                            if (typeof fb.sendLog === 'function') {
+                                Promise.resolve(fb.sendLog(params)).catch(error => {
+                                    console.error('Failed to send GentooIO log:', error);
+                                });
+                            }
+                            break;
+                        default:
+                            console.error('GentooIO: Unknown method', method);
                     }
                 }; 
                 w.GentooIO = ge; 
@@ -96,10 +140,28 @@
 
 
         GentooIO('boot', {
-            clientId: 'dlst',
+            partnerType: 'dlst',
             udid: 'd02a7e31-3727-4e72-8768-88d06d313eed',
             authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
-            itemId: '31900',
+            partnerId: '6718be2310310e41ab5276ef',
+        })
+
+        GentooIO('init', {});
+
+        GentooIO('sendLog', {
+            eventCategory: 'purchase-complete',
+            partnerId: '6718be2310310e41ab5276ef',
+            userToken: 'testestset',
+            products: [
+                {
+                    itemId: '111',
+                    quantity: 1,
+                },
+                {
+                    itemId: '222',
+                    quantity: 2,
+                }
+            ],
         })
 
         // GentooIO('unmount', {});
