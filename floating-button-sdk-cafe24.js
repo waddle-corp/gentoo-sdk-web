@@ -56,7 +56,12 @@ class FloatingButton {
         // fetch cafe24 mallId
         ((CAFE24API) => {
             // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
-            this.partnerId = this.fetchPartnerId(CAFE24API.MALL_ID);
+            this.bootPromise = Promise.all([
+                this.partnerId = this.fetchPartnerId(CAFE24API.MALL_ID),
+            ]).catch(error => {
+                console.error(`Error during fetchPartnerId: ${error}`);
+                throw error;
+            });
 
             CAFE24API.getCustomerIDInfo((err, res) => {
                 if (err) {
