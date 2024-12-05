@@ -27,8 +27,8 @@
         }
     
         // Inject the CSS automatically
-        // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
-        injectCSS('./floating-button-sdk-cafe24.css');
+        injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+        // injectCSS('./floating-button-sdk-cafe24.css');
         
         var fb = null; 
         var ge = function () { 
@@ -99,7 +99,7 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "/floating-button-sdk-cafe24.js"; 
+            s.src = "https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js"; 
             s.onload = () => { 
                 while (ge.q.length) { 
                     var args = ge.q.shift();
