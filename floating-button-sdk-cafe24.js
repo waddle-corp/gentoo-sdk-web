@@ -71,10 +71,12 @@ class FloatingButton {
 
             this.bootPromise = Promise.all([
                 this.fetchPartnerId(CAFE24API.MALL_ID).then(partnerId => {
+                    console.log('fetchPartnerId', partnerId);
                     this.partnerId = partnerId;
                 }),
                 getCustomerIDInfoPromise().then(res => {
                     // Now you can work with the full response
+                    console.log('getCustomerIDInfoPromise', res)
                     if (res.id.member_id) {
                         this.chatUserId = res.id.member_id;
                     } else {
@@ -90,6 +92,8 @@ class FloatingButton {
             client_id : 'ckUs4MK3KhZixizocrCmTA',
             version : '2022-12-01'
         }));
+        console.log('chatUserId', this.chatUserId);
+        console.log('partnerId after bootPromise', this.partnerId);
 
         // this.partnerId='672c5e9d45c48a1e578efae4';
         // this.chatUserId='1234567890';
