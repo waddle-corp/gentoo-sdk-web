@@ -3,7 +3,7 @@ class FloatingButton {
         console.log('constructor called');
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
-        this.chatUserId;
+        this.chatUserId = null;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -53,61 +53,61 @@ class FloatingButton {
             }
         }
 
-        // fetch cafe24 mallId
-        ((CAFE24API) => {
-            // Wrap CAFE24API.getCustomerIDInfo in a Promise
-            const getCustomerIDInfoPromise = () => {
-                return new Promise((resolve, reject) => {
-                    CAFE24API.getCustomerIDInfo((err, res) => {
-                        if (err) {
-                            console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                            reject(err);
-                        } else {
-                            resolve(res); // Resolve with full response
-                        }
+        // Modify the CAFE24API initialization to ensure promises are handled correctly
+        this.bootPromise = new Promise((resolve, reject) => {
+            ((CAFE24API) => {
+                // Wrap CAFE24API methods in Promises
+                const getCustomerIDInfoPromise = () => {
+                    return new Promise((innerResolve, innerReject) => {
+                        CAFE24API.getCustomerIDInfo((err, res) => {
+                            if (err) {
+                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                                innerReject(err);
+                            } else {
+                                innerResolve(res);
+                            }
+                        });
                     });
-                });
-            };
+                };
 
-            this.bootPromise = Promise.all([
-                this.fetchPartnerId(CAFE24API.MALL_ID).then(partnerId => {
-                    console.log('fetchPartnerId', partnerId);
-                    this.partnerId = partnerId;
-                }),
-                getCustomerIDInfoPromise().then(res => {
-                    // Now you can work with the full response
-                    console.log('getCustomerIDInfoPromise', res)
-                    if (res.id.member_id) {
-                        this.chatUserId = res.id.member_id;
-                    } else {
-                        this.chatUserId = res.id['guest_id'];
-                    }
-                    return res; // Return full response if needed later
-                }),
-            ]).catch(error => {
-                console.error(`Error during fetchPartnerId: ${error}`);
-                throw error;
-            });
-        })(CAFE24API.init({
-            client_id : 'ckUs4MK3KhZixizocrCmTA',
-            version : '2022-12-01'
-        }));
-        console.log('chatUserId', this.chatUserId);
-        console.log('partnerId after bootPromise', this.partnerId);
+                // Fetch partner ID first
+                this.fetchPartnerId(CAFE24API.MALL_ID)
+                    .then(partnerId => {
+                        console.log('Fetched partnerId:', partnerId);
+                        this.partnerId = partnerId;
 
-        // this.partnerId='672c5e9d45c48a1e578efae4';
-        // this.chatUserId='1234567890';
+                        // Then get customer ID
+                        return getCustomerIDInfoPromise();
+                    })
+                    .then(res => {
+                        console.log('Customer ID Info:', res);
+                        if (res.id.member_id) {
+                            this.chatUserId = res.id.member_id;
+                        } else {
+                            this.chatUserId = res.id['guest_id'];
+                        }
 
-        // Add a promise to track initialization status
-        this.bootPromise = Promise.all([
-            this.fetchChatbotData(this.partnerId)
-                .then(res => {
-                    if (!res) throw new Error('Failed to fetch chatbot data');
-                    this.chatbotData = res;
-                }),
-        ]).catch(error => {
-            console.error(`Error during initialization: ${error}`);
-            throw error;
+                        // Fetch additional data
+                        return Promise.all([
+                            this.fetchChatbotData(this.partnerId),
+                            this.fetchFloatingData(this.partnerId)
+                        ]);
+                    })
+                    .then(([chatbotData, floatingData]) => {
+                        console.log('Chatbot Data:', chatbotData);
+                        console.log('Floating Data:', floatingData);
+                        this.chatbotData = chatbotData;
+                        this.floatingData = floatingData;
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Initialization error:', error);
+                        reject(error);
+                    });
+            })(CAFE24API.init({
+                client_id : 'ckUs4MK3KhZixizocrCmTA',
+                version : '2022-12-01'
+            }));
         });
     }    
     
@@ -122,19 +122,11 @@ class FloatingButton {
                 return;
             }
 
-            if (!this.chatUserId || !this.chatbotData) {
+            if (!this.chatUserId || !this.chatbotData || !this.floatingData) {
                 throw new Error('Required data not yet loaded');
             }
 
             this.isInitialized = true;
-            
-            // Fetch floating data before creating UI elements
-            this.floatingData = await this.fetchFloatingData(this.partnerId);
-            if (!this.floatingData) {
-                throw new Error('Failed to fetch floating data');
-            }
-            
-            this.remove(this.button, this.expandedButton, this.iframeContainer);
             
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
 
@@ -149,6 +141,17 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements() {
+        // Add null checks before accessing properties
+        if (!this.chatbotData || !this.chatbotData.position) {
+            console.error('Chatbot data is incomplete');
+            return;
+        }
+
+        if (!this.floatingData || !this.floatingData.imageUrl) {
+            console.error('Floating data is incomplete');
+            return;
+        }
+
         // Create iframe elements
         this.dimmedBackground = document.createElement('div');
         this.dimmedBackground.className = 'dimmed-background hide';
