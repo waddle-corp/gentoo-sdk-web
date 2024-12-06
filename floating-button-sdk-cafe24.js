@@ -564,8 +564,8 @@ class FloatingButton {
     getProductNo(urlString = window.location.href) {
         console.log('getProductNo called', urlString);
         if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
-        else if (urlString.includes('/category')) {this.displayLocation === 'PRODUCT_LIST'}
-        else {this.displayLocation === 'HOME'}
+        else if (urlString.includes('/category')) {this.displayLocation = 'PRODUCT_LIST'}
+        else {this.displayLocation = 'HOME'}
         console.log('displayLocation @ getProductNo', this.displayLocation);
 
         try {
