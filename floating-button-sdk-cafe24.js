@@ -14,6 +14,7 @@ class FloatingButton {
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
+        this.itemId = this.getProductNo();
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -423,7 +424,7 @@ class FloatingButton {
 
     async fetchFloatingData (partnerId) {
         try {
-            const url = `${this.domains.floating}/${partnerId}?displayLocation=HOME`;
+            const url = `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}

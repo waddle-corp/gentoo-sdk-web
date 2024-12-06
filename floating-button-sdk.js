@@ -74,6 +74,7 @@ class FloatingButton {
     }    
     
     async init() {
+        console.log('init called');
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -206,7 +207,7 @@ class FloatingButton {
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
                 this.button.className = 'floating-button-common button-image-close-mr';
-                this.button.style.backgroundImage = `url('public/img/units/sdk-floating-close.png')`;
+                this.button.style.backgroundImage = `url(''https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
