@@ -15,6 +15,7 @@ class FloatingButton {
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
         this.itemId = this.getProductNo();
+        console.log('itemId, displayLocation @ constructor', this.itemId, this.displayLocation);
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -423,6 +424,7 @@ class FloatingButton {
     }
 
     async fetchFloatingData (partnerId) {
+        console.log('fetchFloatingData called', partnerId, this.displayLocation);
         try {
             const url = `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`;
             const response = await fetch(url, {
@@ -560,9 +562,11 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
+        console.log('getProductNo called', urlString);
         if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
         else if (urlString.includes('/category')) {this.displayLocation === 'PRODUCT_LIST'}
         else {this.displayLocation === 'HOME'}
+        console.log('displayLocation @ getProductNo', this.displayLocation);
 
         try {
             // URL 객체 생성
