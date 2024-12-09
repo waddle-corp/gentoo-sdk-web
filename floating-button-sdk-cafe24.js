@@ -3,7 +3,7 @@ class FloatingButton {
         console.log('constructor called');
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
-        this.chatUserId;
+        this.chatUserId = null;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -14,6 +14,8 @@ class FloatingButton {
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
+        this.itemId = this.getProductNo();
+        console.log('itemId, displayLocation @ constructor', this.itemId, this.displayLocation);
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -53,41 +55,61 @@ class FloatingButton {
             }
         }
 
-        // fetch cafe24 mallId
-        ((CAFE24API) => {
-            // CAFE24API 객체를 통해 SDK 메소드를 사용할 수 있습니다.
-            this.partnerId = this.fetchPartnerId(CAFE24API.MALL_ID);
+        // Modify the CAFE24API initialization to ensure promises are handled correctly
+        this.bootPromise = new Promise((resolve, reject) => {
+            ((CAFE24API) => {
+                // Wrap CAFE24API methods in Promises
+                const getCustomerIDInfoPromise = () => {
+                    return new Promise((innerResolve, innerReject) => {
+                        CAFE24API.getCustomerIDInfo((err, res) => {
+                            if (err) {
+                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                                innerReject(err);
+                            } else {
+                                innerResolve(res);
+                            }
+                        });
+                    });
+                };
 
-            CAFE24API.getCustomerIDInfo((err, res) => {
-                if (err) {
-                    console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`)
-                } else {
-                    if (res.id.member_id) {
-                        this.chatUserId = res.id.member_id;
-                    } else {
-                        this.chatUserId = res.id['guest_id'];
-                    }
-                }
-            });
-            
+                // Fetch partner ID first
+                this.fetchPartnerId(CAFE24API.MALL_ID)
+                    .then(partnerId => {
+                        console.log('Fetched partnerId:', partnerId);
+                        this.partnerId = partnerId;
+
+                        // Then get customer ID
+                        return getCustomerIDInfoPromise();
+                    })
+                    .then(res => {
+                        console.log('Customer ID Info:', res);
+                        if (res.id.member_id) {
+                            this.chatUserId = res.id.member_id;
+                        } else {
+                            this.chatUserId = res.id['guest_id'];
+                        }
+
+                        // Fetch additional data
+                        return Promise.all([
+                            this.fetchChatbotData(this.partnerId),
+                            this.fetchFloatingData(this.partnerId)
+                        ]);
+                    })
+                    .then(([chatbotData, floatingData]) => {
+                        console.log('Chatbot Data:', chatbotData);
+                        console.log('Floating Data:', floatingData);
+                        this.chatbotData = chatbotData;
+                        this.floatingData = floatingData;
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Initialization error:', error);
+                        reject(error);
+                    });
             })(CAFE24API.init({
-                client_id : 'ckUs4MK3KhZixizocrCmTA',  // 사용할 앱의 App Key를 설정해 주세요.
-                version : '2022-12-01'   // 적용할 버전을 설정해 주세요.
+                client_id : 'ckUs4MK3KhZixizocrCmTA',
+                version : '2022-12-01'
             }));
-
-        // this.partnerId='672c5e9d45c48a1e578efae4';
-        // this.chatUserId='1234567890';
-
-        // Add a promise to track initialization status
-        this.bootPromise = Promise.all([
-            this.fetchChatbotData(this.partnerId)
-                .then(res => {
-                    if (!res) throw new Error('Failed to fetch chatbot data');
-                    this.chatbotData = res;
-                }),
-        ]).catch(error => {
-            console.error(`Error during initialization: ${error}`);
-            throw error;
         });
     }    
     
@@ -102,19 +124,11 @@ class FloatingButton {
                 return;
             }
 
-            if (!this.chatUserId || !this.chatbotData) {
+            if (!this.chatUserId || !this.chatbotData || !this.floatingData) {
                 throw new Error('Required data not yet loaded');
             }
 
             this.isInitialized = true;
-            
-            // Fetch floating data before creating UI elements
-            this.floatingData = await this.fetchFloatingData(this.partnerId);
-            if (!this.floatingData) {
-                throw new Error('Failed to fetch floating data');
-            }
-            
-            this.remove(this.button, this.expandedButton, this.iframeContainer);
             
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
 
@@ -129,6 +143,17 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements() {
+        // Add null checks before accessing properties
+        if (!this.chatbotData || !this.chatbotData.position) {
+            console.error('Chatbot data is incomplete');
+            return;
+        }
+
+        if (!this.floatingData || !this.floatingData.imageUrl) {
+            console.error('Floating data is incomplete');
+            return;
+        }
+
         // Create iframe elements
         this.dimmedBackground = document.createElement('div');
         this.dimmedBackground.className = 'dimmed-background hide';
@@ -225,7 +250,7 @@ class FloatingButton {
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
                 this.button.className = 'floating-button-common button-image-close-mr';
-                this.button.style.backgroundImage = `url('public/img/units/sdk-floating-close.png')`;
+                this.button.style.backgroundImage = `url('https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
@@ -399,8 +424,9 @@ class FloatingButton {
     }
 
     async fetchFloatingData (partnerId) {
+        console.log('fetchFloatingData called', partnerId, this.displayLocation);
         try {
-            const url = `${this.domains.floating}/${partnerId}?displayLocation=HOME`;
+            const url = `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -536,9 +562,11 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
+        console.log('getProductNo called', urlString);
         if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
-        else if (urlString.includes('/category')) {this.displayLocation === 'PRODUCT_LIST'}
-        else {this.displayLocation === 'HOME'}
+        else if (urlString.includes('/category')) {this.displayLocation = 'PRODUCT_LIST'}
+        else {this.displayLocation = 'HOME'}
+        console.log('displayLocation @ getProductNo', this.displayLocation);
 
         try {
             // URL 객체 생성
