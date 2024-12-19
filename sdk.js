@@ -15,12 +15,55 @@
         ge.process = function (args) { 
             var method = args[0]; 
             var params = args[1]; 
+            
+            // Allow boot method anytime
             if (method === 'boot') { 
-                fb = new w.FloatingButton(params); 
-            } else if (method === 'update') { 
-                fb.updateParameter(params); 
-            } else if (method === 'unmount') {
-                fb.destroy();
+                try {
+                    fb = new w.FloatingButton(params); 
+                } catch (error) {
+                    console.error('Failed to create FloatingButton instance:', error);
+                }
+                return;
+            }
+            
+            // For all other methods, ensure FloatingButton instance exists
+            if (!fb) {
+                console.error('GentooIO: Must call boot() before using this method');
+                return;
+            }
+
+            // Process other methods
+            switch (method) {
+                case 'init':
+                    if (typeof fb.init === 'function') {
+                        Promise.resolve(fb.init()).catch(error => {
+                            console.error('Failed to initialize GentooIO:', error);
+                        });
+                    }
+                    break;
+                case 'update':
+                    if (typeof fb.updateParameter === 'function') {
+                        Promise.resolve(fb.updateParameter(params)).catch(error => {
+                            console.error('Failed to update GentooIO parameters:', error);
+                        });
+                    }
+                    break;
+                case 'unmount':
+                    if (typeof fb.destroy === 'function') {
+                        Promise.resolve(fb.destroy()).catch(error => {
+                            console.error('Failed to unmount GentooIO:', error);
+                        });
+                    }
+                    break;
+                case 'sendLog':
+                    if (typeof fb.sendLog === 'function') {
+                        Promise.resolve(fb.sendLog(params)).catch(error => {
+                            console.error('Failed to send GentooIO log:', error);
+                        });
+                    }
+                    break;
+                default:
+                    console.error('GentooIO: Unknown method', method);
             }
         }; 
         w.GentooIO = ge; 
@@ -30,8 +73,7 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // s.src = "https://d32xcphivq9687.cloudfront.net/floating-button-sdk.js"; 
-            s.src = "/floating-button-sdk.js"; 
+            s.src = "https://d32xcphivq9687.cloudfront.net/floating-button-sdk.js"; 
             s.onload = () => { 
                 while (ge.q.length) { 
                     var args = ge.q.shift();
