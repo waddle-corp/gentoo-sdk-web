@@ -36,7 +36,7 @@ class FloatingButton {
                 log: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/userEvent',
                 chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
                 floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
-                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall', 
+                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
             }
             this.keys = {
                 log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
