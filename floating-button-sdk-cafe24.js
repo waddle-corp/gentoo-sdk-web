@@ -284,6 +284,7 @@ class FloatingButton {
             e.preventDefault();
             dimmedBackground.className = 'dimmed-background hide';
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         })
 
         window.addEventListener('message', (e) => {
