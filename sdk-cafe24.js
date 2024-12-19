@@ -105,23 +105,12 @@
                     var args = ge.q.shift();
                     ge.process(args); 
                 };  
-                var sl = () => {handleScroll(w, sl)}
-                w.addEventListener("scroll", sl) 
                 w.addEventListener("message", ()=>{})
             }; 
             var x = document.getElementsByTagName("script")[0]; 
             if (x.parentNode) { 
                 x.parentNode.insertBefore(s, x) 
             }; 
-        }; 
-        function handleScroll(tn, sl) {  
-            var st = tn.scrollY; 
-            var dh = document.getElementById('gentoo-sc').clientHeight;
-            var sp = st / (dh - tn.innerHeight); 
-            if (sp >= 0.6) { 
-                ge.process(['update', { type: 'needs' }]); 
-                tn.removeEventListener('scroll', sl); 
-            } 
         }; 
         if (document.readyState === "complete") { 
             l(); 
