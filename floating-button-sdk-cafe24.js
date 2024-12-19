@@ -29,19 +29,7 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'dailyshot.co' || window.location.hostname === 'demo.gentooai.com') {
-            this.hostSrc = 'https://demo.gentooai.com';
-            this.domains = {
-                auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
-                log: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/userEvent',
-                chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
-                floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
-                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
-            }
-            this.keys = {
-                log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
-            }
-        } else {
+        } else if (window.location.hostname === 'demo.gentooai.com') {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
@@ -52,6 +40,18 @@ class FloatingButton {
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+            }
+        } else {
+            this.hostSrc = 'https://demo.gentooai.com';
+            this.domains = {
+                auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
+                log: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/userEvent',
+                chatbot: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/chatbot',
+                floating: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/chat/floating',
+                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
+            }
+            this.keys = {
+                log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
             }
         }
 
