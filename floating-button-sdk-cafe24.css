@@ -6,6 +6,7 @@
     right: 0;
     display: flex;
     flex-direction: row-reverse;
+    z-index: 10000;
 }
 
 .floating-button-common {
@@ -16,7 +17,7 @@
     color: white;
     border: none;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 10000;
 
     /* @media screen and (min-width: 600px) {
         bottom: 66px;
