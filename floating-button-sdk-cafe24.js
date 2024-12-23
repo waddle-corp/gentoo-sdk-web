@@ -183,9 +183,9 @@ class FloatingButton {
         this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
         this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.floatingContainer);
         this.floatingContainer.appendChild(this.button);
+        this.floatingContainer.appendChild(this.iframeContainer);
 
         this.logEvent({
             eventCategory: 'SDKFloatingRendered',
