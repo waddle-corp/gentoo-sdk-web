@@ -21,7 +21,7 @@ class FloatingButton {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-                log: 'https://7u6bc0lsf4.execute-api.ap-northeast-2.amazonaws.com/userEvent',
+                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
@@ -29,11 +29,11 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'demo.gentooai.com') {
+        } else if (window.location.hostname === 'dev-demo.gentooai.com') {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-                log: 'https://7u6bc0lsf4.execute-api.ap-northeast-2.amazonaws.com/userEvent',
+                log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
@@ -45,7 +45,7 @@ class FloatingButton {
             this.hostSrc = 'https://demo.gentooai.com';
             this.domains = {
                 auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
-                log: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/userEvent',
+                log: 'https://stage-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
@@ -159,16 +159,30 @@ class FloatingButton {
         this.dimmedBackground.className = 'dimmed-background hide';
         this.iframeContainer = document.createElement('div');
         this.iframeContainer.className = 'iframe-container iframe-container-hide';
-        
         this.chatHeader = document.createElement('div');
-        this.chatHeader.className = 'chat-header';
-        this.chatHandler = document.createElement('div');
-        this.chatHandler.className = 'chat-handler';
-        this.chatHeader.appendChild(this.chatHandler);
+        
+        if (this.isSmallResolution) {
+            this.chatHandler = document.createElement('div');
+            this.chatHeader.className = 'chat-header-md';
+            this.chatHandler.className = 'chat-handler-md';
+            this.chatHeader.appendChild(this.chatHandler);
+        } else {
+            this.chatHeader.className = 'chat-header';
+            this.closeButtonContainer = document.createElement('div');
+            this.closeButtonContainer.className = 'chat-close-button-container';
+            this.closeButtonIcon = document.createElement('div');
+            this.closeButtonIcon.className = 'chat-close-button-icon';
+            this.closeButtonText = document.createElement('p');
+            this.closeButtonText.className = 'chat-close-button-text';
+            this.closeButtonText.innerText = '채팅창 축소';
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+        }
 
         this.iframe = document.createElement('iframe');
         this.iframe.src = this.chatUrl;
-        this.iframe.className = 'chat-iframe';
+        this.iframe.className = this.isSmallResolution ? 'chat-iframe-md' : 'chat-iframe';
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
@@ -249,16 +263,18 @@ class FloatingButton {
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
-                this.button.className = 'floating-button-common button-image-close-mr';
-                this.button.style.backgroundImage = `url('https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
+                this.button.className = 'floating-button-common button-image-close-mr hide-visibility';
+                // this.button.style.backgroundImage = `url('https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
+                this.button.className = 'floating-button-common button-image';
                 this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             }
         }
 
         this.floatingContainer.addEventListener('click', buttonClickHandler);
+        this.closeButtonContainer.addEventListener('click', buttonClickHandler);
 
         // Add event listener for the resize event
         window.addEventListener('resize', () => {
@@ -369,7 +385,7 @@ class FloatingButton {
 
     async logEvent(payload) {
         try {
-            const url = this.domains.log;
+            const url = this.domains.log + `/${this.partnerId}`;
 
             const params = {
                 eventCategory: String(payload.eventCategory),
