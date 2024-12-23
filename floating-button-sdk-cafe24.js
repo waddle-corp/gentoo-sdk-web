@@ -159,12 +159,26 @@ class FloatingButton {
         this.dimmedBackground.className = 'dimmed-background hide';
         this.iframeContainer = document.createElement('div');
         this.iframeContainer.className = 'iframe-container iframe-container-hide';
-        
         this.chatHeader = document.createElement('div');
-        this.chatHeader.className = 'chat-header';
-        this.chatHandler = document.createElement('div');
-        this.chatHandler.className = 'chat-handler';
-        this.chatHeader.appendChild(this.chatHandler);
+        
+        if (this.isSmallResolution) {
+            this.chatHandler = document.createElement('div');
+            this.chatHeader.className = 'chat-header-md';
+            this.chatHandler.className = 'chat-handler-md';
+            this.chatHeader.appendChild(this.chatHandler);
+        } else {
+            this.chatHeader.className = 'chat-header';
+            this.closeButtonContainer = document.createElement('div');
+            this.closeButtonContainer.className = 'chat-close-button-container';
+            this.closeButton = document.createElement('div');
+            this.closeButton.className = 'chat-close-button';
+            this.closeButtonText = document.createElement('p');
+            this.closeButtonText.className = 'chat-close-button-text';
+            this.closeButtonText.innerText = '채팅창 축소';
+            this.closeButtonContainer.appendChild(this.closeButton);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+        }
 
         this.iframe = document.createElement('iframe');
         this.iframe.src = this.chatUrl;
