@@ -33,7 +33,7 @@ class FloatingButton {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
+                log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
@@ -369,7 +369,7 @@ class FloatingButton {
 
     async logEvent(payload) {
         try {
-            const url = this.domains.log;
+            const url = this.domains.log + `/${this.partnerId}`;
 
             const params = {
                 eventCategory: String(payload.eventCategory),
