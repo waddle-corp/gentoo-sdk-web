@@ -183,9 +183,9 @@ class FloatingButton {
         this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
         this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+        document.body.appendChild(this.iframeContainer);
         document.body.appendChild(this.floatingContainer);
         this.floatingContainer.appendChild(this.button);
-        this.floatingContainer.appendChild(this.iframeContainer);
 
         this.logEvent({
             eventCategory: 'SDKFloatingRendered',
@@ -249,11 +249,12 @@ class FloatingButton {
             e.preventDefault(); 
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
-                this.button.className = 'floating-button-common button-image-close-mr';
-                this.button.style.backgroundImage = `url('https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
+                this.button.className = 'floating-button-common button-image-close-mr hide-visibility';
+                // this.button.style.backgroundImage = `url('https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
+                this.button.className = 'floating-button-common button-image';
                 this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             }
         }
