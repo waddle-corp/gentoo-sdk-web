@@ -182,7 +182,7 @@ class FloatingButton {
 
         this.iframe = document.createElement('iframe');
         this.iframe.src = this.chatUrl;
-        this.iframe.className = 'chat-iframe';
+        this.iframe.className = this.isSmallResolution ? 'chat-iframe-md' : 'chat-iframe';
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
