@@ -223,7 +223,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 10px 16px;
 }
 
 .chat-handler {
@@ -240,6 +239,7 @@
     justify-content: center;
     border: 1px solid #e1e1e1;
     border-radius: 10px;
+    margin-right: 16px;
 }
 
 .chat-close-button-icon {
