@@ -251,6 +251,10 @@
     border-radius: 10px;
     margin-right: 16px;
     cursor: pointer;
+
+    :hover {
+        background-color: #efefef;
+    }
 }
 
 .chat-close-button-icon {
