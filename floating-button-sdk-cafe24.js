@@ -170,12 +170,12 @@ class FloatingButton {
             this.chatHeader.className = 'chat-header';
             this.closeButtonContainer = document.createElement('div');
             this.closeButtonContainer.className = 'chat-close-button-container';
-            this.closeButton = document.createElement('div');
-            this.closeButton.className = 'chat-close-button';
+            this.closeButtonIcon = document.createElement('div');
+            this.closeButtonIcon.className = 'chat-close-button-icon';
             this.closeButtonText = document.createElement('p');
             this.closeButtonText.className = 'chat-close-button-text';
             this.closeButtonText.innerText = '채팅창 축소';
-            this.closeButtonContainer.appendChild(this.closeButton);
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.closeButtonContainer);
         }
@@ -274,6 +274,7 @@ class FloatingButton {
         }
 
         this.floatingContainer.addEventListener('click', buttonClickHandler);
+        this.closeButtonContainer.addEventListener('click', buttonClickHandler);
 
         // Add event listener for the resize event
         window.addEventListener('resize', () => {
