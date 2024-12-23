@@ -250,11 +250,14 @@
     border: 1px solid #e1e1e1;
     border-radius: 10px;
     margin-right: 16px;
+    cursor: pointer;
 }
 
 .chat-close-button-icon {
     width: 20px;
     height: 20px;
+    margin-right: 2px;
+    background-size: contain;
     background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/chat-shrink.png');
 }
 
