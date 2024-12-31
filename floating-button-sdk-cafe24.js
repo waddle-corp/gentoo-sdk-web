@@ -219,7 +219,6 @@ class FloatingButton {
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
-                console.log('expandedButton created', this.floatingClicked);
                 if (this.floatingClicked) return;
                 this.expandedButton = document.createElement('div');
                 this.expandedButton.className = 'expanded-area';
@@ -240,7 +239,6 @@ class FloatingButton {
                 // 첫 호출 시작
                 addLetter();
                 this.floatingCount += 1;
-                console.log('floatingCount @ createUIElements', this.floatingCount);
             }, 3000);
 
             setTimeout(() => {
