@@ -218,6 +218,7 @@ class FloatingButton {
         // });
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0 && !this.floatingClicked) {
+            console.log('expandedButton created', this.floatingClicked);
             setTimeout(() => {
                 this.expandedButton = document.createElement('div');
                 this.expandedButton.className = 'expanded-area';
