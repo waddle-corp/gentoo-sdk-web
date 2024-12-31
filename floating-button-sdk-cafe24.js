@@ -14,6 +14,7 @@ class FloatingButton {
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
+        this.floatingClicked = false;
         this.itemId = this.getProductNo();
         console.log('itemId, displayLocation @ constructor', this.itemId, this.displayLocation);
         
@@ -216,7 +217,7 @@ class FloatingButton {
         //     type: this.type,
         // });
 
-        if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+        if(this.floatingCount < 2 && this.floatingData.comment.length > 0 && !this.floatingClicked) {
             setTimeout(() => {
                 this.expandedButton = document.createElement('div');
                 this.expandedButton.className = 'expanded-area';
@@ -261,6 +262,7 @@ class FloatingButton {
         var buttonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault(); 
+            this.floatingClicked = true;
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
                 this.button.className = 'floating-button-common button-image-close-mr hide-visibility';
