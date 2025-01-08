@@ -1,13 +1,13 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
-        if (!props.partnerId || !props.authCode || !props.udid) {
-            throw new Error('Missing required parameters: partnerId, authCode, and udid are required');
+        if (!props.partnerId || !props.authCode) {
+            throw new Error('Missing required parameters: partnerId, authCode are required');
         }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
-        this.udid = props.udid;
+        this.udid = props.udid || '';
         this.chatUserId;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
