@@ -8,6 +8,7 @@ class FloatingButton {
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
         this.udid = props.udid || '';
+        this.utm = props.utm;
         this.chatUserId;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -98,7 +99,7 @@ class FloatingButton {
             
             this.remove(this.button, this.expandedButton, this.iframeContainer);
             
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utm_source=${this.utm.utms}&utm_medium=${this.utm.utmm}&utm_campaign=${this.utm.utmcp}&utm_content=${this.utm.utmct}`;
 
             // Create UI elements after data is ready
             this.createUIElements();

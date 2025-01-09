@@ -47,7 +47,9 @@
                 ge.process = function (args) { 
                     var method = args[0]; 
                     var params = args[1]; 
-                    
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content') };
+                    params.utm = utm;
                     // Allow boot method anytime
                     if (method === 'boot') { 
                         try {
@@ -151,21 +153,21 @@
         GentooIO('init', {});
 
         // Send Log
-        GentooIO('sendLog', {
-            eventCategory: 'purchase-complete',
-            partnerId: '6718be2310310e41ab5276ef',
-            userToken: 'testestset',
-            products: [
-                {
-                    itemId: '111',
-                    quantity: 1,
-                },
-                {
-                    itemId: '222',
-                    quantity: 2,
-                }
-            ],
-        })
+        // GentooIO('sendLog', {
+        //     eventCategory: 'purchase-complete',
+        //     partnerId: '6718be2310310e41ab5276ef',
+        //     userToken: 'testestset',
+        //     products: [
+        //         {
+        //             itemId: '111',
+        //             quantity: 1,
+        //         },
+        //         {
+        //             itemId: '222',
+        //             quantity: 2,
+        //         }
+        //     ],
+        // })
 
         // GentooIO('unmount', {});
     </script>
