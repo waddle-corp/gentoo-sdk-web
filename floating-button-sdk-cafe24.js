@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 class FloatingButton {
     constructor(props) {
         console.log('constructor called');
@@ -20,43 +17,43 @@ class FloatingButton {
         this.itemId = this.getProductNo();
         console.log('itemId, displayLocation @ constructor', this.itemId, this.displayLocation);
         
-        // if (window.location.hostname === 'localhost') {
-        //     this.hostSrc = 'http://localhost:3000';
-        //     this.domains = {
-        //         auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-        //         log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
-        //         chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
-        //         floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
-        //         partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-        //     }
-        //     this.keys = {
-        //         log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
-        //     }
-        // } else if (window.location.hostname === 'dev-demo.gentooai.com') {
-        //     this.hostSrc = 'https://dev-demo.gentooai.com';
-        //     this.domains = {
-        //         auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
-        //         log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
-        //         chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
-        //         floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
-        //         partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-        //     }
-        //     this.keys = {
-        //         log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
-        //     }
-        // } else {
-        //     this.hostSrc = 'https://demo.gentooai.com';
-        //     this.domains = {
-        //         auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
-        //         log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
-        //         chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
-        //         floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
-        //         partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
-        //     }
-        //     this.keys = {
-        //         log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
-        //     }
-        // }
+        if (window.location.hostname === 'localhost') {
+            this.hostSrc = 'http://localhost:3000';
+            this.domains = {
+                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
+                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+            }
+            this.keys = {
+                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+            }
+        } else if (window.location.hostname === 'dev-demo.gentooai.com') {
+            this.hostSrc = 'https://dev-demo.gentooai.com';
+            this.domains = {
+                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
+                log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+            }
+            this.keys = {
+                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+            }
+        } else {
+            this.hostSrc = 'https://demo.gentooai.com';
+            this.domains = {
+                auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
+                log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
+            }
+            this.keys = {
+                log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
+            }
+        }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -390,7 +387,7 @@ class FloatingButton {
 
     async logEvent(payload) {
         try {
-            const url = process.env.API_URL_USEREVENT + `/${this.partnerId}`;
+            const url = this.domains.log + `/${this.partnerId}`;
 
             const params = {
                 eventCategory: String(payload.eventCategory),
@@ -417,7 +414,7 @@ class FloatingButton {
 
     async fetchChatUserId (userToken, udid = '') {
         try {
-            const url = `${process.env.API_URL_AUTH}?userToken=${userToken}&udid=${udid}`;
+            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -432,7 +429,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const url = `${process.env.API_URL_CHATBOT}/${partnerId}`;
+            const url = `${this.domains.chatbot}/${partnerId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -447,7 +444,7 @@ class FloatingButton {
     async fetchFloatingData (partnerId) {
         console.log('fetchFloatingData called', partnerId, this.displayLocation);
         try {
-            const url = `${process.env.API_URL_FLOATING}/${partnerId}?displayLocation=${this.displayLocation}`;
+            const url = `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
@@ -462,7 +459,7 @@ class FloatingButton {
 
     async fetchPartnerId(mallId) {
         try {
-            const url = `${process.env.API_URL_PARTNERID}/${mallId}`;
+            const url = `${this.domains.partnerId}/${mallId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
