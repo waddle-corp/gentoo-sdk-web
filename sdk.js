@@ -25,6 +25,7 @@
             // Allow boot method anytime
             if (method === 'boot') { 
                 try {
+                    console.log('params', params);
                     fb = new w.FloatingButton(params); 
                 } catch (error) {
                     console.error('Failed to create FloatingButton instance:', error);

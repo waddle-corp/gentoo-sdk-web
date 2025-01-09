@@ -47,12 +47,16 @@
                 ge.process = function (args) { 
                     var method = args[0]; 
                     var params = args[1]; 
+                    const parsedUrl = new URL(window.location.href);
+                    const pathSegments = parsedUrl.pathname.split('/');
+                    const transitionPage = '/' + pathSegments[1];
                     const searchParams = new URLSearchParams(window.location.search);
-                    const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content'), utmt: searchParams.get('utm_term') };
+                    const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content'), utmt: searchParams.get('utm_term'), tp: transitionPage };
                     params.utm = utm;
                     // Allow boot method anytime
                     if (method === 'boot') { 
                         try {
+                            console.log('params', params);
                             fb = new w.FloatingButton(params); 
                         } catch (error) {
                             console.error('Failed to create FloatingButton instance:', error);
@@ -144,7 +148,8 @@
         GentooIO('boot', {
             udid: 'd02a7e31-3727-4e72-8768-88d06d313eed', // optional, only for dlst
             authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
-            partnerId: '6718be2310310e41ab5276ef',
+            // partnerId: '6718be2310310e41ab5276ef',
+            partnerId: '67516ecf103e7e29c75a621e',
             itemId: '1234', // optional, only @PRODUCT_DETAIL page
             displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
         })
