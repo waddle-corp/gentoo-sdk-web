@@ -41,6 +41,9 @@
         ge.process = function (args) { 
             var method = args[0]; 
             var params = args[1]; 
+            const searchParams = new URLSearchParams(window.location.search);
+            const utmSource = searchParams.get('utm_source');
+            console.log('utmSource', utmSource);
             
             // Allow boot method anytime
             if (method === 'boot') { 
