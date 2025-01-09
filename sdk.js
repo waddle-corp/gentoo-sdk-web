@@ -15,8 +15,11 @@
         ge.process = function (args) { 
             var method = args[0]; 
             var params = args[1]; 
+            const parsedUrl = new URL(window.location.href);
+            const pathSegments = parsedUrl.pathname.split('/');
+            const transitionPage = '/' + pathSegments[1];
             const searchParams = new URLSearchParams(window.location.search);
-            const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content') };
+            const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content'), utmt: searchParams.get('utm_term'), tp: transitionPage };
             params.utm = utm;
 
             // Allow boot method anytime
