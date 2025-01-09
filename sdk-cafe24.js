@@ -42,9 +42,9 @@
             var method = args[0]; 
             var params = args[1]; 
             const searchParams = new URLSearchParams(window.location.search);
-            const utmSource = searchParams.get('utm_source');
-            console.log('utmSource', utmSource);
-            
+            const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content') };
+            params.utm = utm;
+            console.log('params', params);
             // Allow boot method anytime
             if (method === 'boot') { 
                 try {
