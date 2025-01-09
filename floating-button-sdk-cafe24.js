@@ -1,5 +1,5 @@
-const env = require('dotenv');
-env.config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 class FloatingButton {
     constructor(props) {
