@@ -3,6 +3,7 @@ class FloatingButton {
         console.log('constructor called');
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
+        this.utm = props.utm;
         this.chatUserId = null;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
@@ -10,7 +11,6 @@ class FloatingButton {
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         this.hostSrc;
         this.domains;
-        this.keys;
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
@@ -131,7 +131,7 @@ class FloatingButton {
 
             this.isInitialized = true;
             
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             this.createUIElements();
@@ -402,7 +402,6 @@ class FloatingButton {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': this.keys.log,
                 },
                 body: JSON.stringify(params),
             });
