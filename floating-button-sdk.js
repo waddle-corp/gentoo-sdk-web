@@ -205,7 +205,7 @@ class FloatingButton {
 
             setTimeout(() => {
                 this.floatingContainer.removeChild(this.expandedButton);
-            }, 80000)
+            }, 8000)
         }
 
         this.elems = {
