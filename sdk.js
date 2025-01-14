@@ -28,7 +28,7 @@
     
         // Inject the CSS automatically
         injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
-
+        
         var fb = null; 
         var ge = function () { 
             ge.c(arguments); 

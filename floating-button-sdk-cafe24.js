@@ -321,27 +321,6 @@ class FloatingButton {
         });
     }
 
-    // updateParameter(props) {
-    //     this.type = props.type;
-    //     this.floatingCount += 1;
-    //     this.enableExpandTimer('off');
-    //     this.fetchFloatingComment(this.itemId, this.userId, props.type)
-    //         .then(floatingComment => {
-    //             if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-    //                 this.floatingComment = floatingComment[0];
-    //                 this.commentType = floatingComment[1];
-    //                 this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.userId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-    //                 if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-    //             } else {
-    //                 // client variable required in chatUrl for the future
-    //                 this.chatUrl = `${this.hostSrc}/dlst/${this.userId}?ch=${this.isMobileDevice}`;
-    //                 if (!this.isDestroyed) this.init('general', 'general', this.chatUrl);
-    //             }
-    //         }).catch(error => {
-    //             console.error(`Error while constructing FloatingButton: ${error}`);
-    //         })
-    // }
-
     remove() {
         if (this.button) {document.body.removeChild(this.button)};
         if (this.expandedButton) {document.body.removeChild(this.expandedButton)};
