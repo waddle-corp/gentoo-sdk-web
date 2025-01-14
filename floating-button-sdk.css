@@ -30,6 +30,7 @@
     /* box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%; */
     background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif');
+    background-repeat: no-repeat;
 }
 
 .button-image-close {
