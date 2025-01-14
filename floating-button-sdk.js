@@ -17,10 +17,11 @@ class FloatingButton {
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         this.hostSrc;
         this.domains;
-        this.keys;
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
+        this.floatingClicked = false;
+        this.floatingData;
         
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -113,21 +114,46 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements() {
+        // Add null checks before accessing properties
+        if (!this.chatbotData || !this.chatbotData.position) {
+            console.error('Chatbot data is incomplete');
+            return;
+        }
+
+        if (!this.floatingData || !this.floatingData.imageUrl) {
+            console.error('Floating data is incomplete');
+            return;
+        }
+
         // Create iframe elements
         this.dimmedBackground = document.createElement('div');
         this.dimmedBackground.className = 'dimmed-background hide';
         this.iframeContainer = document.createElement('div');
         this.iframeContainer.className = 'iframe-container iframe-container-hide';
-        
         this.chatHeader = document.createElement('div');
-        this.chatHeader.className = 'chat-header';
-        this.chatHandler = document.createElement('div');
-        this.chatHandler.className = 'chat-handler';
-        this.chatHeader.appendChild(this.chatHandler);
+        
+        if (this.isSmallResolution) {
+            this.chatHandler = document.createElement('div');
+            this.chatHeader.className = 'chat-header-md';
+            this.chatHandler.className = 'chat-handler-md';
+            this.chatHeader.appendChild(this.chatHandler);
+        } else {
+            this.chatHeader.className = 'chat-header';
+            this.closeButtonContainer = document.createElement('div');
+            this.closeButtonContainer.className = 'chat-close-button-container';
+            this.closeButtonIcon = document.createElement('div');
+            this.closeButtonIcon.className = 'chat-close-button-icon';
+            this.closeButtonText = document.createElement('p');
+            this.closeButtonText.className = 'chat-close-button-text';
+            this.closeButtonText.innerText = '채팅창 축소';
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+        }
 
         this.iframe = document.createElement('iframe');
         this.iframe.src = this.chatUrl;
-        this.iframe.className = 'chat-iframe';
+        this.iframe.className = this.isSmallResolution ? 'chat-iframe-md' : 'chat-iframe';
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
@@ -155,6 +181,7 @@ class FloatingButton {
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
+                if (this.floatingClicked) return;
                 this.expandedButton = document.createElement('div');
                 this.expandedButton.className = 'expanded-area';
                 this.expandedText = document.createElement('p');
@@ -178,7 +205,7 @@ class FloatingButton {
 
             setTimeout(() => {
                 this.floatingContainer.removeChild(this.expandedButton);
-            }, 8000)
+            }, 80000)
         }
 
         this.elems = {
@@ -198,19 +225,22 @@ class FloatingButton {
         var buttonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault(); 
+            this.floatingClicked = true;
             if (this.iframeContainer.classList.contains('iframe-container-hide')) {
                 if (this.expandedButton) this.expandedButton.className = 'expanded-area hide';
-                this.button.className = 'floating-button-common button-image-close-mr';
-                this.button.style.backgroundImage = `url(''https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
+                this.button.className = 'floating-button-common button-image-close-mr hide-visibility';
+                // this.button.style.backgroundImage = `url(''https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
             } else {
                 this.hideChat(this.elems.iframeContainer, this.elems.button, this.elems.expandedButton, this.elems.dimmedBackground);
+                this.button.className = 'floating-button-common button-image';
                 this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             }
         }
 
         this.floatingContainer.addEventListener('click', buttonClickHandler);
-
+        this.closeButtonContainer.addEventListener('click', buttonClickHandler);
+        
         // Add event listener for the resize event
         window.addEventListener('resize', () => {
             this.browserWidth = this.logWindowWidth();
@@ -235,6 +265,7 @@ class FloatingButton {
             e.preventDefault();
             dimmedBackground.className = 'dimmed-background hide';
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         })
 
         window.addEventListener('message', (e) => {
@@ -395,16 +426,19 @@ class FloatingButton {
     }
 
     enableExpandTimer(mode) {
-        if (this.needsTimer) {
-            clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
-        }
-        if (mode === 'on') {
-            this.needsTimer = setTimeout(() => {
-                this.updateParameter({type: 'needs'});
-            }, 10000);
-        }
-        else if (mode === 'off') {
-            clearTimeout(this.needsTimer);  // 타이머 클리어
+        if (this.type === 'default') return;
+        else {
+            if (this.needsTimer) {
+                clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
+            }
+            if (mode === 'on') {
+                this.needsTimer = setTimeout(() => {
+                    this.updateParameter({type: 'needs'});
+                }, 10000);
+            }
+            else if (mode === 'off') {
+                clearTimeout(this.needsTimer);  // 타이머 클리어
+            }
         }
     }
 
