@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="/floating-button-sdk.css">
+    <link rel="stylesheet" href="/global.css"> -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K6R9Z9D8EP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-K6R9Z9D8EP', { 'debug_mode': true });
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+            'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5VRNPTQW');</script>
+    <!-- End Google Tag Manager -->
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://d3qrvyizob9ouf.cloudfront.net/sdk.js"></script>
+    <script>
+        // Initialize GentooIO parameters
+        GentooIO('boot', {
+            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed', // optional, only for dlst
+            authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
+            // partnerId: '6718be2310310e41ab5276ef',
+            partnerId: '67615284c5ff44110dbc6613', // fastfive prod
+            // partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
+            itemId: '1234', // optional, only @PRODUCT_DETAIL page
+            displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
+        })
+
+        // Render Floating Button
+        GentooIO('init', {});
+    </script>
+    <div>
+        <div id='gentoo-sc'>
+            <div style="display: flex; flex-direction: column; align-items: stretch; height: 100%;">
+                <div style="width: 100%; height: 400px; background: skyblue;">
+                    box1
+                </div>
+                <div style="display: flex; width: 100%; height: fit-content";>
+                    <div style="flex: 1; height: 300px; background: cornflowerblue;">
+                        box2
+                    </div>
+                    <div style="flex: 1; height: 300px; background: cornsilk;">
+                        box3
+                    </div>
+                </div>
+                <div style="width: 100%; height: 800px; background: skyblue;">
+                    box4
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
