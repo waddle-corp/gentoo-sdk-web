@@ -152,13 +152,13 @@ class FloatingButton {
             products: [],
         });
 
-        window.gtag('event', 'GentooPopped', {
-            event_category: 'SDKFloatingRendered',
-            event_label: 'SDK floating button is rendered',
-            itemId: this.itemId,
-            clientId: this.partnerId,
-            type: this.type,
-        });
+        // window.gtag('event', 'GentooPopped', {
+        //     event_category: 'SDKFloatingRendered',
+        //     event_label: 'SDK floating button is rendered',
+        //     itemId: this.itemId,
+        //     clientId: this.partnerId,
+        //     type: this.type,
+        // });
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
@@ -448,14 +448,14 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        window.gtag('event', 'iconClicked', {
-            event_category: 'SDKFloatingClicked',
-            event_label: 'User clicked SDK floating button',
-            itemId: this.itemId,
-            clientId: this.clientId,
-            type: this.type,
-            commentType: (this.type === 'this' ? this.commentType : ''),
-        })
+        // window.gtag('event', 'iconClicked', {
+        //     event_category: 'SDKFloatingClicked',
+        //     event_label: 'User clicked SDK floating button',
+        //     itemId: this.itemId,
+        //     clientId: this.clientId,
+        //     type: this.type,
+        //     commentType: (this.type === 'this' ? this.commentType : ''),
+        // })
         this.logEvent({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
