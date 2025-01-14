@@ -104,7 +104,7 @@ class FloatingButton {
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
-            this.createUIElements();
+            if (!this.isDestroyed) this.createUIElements();
 
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -293,12 +293,9 @@ class FloatingButton {
     }
 
     destroy() {
-        if (!this.isInitialized) {
-            console.error('FloatingButton must be initialized before calling destroy');
-            return;
-        }
-        console.log('Destroying FloatingButton instance');
         this.isDestroyed = true;
+
+        console.log('Destroying FloatingButton instance');
         window.removeEventListener('resize', this.handleResize);
         if (this.button) {
             this.button.removeEventListener('click', this.buttonClickHandler);
