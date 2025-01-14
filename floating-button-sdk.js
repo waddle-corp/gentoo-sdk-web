@@ -7,6 +7,7 @@ class FloatingButton {
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
+        this.displayLocation = props.displayLocation || 'HOME';
         this.udid = props.udid || '';
         this.utm = props.utm;
         this.chatUserId;
@@ -24,7 +25,7 @@ class FloatingButton {
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
-                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
+                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
                 log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
@@ -32,27 +33,27 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'dailyshot.co' || window.location.hostname === 'demo.gentooai.com') {
-            this.hostSrc = 'https://demo.gentooai.com';
+        } else if (window.location.hostname === 'dailyshot.co' || window.location.hostname === 'dev-demo.gentooai.com') {
+            this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
-                auth: 'https://byg7k8r4gi.execute-api.ap-northeast-2.amazonaws.com/prod/auth',
+                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
                 log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
             }
             this.keys = {
-                log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
+                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
         } else {
-            this.hostSrc = 'https://dev-demo.gentooai.com';
+            this.hostSrc = 'https://demo.gentooai.com';
             this.domains = {
-                auth: 'https://8krjc3tlhc.execute-api.ap-northeast-2.amazonaws.com/chat/api/v1/user',
+                auth: 'https://api.gentooai.com/chat/api/v1/user',
                 log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
             }
             this.keys = {
-                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+                log: 'EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k',
             }
         }
         
@@ -151,14 +152,6 @@ class FloatingButton {
             chatUserId: this.chatUserId,
             products: [],
         });
-
-        // window.gtag('event', 'GentooPopped', {
-        //     event_category: 'SDKFloatingRendered',
-        //     event_label: 'SDK floating button is rendered',
-        //     itemId: this.itemId,
-        //     clientId: this.partnerId,
-        //     type: this.type,
-        // });
 
         if(this.floatingCount < 2 && this.floatingData.comment.length > 0) {
             setTimeout(() => {
@@ -259,33 +252,6 @@ class FloatingButton {
         });
     }
 
-    // async updateParameter(props) {
-    //     try {
-    //         await this.bootPromise;
-    //         this.type = props.type;
-    //         // this.floatingCount += 1;
-    //         this.enableExpandTimer('off');
-    //         this.fetchFloatingComment(this.itemId, this.chatUserId, props.type)
-    //             .then(floatingComment => {
-    //                 if (floatingComment[0] !== '존재하지 않는 상품입니다.') {
-    //                     this.floatingComment = floatingComment[0];
-    //                     this.commentType = floatingComment[1];
-    //                     this.chatUrl = `${this.hostSrc}/dlst/sdk/${this.chatUserId}?i=${this.itemId}&t=${this.type}&ch=${this.isMobileDevice}&fc=${this.floatingComment}`;
-    //                     if (!this.isDestroyed) this.init(this.itemId, this.type, this.chatUrl);
-    //                 } else {
-    //                     // client variable required in chatUrl for the future
-    //                     this.chatUrl = `${this.hostSrc}/dlst/${this.chatUserId}?ch=${this.isMobileDevice}`;
-    //                     if (!this.isDestroyed) this.init('basic', 'basic', this.chatUrl);
-    //                 }
-    //             }).catch(error => {
-    //                 console.error(`Error while constructing FloatingButton: ${error}`);
-    //             })
-    //     } catch (error) {
-    //         console.error('Failed to update parameters:', error);
-    //         throw error;
-    //     }
-    // }
-
     remove() {
         if (this.button) {document.body.removeChild(this.button)};
         if (this.expandedButton) {document.body.removeChild(this.expandedButton)};
@@ -332,8 +298,6 @@ class FloatingButton {
 
     async logEvent(payload) {
         try {
-            const url = this.domains.log;
-
             const params = {
                 eventCategory: String(payload.eventCategory),
                 chatUserId: String(payload.chatUserId),
@@ -342,11 +306,10 @@ class FloatingButton {
                 products: payload?.products,
             }
 
-            const response = await fetch(url, {
+            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': this.keys.log,
                 },
                 body: JSON.stringify(params),
             });
@@ -375,8 +338,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const url = `${this.domains.chatbot}/${partnerId}`;
-            const response = await fetch(url, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}`, {
                 method: "GET",
                 headers: {}
             });
@@ -389,8 +351,7 @@ class FloatingButton {
 
     async fetchFloatingData (partnerId) {
         try {
-            const url = `${this.domains.floating}/${partnerId}?displayLocation=HOME`;
-            const response = await fetch(url, {
+            const response = await fetch(`${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`, {
                 method: "GET",
                 headers: {}
             });
@@ -448,14 +409,6 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        // window.gtag('event', 'iconClicked', {
-        //     event_category: 'SDKFloatingClicked',
-        //     event_label: 'User clicked SDK floating button',
-        //     itemId: this.itemId,
-        //     clientId: this.clientId,
-        //     type: this.type,
-        //     commentType: (this.type === 'this' ? this.commentType : ''),
-        // })
         this.logEvent({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
@@ -505,7 +458,7 @@ class FloatingButton {
         try {
             await this.bootPromise;
             // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await this.fetchChatUserId(input.userToken);
+            this.chatUserId = await this.fetchChatUserId(input.chatUserId);
             
             const payload = {
                 eventCategory: input.eventCategory,
