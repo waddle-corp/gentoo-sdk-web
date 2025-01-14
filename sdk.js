@@ -27,8 +27,8 @@
         }
     
         // Inject the CSS automatically
-        // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
-        injectCSS("./floating-button-sdk.css");
+        injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+        
         var fb = null; 
         var ge = function () { 
             ge.c(arguments); 
@@ -105,8 +105,7 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"; 
-            s.src = "./floating-button-sdk.js";
+            s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"; 
             s.onload = () => { 
                 while (ge.q.length) { 
                     var args = ge.q.shift();
