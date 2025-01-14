@@ -4,6 +4,31 @@
         if (w.GentooIO) { 
             return w.console.error("GentooIO script included twice"); 
         }; 
+
+        // Function to inject CSS
+        function injectCSS(href) {
+            // Check if the CSS is already injected
+            var existingLink = document.querySelector('link[href="' + href + '"]');
+            if (existingLink) {
+            return;
+            }
+    
+            var link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = href;
+            link.type = "text/css";
+            link.onload = function() {
+            console.log("GentooIO CSS loaded successfully.");
+            };
+            link.onerror = function() {
+            console.error("Failed to load GentooIO CSS.");
+            };
+            document.head.appendChild(link);
+        }
+    
+        // Inject the CSS automatically
+        injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+
         var fb = null; 
         var ge = function () { 
             ge.c(arguments); 
