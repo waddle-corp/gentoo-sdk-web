@@ -1,5 +1,6 @@
 (function (global, document) { 
     var w = global;
+    console.log('GentooIO', w.GentooIO, GentooIO);
     while (GentooIO.q.length) { 
         var args = GentooIO.q.shift();
         // GentooIO.process(args); 
