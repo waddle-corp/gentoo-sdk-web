@@ -95,6 +95,13 @@
                         });
                     }
                     break;
+                case 'setPageList':
+                    if (typeof fb.setPageList === 'function') {
+                        Promise.resolve(fb.setPageList(params)).catch(error => {
+                            console.error('Failed to set GentooIO page list:', error);
+                        });
+                    }
+                    break;
                 default:
                     console.error('GentooIO: Unknown method', method);
             }
