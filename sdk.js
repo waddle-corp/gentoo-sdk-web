@@ -101,7 +101,7 @@
         }; 
         w.GentooIO = ge; 
         function l() { 
-            console.log('l called');
+            console.log('l called', w.GentooIOInitialized);
             if (w.GentooIOInitialized) { return }; 
             w.GentooIOInitialized = true; 
             var s = document.createElement("script"); 
@@ -109,28 +109,17 @@
             s.async = true; 
             s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"; 
             s.onload = () => { 
-                console.log('s.onload called');
+                console.log('s.onload called', w.GentooIOInitialized, ge.q);
                 while (ge.q.length) { 
                     var args = ge.q.shift();
                     ge.process(args); 
                 };  
-                var sl = () => {handleScroll(w, sl)}
-                w.addEventListener("scroll", sl) 
                 w.addEventListener("message", ()=>{})
             }; 
             var x = document.getElementsByTagName("script")[0]; 
             if (x.parentNode) { 
                 x.parentNode.insertBefore(s, x) 
             }; 
-        }; 
-        function handleScroll(tn, sl) {  
-            var st = tn.scrollY; 
-            var dh = document.getElementById('gentoo-sc').clientHeight;
-            var sp = st / (dh - tn.innerHeight); 
-            if (sp >= 0.6) { 
-                ge.process(['update', { type: 'needs' }]); 
-                tn.removeEventListener('scroll', sl); 
-            } 
         }; 
         if (document.readyState === "complete") { 
             console.log('document.readyState === "complete"');
