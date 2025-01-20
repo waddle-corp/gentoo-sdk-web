@@ -22,6 +22,7 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.floatingData;
+        this.pageList = [];
         
         if (window.location.hostname === 'dailyshot.co' || window.location.hostname === 'dev-demo.gentooai.com') {
             this.hostSrc = 'https://dev-demo.gentooai.com';
@@ -93,7 +94,13 @@ class FloatingButton {
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
-            if (!this.isDestroyed) this.createUIElements();
+            if (
+                !this.isDestroyed || 
+                (this.pageList.length > 0 && this.pageList.includes(window.location.pathname))
+            ) {
+                console.log('createUIElements called', this.pageList, window.location.pathname);
+                this.createUIElements();
+            }
 
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -311,6 +318,10 @@ class FloatingButton {
         console.log('FloatingButton instance destroyed');
         // Any other cleanup operations
         this.isInitialized = false;
+    }
+
+    setPageList(pageList) {
+        this.pageList = pageList;
     }
 
     async logEvent(payload) {
