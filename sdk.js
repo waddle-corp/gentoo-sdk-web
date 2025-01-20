@@ -38,6 +38,7 @@
             ge.q.push(args) 
         }; 
         ge.process = function (args) { 
+            console.log('ge.process called', args);
             var method = args[0]; 
             var params = args[1]; 
             const parsedUrl = new URL(window.location.href);
@@ -100,6 +101,7 @@
         }; 
         w.GentooIO = ge; 
         function l() { 
+            console.log('l called');
             if (w.GentooIOInitialized) { return }; 
             w.GentooIOInitialized = true; 
             var s = document.createElement("script"); 
@@ -107,6 +109,7 @@
             s.async = true; 
             s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"; 
             s.onload = () => { 
+                console.log('s.onload called');
                 while (ge.q.length) { 
                     var args = ge.q.shift();
                     ge.process(args); 
@@ -130,8 +133,10 @@
             } 
         }; 
         if (document.readyState === "complete") { 
+            console.log('document.readyState === "complete"');
             l(); 
         } else { 
+            console.log('document.readyState !== "complete"');
             w.addEventListener("DOMContentLoaded", l); 
             w.addEventListener("load", l); 
         };
