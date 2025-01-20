@@ -40,7 +40,7 @@
         if (method === 'boot') { 
             try {
                 console.log('params', params);
-                fb = new w.FloatingButton(params); 
+                fb = new FloatingButton(params); 
             } catch (error) {
                 console.error('Failed to create FloatingButton instance:', error);
             }
