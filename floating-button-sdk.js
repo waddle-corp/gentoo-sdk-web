@@ -1,3 +1,15 @@
+(function (global, document) { 
+    var w = global;
+    if (w.GentooIO) { 
+        return w.console.error("GentooIO script included twice"); 
+    };
+    while (GentooIO.q.length) { 
+        var args = GentooIO.q.shift();
+        // GentooIO.process(args); 
+        console.log('GentooIO args', args);
+    };  
+})(window, document);
+
 class FloatingButton {
     constructor(props) {
         // Validate required props
