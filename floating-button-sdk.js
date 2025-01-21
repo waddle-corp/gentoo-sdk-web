@@ -166,16 +166,7 @@ class FloatingButton {
       // Create floating button
       this.floatingContainer = document.createElement("div");
       this.floatingContainer.className = `floating-container`;
-      this.floatingContainer.style.bottom = `${
-        this.isSmallResolution
-          ? this.chatbotData.mobilePosition.bottom
-          : this.chatbotData.position.bottom
-      }px`;
-      this.floatingContainer.style.right = `${
-        this.isSmallResolution
-          ? this.chatbotData.mobilePosition.right
-          : this.chatbotData.position.right
-      }px`;
+      this.updateFloatingContainerPosition(); // Set initial position
       this.button = document.createElement("div");
       this.button.className = `floating-button-common button-image`;
       this.button.type = "button";
@@ -270,14 +261,30 @@ class FloatingButton {
         }
       };
   
-      this.floatingContainer.addEventListener("click", buttonClickHandler);
-      this.closeButtonContainer.addEventListener("click", buttonClickHandler);
+      this.floatingContainer?.addEventListener("click", buttonClickHandler);
+      this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
   
       // Add event listener for the resize event
-      window.addEventListener("resize", () => {
+      window?.addEventListener("resize", () => {
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
+        this.updateFloatingContainerPosition(); // Update position on resize
       });
+    }
+  
+    updateFloatingContainerPosition() {
+        if (this.floatingContainer) {
+            this.floatingContainer.style.bottom = `${
+                this.isSmallResolution
+                    ? this.chatbotData.mobilePosition.bottom
+                    : this.chatbotData.position.bottom
+            }px`;
+            this.floatingContainer.style.right = `${
+                this.isSmallResolution
+                    ? this.chatbotData.mobilePosition.right
+                    : this.chatbotData.position.right
+            }px`;
+        }
     }
   
     openChat(e, elems) {
@@ -298,7 +305,7 @@ class FloatingButton {
         "shrink"
       );
   
-      dimmedBackground.addEventListener("click", (e) => {
+      dimmedBackground?.addEventListener("click", (e) => {
         e.stopPropagation();
         e.preventDefault();
         dimmedBackground.className = "dimmed-background hide";
@@ -306,7 +313,7 @@ class FloatingButton {
         this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
       });
   
-      window.addEventListener("message", (e) => {
+      window?.addEventListener("message", (e) => {
         if (e.data.redirectState) {
           window.location.href = e.data.redirectUrl;
         }
@@ -321,10 +328,10 @@ class FloatingButton {
         }
       });
   
-      chatHeader.addEventListener("touchmove", (e) => {
+      chatHeader?.addEventListener("touchmove", (e) => {
         this.handleTouchMove(e, iframeContainer);
       });
-      chatHeader.addEventListener("touchend", (e) => {
+      chatHeader?.addEventListener("touchend", (e) => {
         this.handleTouchEnd(
           e,
           iframeContainer,
@@ -707,6 +714,6 @@ class FloatingButton {
       });
     }
   
-    w.addEventListener("message", () => {});
+    w?.addEventListener("message", () => {});
   })(window, document);
   
