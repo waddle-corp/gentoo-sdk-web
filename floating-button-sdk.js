@@ -67,7 +67,7 @@ class FloatingButton {
     }    
     
     async init() {
-        console.log('init called');
+        console.log('init called', this.pageList);
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -327,6 +327,7 @@ class FloatingButton {
     }
 
     setPageList(pageList) {
+        console.log('setPageList called', pageList);
         this.pageList = pageList;
     }
 
@@ -517,6 +518,7 @@ window.FloatingButton = FloatingButton;
 
 (function (global, document) { 
     var w = global;
+    var fb;
 
     // Function to inject CSS
     function injectCSS(href) {
