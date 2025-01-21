@@ -411,7 +411,6 @@ class FloatingButton {
       this.isInitialized = false;
       this.floatingCount = 0;
       this.floatingClicked = false;
-      this.needsTimer = null;
   
       console.log("FloatingButton instance destroyed");
     }
@@ -526,23 +525,7 @@ class FloatingButton {
       this.scrollPosition = 0;
       this.scrollDir = "";
     }
-  
-    enableExpandTimer(mode) {
-      if (this.type === "default") return;
-      else {
-        if (this.needsTimer) {
-          clearTimeout(this.needsTimer); // 기존 타이머를 먼저 클리어
-        }
-        if (mode === "on") {
-          this.needsTimer = setTimeout(() => {
-            this.updateParameter({ type: "needs" });
-          }, 10000);
-        } else if (mode === "off") {
-          clearTimeout(this.needsTimer); // 타이머 클리어
-        }
-      }
-    }
-  
+
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
       this.logEvent({
         eventCategory: "SDKFloatingClicked",
@@ -550,7 +533,6 @@ class FloatingButton {
         chatUserId: this.chatUserId,
         products: [],
       });
-      this.enableExpandTimer("off");
   
       var isChatOpenState = {
         isChatOpen: true,
@@ -573,10 +555,6 @@ class FloatingButton {
     }
   
     hideChat(iframeContainer, button, expandedButton, dimmedBackground) {
-      if (!this.isDestroyed && this.floatingCount < 2) {
-        // mockup is not the case cause scroll event is applied
-        this.enableExpandTimer("on");
-      }
       button.className = "floating-button-common button-image";
       if (expandedButton) expandedButton.className = "expanded-button hide";
       iframeContainer.className = "iframe-container iframe-container-hide";
@@ -690,13 +668,6 @@ class FloatingButton {
             if (typeof fb.init === "function") {
               Promise.resolve(fb.init()).catch((error) => {
                 console.error("Failed to initialize GentooIO:", error);
-              });
-            }
-            break;
-          case "update":
-            if (typeof fb.updateParameter === "function") {
-              Promise.resolve(fb.updateParameter(params)).catch((error) => {
-                console.error("Failed to update GentooIO parameters:", error);
               });
             }
             break;
