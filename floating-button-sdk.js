@@ -553,7 +553,7 @@ window.FloatingButton = FloatingButton;
         const transitionPage = '/' + pathSegments[1];
         const searchParams = new URLSearchParams(window.location.search);
         const utm = { utms: searchParams.get('utm_source'), utmm: searchParams.get('utm_medium'), utmcp: searchParams.get('utm_campaign'), utmct: searchParams.get('utm_content'), utmt: searchParams.get('utm_term'), tp: transitionPage };
-        params.utm = utm;
+        params.utm = utm || {};
 
         // Allow boot method anytime
         if (method === 'boot') { 
