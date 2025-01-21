@@ -246,7 +246,7 @@ class FloatingButton {
           if (this.expandedButton)
             this.expandedButton.className = "expanded-area hide";
           this.button.className =
-            "floating-button-common button-image-close-mr hide-visibility";
+            "floating-button-common button-image-close-mr hide";
           // this.button.style.backgroundImage = `url(''https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
           this.openChat(e, this.elems);
         } else {
