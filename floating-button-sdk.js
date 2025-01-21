@@ -98,21 +98,10 @@ class FloatingButton {
   
         // Create UI elements after data is ready
         if (!this.isDestroyed || this.pageList.length === 0) {
-          console.log(
-            "createUIElements called1",
-            this.pageList,
-            window.location.pathname
-          );
           this.createUIElements();
         } else if (this.pageList.includes(window.location.pathname)) {
-          console.log(
-            "createUIElements called2",
-            this.pageList,
-            window.location.pathname
-          );
           this.createUIElements();
         } else {
-          console.log("destroy called", this.pageList, window.location.pathname);
           this.destroy();
         }
       } catch (error) {

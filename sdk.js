@@ -6,30 +6,30 @@
         }; 
 
         // Function to inject CSS
-        function injectCSS(href) {
-            // Check if the CSS is already injected
-            var existingLink = document.querySelector('link[href="' + href + '"]');
-            if (existingLink) {
-            return;
-            }
+        // function injectCSS(href) {
+        //     // Check if the CSS is already injected
+        //     var existingLink = document.querySelector('link[href="' + href + '"]');
+        //     if (existingLink) {
+        //     return;
+        //     }
     
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = href;
-            link.type = "text/css";
-            link.onload = function() {
-            console.log("GentooIO CSS loaded successfully.");
-            };
-            link.onerror = function() {
-            console.error("Failed to load GentooIO CSS.");
-            };
-            document.head.appendChild(link);
-        }
+        //     var link = document.createElement("link");
+        //     link.rel = "stylesheet";
+        //     link.href = href;
+        //     link.type = "text/css";
+        //     link.onload = function() {
+        //     console.log("GentooIO CSS loaded successfully.");
+        //     };
+        //     link.onerror = function() {
+        //     console.error("Failed to load GentooIO CSS.");
+        //     };
+        //     document.head.appendChild(link);
+        // }
     
-        // Inject the CSS automatically
-        injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+        // // Inject the CSS automatically
+        // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
         
-        var fb = null; 
+        // var fb = null; 
         var ge = function () { 
             ge.c(arguments); 
         }; 
@@ -121,7 +121,6 @@
         // }; 
         w.GentooIO = ge; 
         function l() { 
-            console.log('l called', w.GentooIOInitialized);
             if (w.GentooIOInitialized) { return }; 
             w.GentooIOInitialized = true; 
             var s = document.createElement("script"); 
@@ -129,7 +128,6 @@
             s.async = true; 
             s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"; 
             s.onload = () => { 
-                console.log('s.onload called', w.GentooIOInitialized, ge.q);
                 // while (ge.q.length) { 
                 //     var args = ge.q.shift();
                 //     ge.process(args); 
@@ -142,10 +140,8 @@
             }; 
         }; 
         if (document.readyState === "complete") { 
-            console.log('document.readyState === "complete"');
             l(); 
         } else { 
-            console.log('document.readyState !== "complete"');
             w.addEventListener("DOMContentLoaded", l); 
             w.addEventListener("load", l); 
         };
