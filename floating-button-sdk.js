@@ -429,23 +429,6 @@ class FloatingButton {
         this.scrollDir = '';
     }
 
-    enableExpandTimer(mode) {
-        if (this.type === 'default') return;
-        else {
-            if (this.needsTimer) {
-                clearTimeout(this.needsTimer);  // 기존 타이머를 먼저 클리어
-            }
-            if (mode === 'on') {
-                this.needsTimer = setTimeout(() => {
-                    this.updateParameter({type: 'needs'});
-                }, 10000);
-            }
-            else if (mode === 'off') {
-                clearTimeout(this.needsTimer);  // 타이머 클리어
-            }
-        }
-    }
-
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
         this.logEvent({
             eventCategory: 'SDKFloatingClicked',
@@ -579,13 +562,6 @@ window.FloatingButton = FloatingButton;
                 if (typeof fb.init === 'function') {
                     Promise.resolve(fb.init()).catch(error => {
                         console.error('Failed to initialize GentooIO:', error);
-                    });
-                }
-                break;
-            case 'update':
-                if (typeof fb.updateParameter === 'function') {
-                    Promise.resolve(fb.updateParameter(params)).catch(error => {
-                        console.error('Failed to update GentooIO parameters:', error);
                     });
                 }
                 break;

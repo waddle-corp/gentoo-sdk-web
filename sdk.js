@@ -74,13 +74,6 @@
                         });
                     }
                     break;
-                case 'update':
-                    if (typeof fb.updateParameter === 'function') {
-                        Promise.resolve(fb.updateParameter(params)).catch(error => {
-                            console.error('Failed to update GentooIO parameters:', error);
-                        });
-                    }
-                    break;
                 case 'unmount':
                     if (typeof fb.destroy === 'function') {
                         Promise.resolve(fb.destroy()).catch(error => {
