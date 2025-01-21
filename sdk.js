@@ -75,6 +75,26 @@
                     }
                     break;
                 case 'unmount':
+                    try {
+                        // Remove the SDK script
+                        const sdkScript = document.querySelector('script[src="https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.js"]');
+                        if (sdkScript) {
+                            sdkScript.parentNode.removeChild(sdkScript);
+                        }
+                        // Remove the CSS
+                        const sdkCSS = document.querySelector('link[href="https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css"]');
+                        if (sdkCSS) {
+                            sdkCSS.parentNode.removeChild(sdkCSS);
+                        }
+                        // Clean up the instance
+                        fb = null;
+                        w.GentooIOInitialized = false;
+                        console.log('GentooIO SDK removed successfully');
+                    } catch (error) {
+                        console.error('Failed to remove GentooIO SDK:', error);
+                    }
+                    break;
+                case 'unmount1':
                     if (typeof fb.destroy === 'function') {
                         Promise.resolve(fb.destroy()).catch(error => {
                             console.error('Failed to unmount GentooIO:', error);
