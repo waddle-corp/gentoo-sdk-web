@@ -69,7 +69,8 @@ class FloatingButton {
         });
     }
 
-    async init(position) {
+    async init(params) {
+        var position = params?.position;
         try {
             // Wait for boot process to complete
             await this.bootPromise;
