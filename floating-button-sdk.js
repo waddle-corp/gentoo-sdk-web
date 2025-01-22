@@ -69,9 +69,7 @@ class FloatingButton {
         });
     }
 
-    async init(params) {
-        const { position } = params;
-        console.log('init called', position, params);
+    async init(position) {
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -661,7 +659,6 @@ window.FloatingButton = FloatingButton;
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
-                        console.log('init called @ switch', params);
                         Promise.resolve(fb.init(params)).catch((error) => {
                             console.error("Failed to initialize GentooIO:", error);
                         });
