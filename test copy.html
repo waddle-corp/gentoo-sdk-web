@@ -43,7 +43,18 @@
         })
 
         // Render Floating Button
-        GentooIO('init', {});
+        GentooIO('init', {
+            position: {
+                web: {
+                    bottom: 100,
+                    right: 100,
+                },
+                mobile: {
+                    bottom: 60,
+                    right: 10,
+                }
+            }
+        });
         // GentooIO('unmount', {});
     </script>
     <div>
