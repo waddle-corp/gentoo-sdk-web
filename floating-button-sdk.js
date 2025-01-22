@@ -234,6 +234,15 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners();
+
+        // Call getShowGentooEvent with the provided callback
+        if (typeof this.getShowGentooEvent === "function") {
+            this.getShowGentooEvent((callback) => {
+                if (typeof callback === "function") {
+                    callback();
+                }
+            });
+        }
     }
 
     setupEventListeners(position) {
@@ -580,6 +589,13 @@ class FloatingButton {
             throw error;
         }
     }
+
+    getShowGentooEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function") {
+            callback();
+        }
+    }
 }
 
 // Export as a global variable
@@ -684,6 +700,11 @@ window.FloatingButton = FloatingButton;
                         Promise.resolve(fb.setPageList(params)).catch((error) => {
                             console.error("Failed to set GentooIO page list:", error);
                         });
+                    }
+                    break;
+                case "getShowGentooEvent":
+                    if (typeof fb.getShowGentooEvent === "function") {
+                        fb.getShowGentooEvent(params.callback);
                     }
                     break;
                 default:
