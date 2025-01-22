@@ -71,6 +71,7 @@ class FloatingButton {
 
     async init(params) {
         const { position } = params;
+        console.log('init called', position);
         try {
             // Wait for boot process to complete
             await this.bootPromise;
