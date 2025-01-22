@@ -661,6 +661,7 @@ window.FloatingButton = FloatingButton;
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
+                        console.log('init called @ switch', params);
                         Promise.resolve(fb.init(params)).catch((error) => {
                             console.error("Failed to initialize GentooIO:", error);
                         });
