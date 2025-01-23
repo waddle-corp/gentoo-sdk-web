@@ -134,7 +134,7 @@ class FloatingButton {
             return;
         }
 
-        this.eventCallback.show();
+        this.eventCallback?.show();
 
         // Create iframe elements
         this.dimmedBackground = document.createElement("div");
@@ -257,7 +257,7 @@ class FloatingButton {
                 this.button.className =
                     "floating-button-common button-image-close-mr hide";
                 this.openChat(e, this.elems);
-                this.eventCallback.click();
+                this.eventCallback?.click();
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -325,7 +325,7 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                this.eventCallback.formSubmitted();
+                this.eventCallback?.formSubmitted();
             }
             if (this.isSmallResolution) {
                 this.enableChat(
@@ -596,21 +596,21 @@ class FloatingButton {
     getGentooShowEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback.show = callback;
+            this.eventCallback?.show = callback;
         }
     }
 
     getGentooClickEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback.click = callback;
+            this.eventCallback?.click = callback;
         }
     }
 
     getFormSubmittedEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback.formSubmitted = callback;
+            this.eventCallback?.formSubmitted = callback;
         }
     }
 }
