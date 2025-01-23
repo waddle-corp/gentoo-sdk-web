@@ -42,8 +42,13 @@ class FloatingButton {
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
-            this.keys = {
-                log: "G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc",
+        } else if (window.location.hostname === "stage-demo.gentooai.com") {
+            this.hostSrc = "https://stage-demo.gentooai.com";
+            this.domains = {
+                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
+                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
@@ -52,9 +57,6 @@ class FloatingButton {
                 log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
-            };
-            this.keys = {
-                log: "EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k",
             };
         }
 
