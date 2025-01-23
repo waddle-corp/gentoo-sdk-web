@@ -134,7 +134,9 @@ class FloatingButton {
             return;
         }
 
-        this.eventCallback?.show();
+        if (this.eventCallback.show !== null) {
+            this.eventCallback.show();
+        }
 
         // Create iframe elements
         this.dimmedBackground = document.createElement("div");
@@ -257,7 +259,9 @@ class FloatingButton {
                 this.button.className =
                     "floating-button-common button-image-close-mr hide";
                 this.openChat(e, this.elems);
-                this.eventCallback?.click();
+                if (this.eventCallback.click !== null) {
+                    this.eventCallback.click();
+                }
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -325,7 +329,9 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                this.eventCallback?.formSubmitted();
+                if (this.eventCallback.formSubmitted !== null) {
+                    this.eventCallback.formSubmitted();
+                }
             }
             if (this.isSmallResolution) {
                 this.enableChat(
