@@ -36,8 +36,8 @@
             udid: 'd02a7e31-3727-4e72-8768-88d06d313eed', // optional, only for dlst
             authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
             // partnerId: '6718be2310310e41ab5276ef',
-            partnerId: '67615284c5ff44110dbc6613', // fastfive prod
-            // partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
+            // partnerId: '67615284c5ff44110dbc6613', // fastfive prod
+            partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
             itemId: '1234', // optional, only @PRODUCT_DETAIL page
             displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
         })
@@ -53,6 +53,24 @@
                     bottom: 60,
                     right: 10,
                 }
+            }
+        });
+
+        GentooIO('getGentooShowEvent', {
+            callback: () => {
+                console.log('getGentooShowEvent called');
+            }
+        });
+
+        GentooIO('getGentooClickEvent', {
+            callback: () => {
+                console.log('getGentooClickEvent called');
+            }
+        });
+
+        GentooIO('getFormSubmittedEvent', {
+            callback: () => {
+                console.log('getFormSubmittedEvent called');
             }
         });
         // GentooIO('unmount', {});

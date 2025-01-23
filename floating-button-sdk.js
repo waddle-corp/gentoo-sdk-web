@@ -25,6 +25,11 @@ class FloatingButton {
         this.floatingClicked = false;
         this.floatingData;
         this.pageList = [];
+        this.eventCallback = {
+            show: null,
+            click: null,
+            formSubmitted: null,
+        }
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -43,10 +48,14 @@ class FloatingButton {
         } else {
             this.hostSrc = "https://demo.gentooai.com";
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                // auth: "https://api.gentooai.com/chat/api/v1/user",
+                // log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                // chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+                // floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "  https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
             this.keys = {
                 log: "EYOmgqkSmm55kxojN6ck7a4SKlvKltpd9X5r898k",
@@ -94,7 +103,8 @@ class FloatingButton {
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://dev-demo.gentooai.com/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
@@ -126,6 +136,8 @@ class FloatingButton {
             console.error("Floating data is incomplete");
             return;
         }
+
+        this.eventCallback.show();
 
         // Create iframe elements
         this.dimmedBackground = document.createElement("div");
@@ -247,8 +259,8 @@ class FloatingButton {
                     this.expandedButton.className = "expanded-area hide";
                 this.button.className =
                     "floating-button-common button-image-close-mr hide";
-                // this.button.style.backgroundImage = `url(''https://d32xcphivq9687.cloudfront.net/public/img/units/sdk-floating-close.png')`;
                 this.openChat(e, this.elems);
+                this.eventCallback.click();
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -314,6 +326,9 @@ class FloatingButton {
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 window.location.href = e.data.redirectUrl;
+            }
+            if (e.data.formSubmittedState) {
+                this.eventCallback.formSubmitted();
             }
             if (this.isSmallResolution) {
                 this.enableChat(
@@ -580,6 +595,27 @@ class FloatingButton {
             throw error;
         }
     }
+
+    getGentooShowEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function") {
+            this.eventCallback.show = callback;
+        }
+    }
+
+    getGentooClickEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function") {
+            this.eventCallback.click = callback;
+        }
+    }
+
+    getFormSubmittedEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function") {
+            this.eventCallback.formSubmitted = callback;
+        }
+    }
 }
 
 // Export as a global variable
@@ -683,6 +719,27 @@ window.FloatingButton = FloatingButton;
                     if (typeof fb.setPageList === "function") {
                         Promise.resolve(fb.setPageList(params)).catch((error) => {
                             console.error("Failed to set GentooIO page list:", error);
+                        });
+                    }
+                    break;
+                case "getGentooShowEvent":
+                    if (typeof fb.getGentooShowEvent === "function") {
+                        Promise.resolve(fb.getGentooShowEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
+                        });
+                    }
+                    break;
+                case "getGentooClickEvent":
+                    if (typeof fb.getGentooClickEvent === "function") {
+                        Promise.resolve(fb.getGentooClickEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
+                        });
+                    }
+                    break;
+                case "getFormSubmittedEvent":
+                    if (typeof fb.getFormSubmittedEvent === "function") {
+                        Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
                         });
                     }
                     break;
