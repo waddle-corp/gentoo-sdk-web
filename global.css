@@ -30,11 +30,50 @@
     /* regular */
 }
 
-p {
-    font-family: "pretendard";
-    margin: 0;
+html {
+    -webkit-text-size-adjust: none;
 }
 
-div {
+#root {
+    width: 100%;
+    max-width: 100%;
+    --vh: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: none;
+}
+
+body,
+html {
+    width: 100%;
+    max-width: 100%;
+    height: var(--vh);
+    overflow-y: hidden;
+    font-family: "pretendard";
+    margin: 0;
+    overflow-x: hidden;
+    color: #222222;
+    -webkit-text-size-adjust: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body *,
+html * {
     box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+.label,
+span,
+input,
+input::placeholder {
+    margin: 0;
+    font-family: "pretendard", sans-serif;
 }
