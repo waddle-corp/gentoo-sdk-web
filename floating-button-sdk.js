@@ -102,7 +102,7 @@ class FloatingButton {
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-
+            
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position);
@@ -329,8 +329,9 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
+                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
                 if (this.eventCallback.formSubmitted !== null) {
-                    this.eventCallback.formSubmitted();
+                    this.eventCallback?.formSubmitted(params);
                 }
             }
             if (this.isSmallResolution) {
