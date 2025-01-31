@@ -52,11 +52,17 @@ class FloatingButton {
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
+            // this.domains = {
+            //     auth: "https://api.gentooai.com/chat/api/v1/user",
+            //     log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+            //     chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+            //     floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            // };
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -101,8 +107,9 @@ class FloatingButton {
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-
+            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://dev-demo.gentooai.com/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position);
@@ -325,7 +332,8 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                this.eventCallback?.formSubmitted();
+                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                this.eventCallback?.formSubmitted(params);
             }
             if (this.isSmallResolution) {
                 this.enableChat(
@@ -596,21 +604,21 @@ class FloatingButton {
     getGentooShowEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback?.show = callback;
+            this.eventCallback.show = callback;
         }
     }
 
     getGentooClickEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback?.click = callback;
+            this.eventCallback.click = callback;
         }
     }
 
     getFormSubmittedEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function") {
-            this.eventCallback?.formSubmitted = callback;
+            this.eventCallback.formSubmitted = callback;
         }
     }
 }
