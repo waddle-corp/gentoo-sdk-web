@@ -31,6 +31,8 @@ class FloatingButton {
             formSubmitted: null,
         }
 
+        this.isFF = window.location.hostname === "dev.fastfive.co.kr";
+
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com"
@@ -250,6 +252,9 @@ class FloatingButton {
     setupEventListeners(position) {
         // Button click event
         var buttonClickHandler = (e) => {
+            if (this.isFF) {
+                console.log('FF button clicked', e.target);
+            }
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
@@ -299,6 +304,9 @@ class FloatingButton {
     }
 
     openChat(e, elems) {
+        if (this.isFF) {
+            console.log('FF openChat called', e.target);
+        }
         e.stopPropagation();
         e.preventDefault();
         const iframeContainer = elems.iframeContainer;
@@ -325,6 +333,9 @@ class FloatingButton {
         });
 
         window?.addEventListener("message", (e) => {
+            if (this.isFF) {
+                console.log('FF message', e.data);
+            }
             if (e.data.redirectState) {
                 window.location.href = e.data.redirectUrl;
             }
@@ -540,6 +551,9 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
+        if (this.isFF) {
+            console.log('FF enableChat called');
+        }
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
@@ -609,6 +623,9 @@ class FloatingButton {
 
     getGentooClickEvent(callback) {
         // Execute the callback function
+        if (this.isFF) {
+            console.log('FF getGentooClickEvent called');
+        }
         if (typeof callback === "function") {
             this.eventCallback.click = callback;
         }
