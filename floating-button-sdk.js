@@ -334,7 +334,7 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (this.isFF) {
-                console.log('FF message', e.data);
+                console.log('FF message', e.data, e.data.event);
             }
             if (e.data.redirectState) {
                 window.location.href = e.data.redirectUrl;
@@ -345,7 +345,7 @@ class FloatingButton {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
-            if (this.isSmallResolution) {
+            if (this.isSmallResolution && e.data.event !== 'kakaoPixel:event') {
                 this.enableChat(
                     iframeContainer,
                     button,
