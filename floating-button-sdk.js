@@ -52,11 +52,17 @@ class FloatingButton {
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
+            // this.domains = {
+            //     auth: "https://api.gentooai.com/chat/api/v1/user",
+            //     log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+            //     chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+            //     floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            // };
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -101,7 +107,8 @@ class FloatingButton {
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://dev-demo.gentooai.com/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
@@ -237,6 +244,7 @@ class FloatingButton {
 
         this.elems = {
             iframeContainer: this.iframeContainer,
+            iframe: this.iframe,
             chatHeader: this.chatHeader,
             dimmedBackground: this.dimmedBackground,
             button: this.button,
@@ -302,6 +310,7 @@ class FloatingButton {
         e.stopPropagation();
         e.preventDefault();
         const iframeContainer = elems.iframeContainer;
+        const iframe = elems.iframe;
         const chatHeader = elems.chatHeader;
         const dimmedBackground = elems.dimmedBackground;
         const button = elems.button;
@@ -356,6 +365,31 @@ class FloatingButton {
                 expandedButton,
                 dimmedBackground
             );
+        });
+
+        chatHeader?.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            this.handleMouseDown(e, iframe);
+            const onMouseMove = (e) => {
+                e.preventDefault();
+                this.handleMouseMove(e, iframeContainer);
+            };
+            const onMouseUp = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleMouseUp(
+                    e,
+                    iframeContainer,
+                    iframe,
+                    button,
+                    expandedButton,
+                    dimmedBackground,
+                );
+                document.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+            };
+            document.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
         });
     }
 
@@ -539,6 +573,50 @@ class FloatingButton {
         this.scrollDir = "";
     }
 
+    handleMouseDown(e, iframe) {
+        e.preventDefault();
+        iframe.classList.add("event-disabled");
+        const clientY = e.clientY; // Use clientY from mouse event
+        if (!this.prevPosition) {
+            this.prevPosition = clientY;
+        }
+    }
+
+    handleMouseMove(e, iframeContainer) {
+        e.preventDefault();
+        const clientY = e.clientY; // Use clientY from mouse event
+            
+        const diff = clientY - this.prevPosition;
+
+        const newHeight = iframeContainer.offsetHeight - diff;
+        iframeContainer.style.height = `${newHeight}px`;
+        if (Math.abs(diff) > 30) {
+            this.scrollDir = diff > 0 ? "down" : "up";
+        }
+    }
+
+    handleMouseUp(e, iframeContainer, iframe, button, expandedButton, dimmedBackground) {
+        e.preventDefault();
+        iframe.classList.remove("event-disabled");
+        if (this.scrollDir === "up") {
+            iframeContainer.style.height = "517px";
+            this.enableChat(
+                iframeContainer,
+                button,
+                expandedButton,
+                dimmedBackground,
+                "full"
+            );
+        } else if (this.scrollDir === "down") {
+            iframeContainer.style.height = "517px";
+            this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+        }
+
+        this.prevPosition = null;
+        this.scrollPosition = 0;
+        this.scrollDir = "";
+    }
+
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
@@ -647,7 +725,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 

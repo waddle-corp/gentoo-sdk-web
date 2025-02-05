@@ -202,7 +202,7 @@
     padding: 0px;
     border-radius: 10px;
 
-    transition: all 1s ease;
+    transition: all 0.5s ease;
 
     @media screen and (min-width: 600px) {
         width: 390px;
@@ -330,4 +330,8 @@
 
 .hide-visibility {
     visibility: hidden;
+}
+
+.event-disabled {
+    pointer-events: none;
 }
