@@ -345,7 +345,7 @@ class FloatingButton {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
-            if (this.isSmallResolution && e.data.type !== 'kakaoPixel:event') {
+            if (this.isSmallResolution && e.data.inputFocusState) {
                 this.enableChat(
                     iframeContainer,
                     button,
