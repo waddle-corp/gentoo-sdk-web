@@ -53,7 +53,9 @@
                     bottom: 60,
                     right: 10,
                 }
-            }
+            },
+            showGentooButton: true,
+            isCustomButton: true,
         });
 
         GentooIO('getGentooShowEvent', {
@@ -77,14 +79,17 @@
         // GentooIO('unmount', {});
     </script>
     <div>
-        <div id='gentoo-sc'>
+        <div>
             <div style="display: flex; flex-direction: column; align-items: stretch; height: 100%;">
                 <div style="width: 100%; height: 400px; background: skyblue;">
                     box1
                 </div>
                 <div style="display: flex; width: 100%; height: fit-content";>
                     <div style="flex: 1; height: 300px; background: cornflowerblue;">
-                        box2
+                        <button 
+                            class="gentoo-custom-button"
+                            style="padding: 10px 20px;"
+                        >Open Chat</button>
                     </div>
                     <div style="flex: 1; height: 300px; background: cornsilk;">
                         box3
