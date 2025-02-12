@@ -31,6 +31,8 @@ class FloatingButton {
             formSubmitted: null,
         }
 
+        this.isFF = window.location.hostname === "dev.fastfive.co.kr";
+
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com"
@@ -52,11 +54,17 @@ class FloatingButton {
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
+            // this.domains = {
+            //     auth: "https://api.gentooai.com/chat/api/v1/user",
+            //     log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+            //     chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+            //     floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            // };
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "  https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -77,7 +85,7 @@ class FloatingButton {
     }
 
     async init(params) {
-        const { position } = params;
+        const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -105,9 +113,9 @@ class FloatingButton {
             
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
-                this.createUIElements(position);
+                this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
-                this.createUIElements(position);
+                this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
                 this.destroy();
             }
@@ -118,7 +126,7 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements(position) {
+    createUIElements(position, showGentooButton, isCustomButton = false) {
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -173,68 +181,69 @@ class FloatingButton {
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
         document.body.appendChild(this.dimmedBackground);
+        document.body.appendChild(this.iframeContainer);
 
         // Create floating button
-        this.floatingContainer = document.createElement("div");
-        this.floatingContainer.className = `floating-container`;
-        this.updateFloatingContainerPosition(position); // Set initial position
-        this.button = document.createElement("div");
-        this.button.className = `floating-button-common button-image`;
-        this.button.type = "button";
-        this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        document.body.appendChild(this.iframeContainer);
-        document.body.appendChild(this.floatingContainer);
-        this.floatingContainer.appendChild(this.button);
+        if (showGentooButton) {
+            this.floatingContainer = document.createElement("div");
+            this.floatingContainer.className = `floating-container`;
+            this.updateFloatingContainerPosition(position); // Set initial position
+            this.button = document.createElement("div");
+            this.button.className = `floating-button-common button-image`;
+            this.button.type = "button";
+            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            document.body.appendChild(this.floatingContainer);
+            this.floatingContainer.appendChild(this.button);
 
-        this.logEvent({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        });
+            this.logEvent({
+                eventCategory: "SDKFloatingRendered",
+                partnerId: this.partnerId,
+                chatUserId: this.chatUserId,
+                products: [],
+            });
 
-        if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
-            setTimeout(() => {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
+            if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+                setTimeout(() => {
+                    // Check if component is destroyed or clicked
+                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                        return;
 
-                this.expandedButton = document.createElement("div");
-                this.expandedButton.className = "expanded-area";
-                this.expandedText = document.createElement("p");
-                this.expandedButton.appendChild(this.expandedText);
-                this.expandedText.className = "expanded-area-text";
+                    this.expandedButton = document.createElement("div");
+                    this.expandedButton.className = "expanded-area";
+                    this.expandedText = document.createElement("p");
+                    this.expandedButton.appendChild(this.expandedText);
+                    this.expandedText.className = "expanded-area-text";
 
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
+                    // Double check if floatingContainer still exists before appending
+                    if (this.floatingContainer && this.floatingContainer.parentNode) {
+                        this.floatingContainer.appendChild(this.expandedButton);
 
-                    // Add text animation
-                    let i = 0;
-                    const addLetter = () => {
-                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                            this.expandedText.innerText += this.floatingData.comment[i];
-                            i++;
-                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                        }
-                    };
-                    addLetter();
-                    this.floatingCount += 1;
+                        // Add text animation
+                        let i = 0;
+                        const addLetter = () => {
+                            if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                                this.expandedText.innerText += this.floatingData.comment[i];
+                                i++;
+                                setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                            }
+                        };
+                        addLetter();
+                        this.floatingCount += 1;
 
-                    // Remove expanded button after delay
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
-                        }
-                    }, 8000);
-                }
-            }, 3000);
+                        // Remove expanded button after delay
+                        setTimeout(() => {
+                            if (
+                                this.floatingContainer &&
+                                this.expandedButton &&
+                                this.expandedButton.parentNode === this.floatingContainer
+                            ) {
+                                this.floatingContainer.removeChild(this.expandedButton);
+                            }
+                        }, 8000);
+                    }
+                }, 3000);
+            }
         }
-
         this.elems = {
             iframeContainer: this.iframeContainer,
             iframe: this.iframe,
@@ -245,10 +254,10 @@ class FloatingButton {
         };
 
         // Add event listeners
-        this.setupEventListeners();
+        this.setupEventListeners(position, isCustomButton);
     }
 
-    setupEventListeners(position) {
+    setupEventListeners(position, isCustomButton = false) {
         // Button click event
         var buttonClickHandler = (e) => {
             e.stopPropagation();
@@ -257,8 +266,10 @@ class FloatingButton {
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
-                this.button.className =
-                    "floating-button-common button-image-close-mr hide";
+                if (this.button) {
+                    this.button.className =
+                        "floating-button-common button-image-close-mr hide";
+                }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
                     this.eventCallback.click();
@@ -270,13 +281,19 @@ class FloatingButton {
                     this.elems.expandedButton,
                     this.elems.dimmedBackground
                 );
-                this.button.className = "floating-button-common button-image";
-                this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                if (this.button) {
+                    this.button.className = "floating-button-common button-image";
+                    this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                }
             }
         };
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        if (isCustomButton) {
+            const customButton = document.getElementsByClassName("gentoo-custom-button")[0];
+            customButton.addEventListener("click", buttonClickHandler);
+        }
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -289,12 +306,12 @@ class FloatingButton {
     updateFloatingContainerPosition(position) {
         if (this.floatingContainer) {
             this.floatingContainer.style.bottom = `${this.isSmallResolution
-                    ? (position?.mobile?.bottom || this.chatbotData.mobilePosition.bottom)
-                    : (position?.web?.bottom || this.chatbotData.position.bottom)
+                ? (position?.mobile?.bottom || this.chatbotData.mobilePosition.bottom)
+                : (position?.web?.bottom || this.chatbotData.position.bottom)
                 }px`;
             this.floatingContainer.style.right = `${this.isSmallResolution
-                    ? (position?.mobile?.right || this.chatbotData.mobilePosition.right)
-                    : (position?.web?.right || this.chatbotData.position.right)
+                ? (position?.mobile?.right || this.chatbotData.mobilePosition.right)
+                : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
         }
     }
@@ -611,17 +628,15 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
+        if (this.isFF) {
+            console.log('FF enableChat called');
+        }
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
         });
-
-        var isChatOpenState = {
-            isChatOpen: true,
-        };
-        this.iframe.contentWindow.postMessage(isChatOpenState, "*");
 
         if (this.isSmallResolution) {
             dimmedBackground.className = "dimmed-background";
@@ -639,7 +654,9 @@ class FloatingButton {
     }
 
     hideChat(iframeContainer, button, expandedButton, dimmedBackground) {
-        button.className = "floating-button-common button-image";
+        if (button) {
+            button.className = "floating-button-common button-image";
+        }
         if (expandedButton) expandedButton.className = "expanded-button hide";
         iframeContainer.className = "iframe-container iframe-container-hide";
         dimmedBackground.className = "dimmed-background hide";
@@ -680,6 +697,9 @@ class FloatingButton {
 
     getGentooClickEvent(callback) {
         // Execute the callback function
+        if (this.isFF) {
+            console.log('FF getGentooClickEvent called');
+        }
         if (typeof callback === "function") {
             this.eventCallback.click = callback;
         }
@@ -749,7 +769,7 @@ window.FloatingButton = FloatingButton;
                 utmt: searchParams.get("utm_term"),
                 tp: transitionPage,
             };
-            
+
             // Handle boot separately
             if (method === "boot") {
                 params.utm = utm;
@@ -773,6 +793,13 @@ window.FloatingButton = FloatingButton;
                     if (typeof fb.init === "function") {
                         Promise.resolve(fb.init(params)).catch((error) => {
                             console.error("Failed to initialize GentooIO:", error);
+                        });
+                    }
+                    break;
+                case "openChat":
+                    if (typeof fb.openChat === "function") {
+                        Promise.resolve(fb.openChat()).catch((error) => {
+                            console.error("Failed to open GentooIO chat:", error);
                         });
                     }
                     break;
