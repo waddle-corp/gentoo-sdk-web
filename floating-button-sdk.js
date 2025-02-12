@@ -109,9 +109,8 @@ class FloatingButton {
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
-            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://dev-demo.gentooai.com/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position, showGentooButton, isCustomButton);
@@ -142,7 +141,10 @@ class FloatingButton {
             console.error("Floating data is incomplete");
             return;
         }
-        this.eventCallback?.show();
+
+        if (this.eventCallback.show !== null) {
+            this.eventCallback.show();
+        }
 
         // Create iframe elements
         this.dimmedBackground = document.createElement("div");
@@ -244,6 +246,7 @@ class FloatingButton {
         }
         this.elems = {
             iframeContainer: this.iframeContainer,
+            iframe: this.iframe,
             chatHeader: this.chatHeader,
             dimmedBackground: this.dimmedBackground,
             button: this.button,
@@ -268,7 +271,9 @@ class FloatingButton {
                         "floating-button-common button-image-close-mr hide";
                 }
                 this.openChat(e, this.elems);
-                this.eventCallback?.click();
+                if (this.eventCallback.click !== null) {
+                    this.eventCallback.click();
+                }
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -311,14 +316,15 @@ class FloatingButton {
         }
     }
 
-    openChat(e) {
-        e?.stopPropagation();
-        e?.preventDefault();
-        const iframeContainer = this.elems.iframeContainer;
-        const chatHeader = this.elems.chatHeader;
-        const dimmedBackground = this.elems.dimmedBackground;
-        const button = this.elems.button;
-        const expandedButton = this.elems.expandedButton;
+    openChat(e, elems) {
+        e.stopPropagation();
+        e.preventDefault();
+        const iframeContainer = elems.iframeContainer;
+        const iframe = elems.iframe;
+        const chatHeader = elems.chatHeader;
+        const dimmedBackground = elems.dimmedBackground;
+        const button = elems.button;
+        const expandedButton = elems.expandedButton;
 
         // Chat being visible
         this.enableChat(
@@ -342,10 +348,12 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
-                this.eventCallback?.formSubmitted(params);
+                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                if (this.eventCallback.formSubmitted !== null) {
+                    this.eventCallback?.formSubmitted(params);
+                }
             }
-            if (this.isSmallResolution) {
+            if (this.isSmallResolution && e.data.inputFocusState) {
                 this.enableChat(
                     iframeContainer,
                     button,
@@ -367,6 +375,31 @@ class FloatingButton {
                 expandedButton,
                 dimmedBackground
             );
+        });
+
+        chatHeader?.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            this.handleMouseDown(e, iframe);
+            const onMouseMove = (e) => {
+                e.preventDefault();
+                this.handleMouseMove(e, iframeContainer);
+            };
+            const onMouseUp = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleMouseUp(
+                    e,
+                    iframeContainer,
+                    iframe,
+                    button,
+                    expandedButton,
+                    dimmedBackground,
+                );
+                document.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+            };
+            document.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
         });
     }
 
@@ -542,6 +575,50 @@ class FloatingButton {
                 "full"
             );
         } else if (this.scrollDir === "down") {
+            this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+        }
+
+        this.prevPosition = null;
+        this.scrollPosition = 0;
+        this.scrollDir = "";
+    }
+
+    handleMouseDown(e, iframe) {
+        e.preventDefault();
+        iframe.classList.add("event-disabled");
+        const clientY = e.clientY; // Use clientY from mouse event
+        if (!this.prevPosition) {
+            this.prevPosition = clientY;
+        }
+    }
+
+    handleMouseMove(e, iframeContainer) {
+        e.preventDefault();
+        const clientY = e.clientY; // Use clientY from mouse event
+            
+        const diff = clientY - this.prevPosition;
+
+        const newHeight = iframeContainer.offsetHeight - diff;
+        iframeContainer.style.height = `${newHeight}px`;
+        if (Math.abs(diff) > 30) {
+            this.scrollDir = diff > 0 ? "down" : "up";
+        }
+    }
+
+    handleMouseUp(e, iframeContainer, iframe, button, expandedButton, dimmedBackground) {
+        e.preventDefault();
+        iframe.classList.remove("event-disabled");
+        if (this.scrollDir === "up") {
+            iframeContainer.style.height = "517px";
+            this.enableChat(
+                iframeContainer,
+                button,
+                expandedButton,
+                dimmedBackground,
+                "full"
+            );
+        } else if (this.scrollDir === "down") {
+            iframeContainer.style.height = "517px";
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
         }
 
