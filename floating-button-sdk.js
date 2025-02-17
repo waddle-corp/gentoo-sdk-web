@@ -104,7 +104,7 @@ class FloatingButton {
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            
+
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position, showGentooButton, isCustomButton);
@@ -609,7 +609,7 @@ class FloatingButton {
                 button,
                 expandedButton,
                 dimmedBackground,
-                "full"
+                "shrink"
             );
         } else if (this.scrollDir === "down") {
             iframeContainer.style.height = "517px";
