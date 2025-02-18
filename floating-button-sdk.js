@@ -152,8 +152,20 @@ class FloatingButton {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
             this.chatHeader.appendChild(this.chatHandler);
+            this.chatHeaderText = document.createElement("p");
+            this.chatHeaderText.className = "chat-header-text-md";
+            this.chatHeaderText.innerText = "Powered by Gentoo";
+            this.chatHeader.appendChild(this.chatHeaderText);
+            this.closeButtonIcon = document.createElement("div");
+            this.closeButtonIcon.className = "chat-close-button-icon-md";
+            this.chatHeader.appendChild(this.closeButtonIcon);
         } else {
             this.chatHeader.className = "chat-header";
+            this.chatHeaderText = document.createElement("p");
+            this.chatHeaderText.className = "chat-header-text";
+            this.chatHeaderText.innerText = "Powered by Gentoo";
+            this.chatHeaderText.className = "chat-header-text";
+            this.chatHeader.appendChild(this.chatHeaderText);
             this.closeButtonContainer = document.createElement("div");
             this.closeButtonContainer.className = "chat-close-button-container";
             this.closeButtonIcon = document.createElement("div");
@@ -164,6 +176,7 @@ class FloatingButton {
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.closeButtonContainer);
+
         }
 
         this.iframe = document.createElement("iframe");
@@ -284,6 +297,8 @@ class FloatingButton {
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+
         if (isCustomButton) {
             const customButton = document.getElementsByClassName("gentoo-custom-button")[0];
             customButton.addEventListener("click", buttonClickHandler);
@@ -603,7 +618,7 @@ class FloatingButton {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
-            iframeContainer.style.height = "517px";
+            iframeContainer.style.height = "100%";
             this.enableChat(
                 iframeContainer,
                 button,
@@ -612,7 +627,7 @@ class FloatingButton {
                 "shrink"
             );
         } else if (this.scrollDir === "down") {
-            iframeContainer.style.height = "517px";
+            iframeContainer.style.height = "90%";
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
         }
 
