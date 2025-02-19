@@ -667,7 +667,11 @@ class FloatingButton {
 
     hideChat(iframeContainer, button, expandedButton, dimmedBackground) {
         if (button) {
-            button.className = "floating-button-common button-image";
+            if (this.isSmallResolution) {
+                button.className = "floating-button-common button-image-md";
+            } else {
+                button.className = "floating-button-common button-image";
+            }
         }
         if (expandedButton) expandedButton.className = "expanded-button hide";
         iframeContainer.className = "iframe-container iframe-container-hide";
