@@ -53,12 +53,19 @@ class FloatingButton {
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else {
-            this.hostSrc = "https://demo.gentooai.com";
+            // this.hostSrc = "https://demo.gentooai.com";
+            // this.domains = {
+            //     auth: "https://api.gentooai.com/chat/api/v1/user",
+            //     log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+            //     chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+            //     floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            // };
+            this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "  https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -146,44 +153,38 @@ class FloatingButton {
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.chatHeader = document.createElement("div");
+        this.chatHandler = document.createElement("div");
+        this.chatHeaderText = document.createElement("p");
+        this.closeButtonContainer = document.createElement("div");
+        this.closeButtonIcon = document.createElement("div");
+        this.closeButtonText = document.createElement("p");
+        this.chatHeaderText.innerText = "Powered by Gentoo";
+        this.iframe = document.createElement("iframe");
+        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
-            this.chatHandler = document.createElement("div");
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
-            this.chatHeader.appendChild(this.chatHandler);
-            this.chatHeaderText = document.createElement("p");
             this.chatHeaderText.className = "chat-header-text-md";
-            this.chatHeaderText.innerText = "Powered by Gentoo";
-            this.chatHeader.appendChild(this.chatHeaderText);
-            this.closeButtonIcon = document.createElement("div");
             this.closeButtonIcon.className = "chat-close-button-icon-md";
+            this.iframe.className = "chat-iframe-md";
+            this.chatHeader.appendChild(this.chatHandler);
+            this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.closeButtonIcon);
         } else {
             this.chatHeader.className = "chat-header";
-            this.chatHeaderText = document.createElement("p");
             this.chatHeaderText.className = "chat-header-text";
-            this.chatHeaderText.innerText = "Powered by Gentoo";
-            this.chatHeaderText.className = "chat-header-text";
-            this.chatHeader.appendChild(this.chatHeaderText);
-            this.closeButtonContainer = document.createElement("div");
             this.closeButtonContainer.className = "chat-close-button-container";
-            this.closeButtonIcon = document.createElement("div");
             this.closeButtonIcon.className = "chat-close-button-icon";
-            this.closeButtonText = document.createElement("p");
             this.closeButtonText.className = "chat-close-button-text";
             this.closeButtonText.innerText = "채팅창 축소";
+            this.iframe.className = "chat-iframe";
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.closeButtonContainer);
 
         }
-
-        this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
-        this.iframe.className = this.isSmallResolution
-            ? "chat-iframe-md"
-            : "chat-iframe";
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
@@ -196,7 +197,11 @@ class FloatingButton {
             this.floatingContainer.className = `floating-container`;
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
-            this.button.className = `floating-button-common button-image`;
+            if (this.isSmallResolution) {
+                this.button.className = `floating-button-common button-image-md`;
+            } else {
+                this.button.className = `floating-button-common button-image`;
+            }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
@@ -216,10 +221,15 @@ class FloatingButton {
                         return;
 
                     this.expandedButton = document.createElement("div");
-                    this.expandedButton.className = "expanded-area";
                     this.expandedText = document.createElement("p");
+                    if (this.isSmallResolution) {
+                        this.expandedButton.className = "expanded-area-md";
+                        this.expandedText.className = "expanded-area-text-md";
+                    } else {
+                        this.expandedButton.className = "expanded-area";
+                        this.expandedText.className = "expanded-area-text";
+                    }
                     this.expandedButton.appendChild(this.expandedText);
-                    this.expandedText.className = "expanded-area-text";
 
                     // Double check if floatingContainer still exists before appending
                     if (this.floatingContainer && this.floatingContainer.parentNode) {
@@ -747,7 +757,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
