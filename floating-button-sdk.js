@@ -368,6 +368,8 @@ class FloatingButton {
         const button = elems.button;
         const expandedButton = elems.expandedButton;
 
+        if (this.isFFDev) {console.log('openChat called', button);}
+
         // Chat being visible
         this.enableChat(
             iframeContainer,
