@@ -106,7 +106,7 @@ class FloatingButton {
                 throw new Error("Failed to fetch floating data");
             }
 
-            this.remove(this.button, this.expandedButton, this.iframeContainer);
+            // this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
@@ -749,8 +749,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
-    injectCSS("./floating-button-sdk.css");
+    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
