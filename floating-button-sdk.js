@@ -162,6 +162,7 @@ class FloatingButton {
         this.iframe = document.createElement("iframe");
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
+        this.iframe.setAttribute("sandbox", "allow-scripts allow-forms allow-same-origin");
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
