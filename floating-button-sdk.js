@@ -356,10 +356,12 @@ class FloatingButton {
         });
 
         window?.addEventListener("message", (e) => {
+            console.log('message event called', e.data);
             if (e.data.redirectState) {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
+                if (e.data.firstAnswer === 8912) {console.log('formSubmittedState called', this.eventCallback?.formSubmitted);}
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
