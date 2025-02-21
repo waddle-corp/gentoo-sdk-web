@@ -160,9 +160,10 @@ class FloatingButton {
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("iframe");
-        setTimeout(() => {
+        if (this.iframe.src !== this.chatUrl) {
             this.iframe.src = this.chatUrl;
-        }, 1000);
+            history.replaceState(null, "", window.location.href);
+        }
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
