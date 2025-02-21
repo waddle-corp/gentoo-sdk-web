@@ -158,7 +158,7 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
-        this.chatUrl = "https://demo.gentooai.com/chat/49/selentest11";
+        this.chatUrl = `https://demo.gentooai.com/chat/49/${this.partnerId}`;
         this.iframe = document.createElement("iframe");
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
