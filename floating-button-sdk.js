@@ -31,7 +31,7 @@ class FloatingButton {
             formSubmitted: null,
         }
 
-        this.isFF = window.location.hostname === "dev.fastfive.co.kr";
+        this.isFFDev = window.location.hostname === "dev.fastfive.co.kr";
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -80,6 +80,7 @@ class FloatingButton {
 
     async init(params) {
         const { position, showGentooButton = true, isCustomButton = false } = params;
+        if (this.isFFDev) {console.log('init called', params);}
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -107,8 +108,10 @@ class FloatingButton {
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
+                if (this.isFFDev) {console.log('createUIElements called 1', position, showGentooButton, isCustomButton);}
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
+                if (this.isFFDev) {console.log('createUIElements called 2', position, showGentooButton, isCustomButton);}
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
                 this.destroy();
@@ -356,18 +359,20 @@ class FloatingButton {
         });
 
         window?.addEventListener("message", (e) => {
+            if (this.isFFDev) {console.log('message event called', e.data);}
             if (e.data.redirectState) {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
                 console.log('message event called', e.data);
-                if (e.data.firstAnswer === '89') {console.log('formSubmittedState called', this.eventCallback?.formSubmitted);}
+                if (this.isFFDev) {console.log('formSubmittedState called', this.eventCallback?.formSubmitted);}
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
             if (this.isSmallResolution && e.data.inputFocusState) {
+                if (this.isFFDev) {console.log('enableChat called in small resolution: ', e.data.inputFocusState, ', button: ', button);}
                 this.enableChat(
                     iframeContainer,
                     button,
@@ -642,7 +647,7 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        if (this.isFF) {
+        if (this.isFFDev) {
             console.log('FF enableChat called');
         }
         this.logEvent({
@@ -715,7 +720,7 @@ class FloatingButton {
 
     getGentooClickEvent(callback) {
         // Execute the callback function
-        if (this.isFF) {
+        if (this.isFFDev) {
             console.log('FF getGentooClickEvent called');
         }
         if (typeof callback === "function") {
