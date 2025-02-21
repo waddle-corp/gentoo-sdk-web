@@ -125,6 +125,7 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
+        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -265,6 +266,7 @@ class FloatingButton {
             dimmedBackground: this.dimmedBackground,
             button: this.button,
             expandedButton: this.expandedButton,
+            customButton: this.customButton,
         };
 
         // Add event listeners
@@ -319,10 +321,10 @@ class FloatingButton {
             if (this.isSmallResolution && e.data.inputFocusState) {
                 if (this.isFFDev) {console.log('enableChat called in small resolution: ', e.data.inputFocusState, ', button: ', button);}
                 this.enableChat(
-                    iframeContainer,
-                    button,
-                    expandedButton,
-                    dimmedBackground,
+                    this.elems.iframeContainer,
+                    this.elems.button,
+                    this.elems.expandedButton,
+                    this.elems.dimmedBackground,
                     "full"
                 );
             }
@@ -331,11 +333,8 @@ class FloatingButton {
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+        this.customButton?.addEventListener("click", buttonClickHandler);
 
-        if (isCustomButton) {
-            const customButton = document.getElementsByClassName("gentoo-custom-button")[0];
-            customButton.addEventListener("click", buttonClickHandler);
-        }
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -384,7 +383,7 @@ class FloatingButton {
             e.preventDefault();
             dimmedBackground.className = "dimmed-background hide";
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
-            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            if (button) button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         });
 
         chatHeader?.addEventListener("touchmove", (e) => {
@@ -663,7 +662,7 @@ class FloatingButton {
 
         if (this.isSmallResolution) {
             dimmedBackground.className = "dimmed-background";
-            button.className = "floating-button-common hide";
+            if (button) button.className = "floating-button-common hide";
             if (expandedButton) expandedButton.className = "expanded-button hide";
         }
         if (mode === "shrink") {
