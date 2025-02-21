@@ -31,8 +31,6 @@ class FloatingButton {
             formSubmitted: null,
         }
 
-        this.isFF = window.location.hostname === "dev.fastfive.co.kr";
-
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com"
@@ -128,6 +126,7 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
+        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -268,6 +267,7 @@ class FloatingButton {
             dimmedBackground: this.dimmedBackground,
             button: this.button,
             expandedButton: this.expandedButton,
+            customButton: this.customButton,
         };
 
         // Add event listeners
@@ -305,14 +305,32 @@ class FloatingButton {
             }
         };
 
+        window?.addEventListener("message", (e) => {
+            if (e.data.redirectState) {
+                window.location.href = e.data.redirectUrl;
+            }
+            if (e.data.formSubmittedState) {
+                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                if (this.eventCallback.formSubmitted !== null) {
+                    this.eventCallback?.formSubmitted(params);
+                }
+            }
+            if (this.isSmallResolution && e.data.inputFocusState) {
+                this.enableChat(
+                    this.elems.iframeContainer,
+                    this.elems.button,
+                    this.elems.expandedButton,
+                    this.elems.dimmedBackground,
+                    "full"
+                );
+            }
+        });
+
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+        this.customButton?.addEventListener("click", buttonClickHandler);
 
-        if (isCustomButton) {
-            const customButton = document.getElementsByClassName("gentoo-custom-button")[0];
-            customButton.addEventListener("click", buttonClickHandler);
-        }
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -359,28 +377,7 @@ class FloatingButton {
             e.preventDefault();
             dimmedBackground.className = "dimmed-background hide";
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
-            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        });
-
-        window?.addEventListener("message", (e) => {
-            if (e.data.redirectState) {
-                window.location.href = e.data.redirectUrl;
-            }
-            if (e.data.formSubmittedState) {
-                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
-                if (this.eventCallback.formSubmitted !== null) {
-                    this.eventCallback?.formSubmitted(params);
-                }
-            }
-            if (this.isSmallResolution && e.data.inputFocusState) {
-                this.enableChat(
-                    iframeContainer,
-                    button,
-                    expandedButton,
-                    dimmedBackground,
-                    "full"
-                );
-            }
+            if (button) button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         });
 
         chatHeader?.addEventListener("touchmove", (e) => {
@@ -647,9 +644,6 @@ class FloatingButton {
     }
 
     enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
-        if (this.isFF) {
-            console.log('FF enableChat called');
-        }
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
@@ -659,7 +653,7 @@ class FloatingButton {
 
         if (this.isSmallResolution) {
             dimmedBackground.className = "dimmed-background";
-            button.className = "floating-button-common hide";
+            if (button) button.className = "floating-button-common hide";
             if (expandedButton) expandedButton.className = "expanded-button hide";
         }
         if (mode === "shrink") {
@@ -674,7 +668,11 @@ class FloatingButton {
 
     hideChat(iframeContainer, button, expandedButton, dimmedBackground) {
         if (button) {
-            button.className = "floating-button-common button-image";
+            if (this.isSmallResolution) {
+                button.className = "floating-button-common button-image-md";
+            } else {
+                button.className = "floating-button-common button-image";
+            }
         }
         if (expandedButton) expandedButton.className = "expanded-button hide";
         iframeContainer.className = "iframe-container iframe-container-hide";
@@ -716,9 +714,6 @@ class FloatingButton {
 
     getGentooClickEvent(callback) {
         // Execute the callback function
-        if (this.isFF) {
-            console.log('FF getGentooClickEvent called');
-        }
         if (typeof callback === "function") {
             this.eventCallback.click = callback;
         }
@@ -747,9 +742,6 @@ window.FloatingButton = FloatingButton;
         link.rel = "stylesheet";
         link.href = href;
         link.type = "text/css";
-        link.onload = function () {
-            console.log("GentooIO CSS loaded successfully.");
-        };
         link.onerror = function () {
             console.error("Failed to load GentooIO CSS.");
         };
