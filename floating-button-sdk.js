@@ -160,10 +160,8 @@ class FloatingButton {
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("iframe");
-        if (this.iframe.src !== this.chatUrl) {
-            this.iframe.src = this.chatUrl;
-            history.replaceState(null, "", window.location.href);
-        }
+        this.iframe.id = "gentoo-sdk-iframe";
+        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -327,6 +325,13 @@ class FloatingButton {
                     this.elems.dimmedBackground,
                     "full"
                 );
+            }
+
+            if (e.data.type === "IGNORE_POPSTATE") {
+                console.log("🚨 SDK iframe 내부에서 popstate 이벤트 무시됨!");
+                window.history.back = function () {
+                    console.warn("🚨 iframe 내부에서 history.back() 실행 차단됨!");
+                };
             }
         });
 
