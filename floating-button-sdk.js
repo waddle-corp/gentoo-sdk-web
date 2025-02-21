@@ -106,10 +106,11 @@ class FloatingButton {
                 throw new Error("Failed to fetch floating data");
             }
 
-            // this.remove(this.button, this.expandedButton, this.iframeContainer);
+            this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
+            
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position, showGentooButton, isCustomButton);
@@ -159,7 +160,8 @@ class FloatingButton {
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+        // this.iframe.src = this.chatUrl;
+        this.iframe.src = 'https://dev-demo.gentooai.com/'
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
