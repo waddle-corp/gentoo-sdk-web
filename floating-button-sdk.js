@@ -82,7 +82,7 @@ class FloatingButton {
             throw error;
         });
         // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-        this.chatUrl = "https://demo.gentooai.com/chatroute/gentoo?ptid=676a4cef7efd43d2d6a93cd7&ch=false&cuid=selentest";
+        this.chatUrl = "https://demo.gentooai.com/chat/49/selentest11";
         this.iframe = document.createElement("iframe");
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
