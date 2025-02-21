@@ -87,11 +87,10 @@ class FloatingButton {
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
         const targetWindow = window.parent;
-        targetWindow.postMessage({ type: "IGNORE_POPSTATE" }, "*");
-        const targetWindow2 = window;
-        targetWindow2.postMessage({ type: "IGNORE_POPSTATE2" }, "*");
-        const targetWindow3 = window.top;
-        targetWindow3.postMessage({ type: "IGNORE_POPSTATE3" }, "*");
+        window.addEventListener("popstate", (e) => {
+            console.log("🚨 popstate 이벤트 발생!");
+            targetWindow.postMessage({ type: "IGNORE_POPSTATE" }, "*");
+        });
     }
 
     async init(params) {
