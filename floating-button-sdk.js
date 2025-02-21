@@ -85,6 +85,8 @@ class FloatingButton {
         this.iframe = document.createElement("iframe");
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
+        const targetWindow = window.top;
+        targetWindow.postMessage({ type: "IGNORE_POPSTATE" }, "*");
     }
 
     async init(params) {
