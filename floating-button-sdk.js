@@ -32,6 +32,7 @@ class FloatingButton {
         }
 
         this.isFFDev = window.location.hostname === "dev.fastfive.co.kr";
+        // this.isFFDev = true;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -301,6 +302,32 @@ class FloatingButton {
             }
         };
 
+        window?.addEventListener("message", (e) => {
+            if (this.isFFDev) {console.log('message event called', e.data);}
+            if (e.data.redirectState) {
+                window.location.href = e.data.redirectUrl;
+            }
+            if (e.data.formSubmittedState) {
+                if (this.isFFDev) {
+                    console.log('formSubmittedState called', e.data.formSubmittedState, e.data.log);
+                }
+                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                if (this.eventCallback.formSubmitted !== null) {
+                    this.eventCallback?.formSubmitted(params);
+                }
+            }
+            if (this.isSmallResolution && e.data.inputFocusState) {
+                if (this.isFFDev) {console.log('enableChat called in small resolution: ', e.data.inputFocusState, ', button: ', button);}
+                this.enableChat(
+                    iframeContainer,
+                    button,
+                    expandedButton,
+                    dimmedBackground,
+                    "full"
+                );
+            }
+        });
+
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
@@ -356,32 +383,6 @@ class FloatingButton {
             dimmedBackground.className = "dimmed-background hide";
             this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        });
-
-        window?.addEventListener("message", (e) => {
-            if (this.isFFDev) {console.log('message event called', e.data);}
-            if (e.data.redirectState) {
-                window.location.href = e.data.redirectUrl;
-            }
-            if (e.data.formSubmittedState) {
-                if (this.isFFDev) {
-                    console.log('formSubmittedState called', e.data.formSubmittedState);
-                }
-                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
-                if (this.eventCallback.formSubmitted !== null) {
-                    this.eventCallback?.formSubmitted(params);
-                }
-            }
-            if (this.isSmallResolution && e.data.inputFocusState) {
-                if (this.isFFDev) {console.log('enableChat called in small resolution: ', e.data.inputFocusState, ', button: ', button);}
-                this.enableChat(
-                    iframeContainer,
-                    button,
-                    expandedButton,
-                    dimmedBackground,
-                    "full"
-                );
-            }
         });
 
         chatHeader?.addEventListener("touchmove", (e) => {
@@ -752,9 +753,6 @@ window.FloatingButton = FloatingButton;
         link.rel = "stylesheet";
         link.href = href;
         link.type = "text/css";
-        link.onload = function () {
-            console.log("GentooIO CSS loaded successfully.");
-        };
         link.onerror = function () {
             console.error("Failed to load GentooIO CSS.");
         };
