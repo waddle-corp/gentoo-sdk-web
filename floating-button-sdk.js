@@ -58,13 +58,6 @@ class FloatingButton {
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
             };
-            // this.hostSrc = "https://dev-demo.gentooai.com";
-            // this.domains = {
-            //     auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-            //     log: "  https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
-            //     chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
-            //     floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
-            // };
         }
 
         // Add a promise to track initialization status
@@ -327,13 +320,6 @@ class FloatingButton {
                     this.elems.dimmedBackground,
                     "full"
                 );
-            }
-
-            if (e.data.type === "IGNORE_POPSTATE") {
-                console.log("🚨 SDK iframe 내부에서 popstate 이벤트 무시됨!");
-                window.history.back = function () {
-                    console.warn("🚨 iframe 내부에서 history.back() 실행 차단됨!");
-                };
             }
         });
 
