@@ -82,15 +82,7 @@ class FloatingButton {
             throw error;
         });
         // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-        this.chatUrl = "https://demo.gentooai.com/chat/49/selentest11";
-        this.iframe = document.createElement("iframe");
-        this.iframe.id = "gentoo-sdk-iframe";
-        this.iframe.src = this.chatUrl;
-        const targetWindow = window.parent;
-        window.addEventListener("popstate", (e) => {
-            console.log("🚨 popstate 이벤트 발생!");
-            targetWindow.postMessage({ type: "IGNORE_POPSTATE" }, "*");
-        });
+        
     }
 
     async init(params) {
@@ -166,6 +158,10 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
+        this.chatUrl = "https://demo.gentooai.com/chat/49/selentest11";
+        this.iframe = document.createElement("iframe");
+        this.iframe.id = "gentoo-sdk-iframe";
+        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
