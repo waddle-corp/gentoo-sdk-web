@@ -81,8 +81,6 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
-        // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-        
     }
 
     async init(params) {
@@ -109,6 +107,12 @@ class FloatingButton {
             }
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
+
+            if (this.partnerId === '676a4cef7efd43d2d6a93cd7' || this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}`; 
+            } else {
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
@@ -158,9 +162,7 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
-        this.chatUrl = `https://demo.gentooai.com/chat/49/${this.chatUserId}`;
         this.iframe = document.createElement("iframe");
-        this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
