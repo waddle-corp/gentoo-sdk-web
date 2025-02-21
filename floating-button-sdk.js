@@ -309,6 +309,7 @@ class FloatingButton {
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 // window.location.href = e.data.redirectUrl;
+                console.log('redirect call');
             }
             if (e.data.formSubmittedState) {
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
