@@ -162,9 +162,9 @@ class FloatingButton {
         this.iframe = document.createElement("iframe");
         this.iframe.style.display = "none"; // 숨김
         this.iframe.onload = () => {
+            this.iframe.src = this.chatUrl;
             this.iframe.style.display = "block"; // 로드 후 표시
         };
-        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
