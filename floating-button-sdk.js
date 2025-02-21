@@ -161,11 +161,11 @@ class FloatingButton {
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("div");
         // this.iframe.src = this.chatUrl;
-        this.iframe.style.display = "none"; // 숨김
+        // this.iframe.style.display = "none"; // 숨김
 
         setTimeout(() => {
             this.iframe.src = this.chatUrl;
-            this.iframe.style.display = "block"; // 1초 후 표시
+            // this.iframe.style.display = "block"; // 1초 후 표시
         }, 1000);
         
         
