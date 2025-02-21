@@ -90,6 +90,8 @@ class FloatingButton {
         targetWindow.postMessage({ type: "IGNORE_POPSTATE" }, "*");
         const targetWindow2 = window;
         targetWindow2.postMessage({ type: "IGNORE_POPSTATE2" }, "*");
+        const targetWindow3 = window.top;
+        targetWindow3.postMessage({ type: "IGNORE_POPSTATE3" }, "*");
     }
 
     async init(params) {
