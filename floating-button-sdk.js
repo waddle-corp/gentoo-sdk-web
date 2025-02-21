@@ -158,7 +158,7 @@ class FloatingButton {
         this.closeButtonContainer = document.createElement("div");
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
-        this.chatHeaderText.innerText = "Powered by Gentoo";
+        // this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
 
