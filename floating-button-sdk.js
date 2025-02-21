@@ -110,7 +110,7 @@ class FloatingButton {
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
-            
+
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position, showGentooButton, isCustomButton);
@@ -161,6 +161,11 @@ class FloatingButton {
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("div");
         // this.iframe.src = this.chatUrl;
+        this.iframe.style.display = "none"; // 숨김
+        this.iframe.onload = () => {
+            this.iframe.style.display = "block"; // 로드 후 표시
+        };
+        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -311,7 +316,7 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
                 }
@@ -612,7 +617,7 @@ class FloatingButton {
     handleMouseMove(e, iframeContainer) {
         e.preventDefault();
         const clientY = e.clientY; // Use clientY from mouse event
-            
+
         const diff = clientY - this.prevPosition;
 
         const newHeight = iframeContainer.offsetHeight - diff;
