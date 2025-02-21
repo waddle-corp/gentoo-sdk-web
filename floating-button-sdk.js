@@ -364,8 +364,9 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                console.log('message event called', e.data);
-                if (this.isFFDev) {console.log('formSubmittedState called', this.eventCallback?.formSubmitted);}
+                if (this.isFFDev) {
+                    console.log('formSubmittedState called', e.data.formSubmittedState);
+                }
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
