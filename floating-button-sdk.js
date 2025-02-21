@@ -109,7 +109,9 @@ class FloatingButton {
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-
+            this.iframe = document.createElement("iframe");
+            this.iframe.id = "gentoo-sdk-iframe";
+            this.iframe.src = this.chatUrl;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
@@ -159,10 +161,6 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
-        this.iframe = document.createElement("iframe");
-        this.iframe.id = "gentoo-sdk-iframe";
-        this.iframe.src = this.chatUrl;
-        this.iframe.setAttribute("sandbox", "allow-scripts allow-forms allow-same-origin");
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
