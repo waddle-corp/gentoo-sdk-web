@@ -164,10 +164,10 @@ class FloatingButton {
         this.iframe.style.display = "none"; // 숨김
 
         setTimeout(() => {
+            this.iframe.src = this.chatUrl;
             this.iframe.style.display = "block"; // 1초 후 표시
         }, 1000);
         
-        this.iframe.src = this.chatUrl;
         
 
         if (this.isSmallResolution) {
