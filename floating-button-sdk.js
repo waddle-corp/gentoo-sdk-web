@@ -114,8 +114,8 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 this.createUIElements(position, showGentooButton, isCustomButton);
-            // } else if (this.pageList.includes(window.location.pathname)) {
-                // this.createUIElements(position, showGentooButton, isCustomButton);
+            } else if (this.pageList.includes(window.location.pathname)) {
+                this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
                 this.destroy();
             }
@@ -158,9 +158,9 @@ class FloatingButton {
         this.closeButtonContainer = document.createElement("div");
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
-        // this.chatHeaderText.innerText = "Powered by Gentoo";
-        this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+        this.chatHeaderText.innerText = "Powered by Gentoo";
+        this.iframe = document.createElement("div");
+        // this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -308,8 +308,7 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
-                // window.location.href = e.data.redirectUrl;
-                console.log('redirect call');
+                window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
