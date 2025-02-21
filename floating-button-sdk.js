@@ -160,8 +160,7 @@ class FloatingButton {
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Powered by Gentoo";
         this.iframe = document.createElement("iframe");
-        // this.iframe.src = this.chatUrl;
-        this.iframe.src = 'https://dev-demo.gentooai.com/'
+        this.iframe.src = this.chatUrl;
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -309,7 +308,7 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
-                window.location.href = e.data.redirectUrl;
+                // window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
                 const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
