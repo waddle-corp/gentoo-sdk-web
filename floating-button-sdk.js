@@ -81,7 +81,8 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
-        this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+        // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+        this.chatUrl = "https://demo.gentooai.com";
         this.iframe = document.createElement("iframe");
         this.iframe.id = "gentoo-sdk-iframe";
         this.iframe.src = this.chatUrl;
