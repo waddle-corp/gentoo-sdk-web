@@ -101,7 +101,11 @@ class FloatingButton {
 
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            if (this.partnerId === '676a4cef7efd43d2d6a93cd7' || this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}`; 
+            } else {
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
@@ -303,7 +307,7 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                const params = {p1: e.data.firstAnswer, p2: e.data.secondAnswer};
+                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
                 }
@@ -604,7 +608,7 @@ class FloatingButton {
     handleMouseMove(e, iframeContainer) {
         e.preventDefault();
         const clientY = e.clientY; // Use clientY from mouse event
-            
+
         const diff = clientY - this.prevPosition;
 
         const newHeight = iframeContainer.offsetHeight - diff;
@@ -743,6 +747,7 @@ window.FloatingButton = FloatingButton;
 
     // Inject the CSS automatically
     injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
