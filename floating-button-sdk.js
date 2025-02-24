@@ -1,6 +1,7 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
+        if (window.GentooIO) return;
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
