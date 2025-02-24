@@ -31,6 +31,12 @@ class FloatingButton {
             formSubmitted: null,
         }
 
+        this.isDev = window.location.hostname === 'lycle.kr';
+
+        if (this.isDev) {
+            console.log("FloatingButton constructor", window?.GentooIO, window.location);
+        }
+
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com"
@@ -77,6 +83,9 @@ class FloatingButton {
     }
 
     async init(params) {
+        if (this.isDev) {
+            console.log("FloatingButton init", window?.GentooIO, window.location);
+        }
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
