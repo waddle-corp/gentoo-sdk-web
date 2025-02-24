@@ -32,7 +32,7 @@ class FloatingButton {
         }
 
         this.isDev = window.location.hostname === 'lycle.kr';
-        console.log("location", window.location, window.location.hostname, isDev);
+        console.log("location", window.location, window.location.hostname, this.isDev);
 
         if (this.isDev) {
             console.log("FloatingButton constructor", window?.GentooIO, window.location);
