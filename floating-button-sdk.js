@@ -85,7 +85,7 @@ class FloatingButton {
     }
 
     async init(params) {
-        if (window.GentooIO) return;
+        // if (window.GentooIO) return;
         if (this.isDev) {
             console.log("FloatingButton init", window?.GentooIO, window.location);
             console.log("GentooIO", window?.GentooIO ? "true" : "false");
