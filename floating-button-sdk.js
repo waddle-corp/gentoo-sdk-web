@@ -1,7 +1,7 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
-        console.log('iframeContainer already exists', document.getElementsByClassName('iframe-container').length === 0);
+        console.log('iframeContainer already exists', document.getElementsByClassName('floating-container').length === 0);
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -21,7 +21,7 @@ class FloatingButton {
         this.hostSrc;
         this.domains;
         this.isDestroyed = false;
-        this.isInitialized = document.getElementsByClassName('iframe-container').length === 0 ? false : true; // Add flag to track initialization
+        this.isInitialized = document.getElementsByClassName('floating-container').length === 0 ? false : true; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.floatingData;
