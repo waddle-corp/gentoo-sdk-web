@@ -1,7 +1,7 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
-        // if (window.GentooIO) return;
+        console.log('iframeContainer already exists', document.getElementsByClassName('iframe-container'));
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -33,7 +33,6 @@ class FloatingButton {
         }
 
         this.isDev = window.location.hostname === 'www.lycle.kr';
-        console.log("location", window.location, window.location.hostname, this.isDev);
 
         if (this.isDev) {
             console.log("FloatingButton constructor", window?.GentooIO, window.location);
