@@ -1,7 +1,7 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
-        if (window.GentooIO) return;
+        // if (window.GentooIO) return;
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -85,6 +85,7 @@ class FloatingButton {
     }
 
     async init(params) {
+        if (window.GentooIO) return;
         if (this.isDev) {
             console.log("FloatingButton init", window?.GentooIO, window.location);
             console.log("GentooIO", window?.GentooIO ? "true" : "false");
