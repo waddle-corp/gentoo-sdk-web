@@ -31,7 +31,7 @@ class FloatingButton {
             formSubmitted: null,
         }
 
-        this.isDev = window.location.hostname === 'lycle.kr';
+        this.isDev = window.location.hostname === 'www.lycle.kr';
         console.log("location", window.location, window.location.hostname, this.isDev);
 
         if (this.isDev) {
