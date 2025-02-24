@@ -1,5 +1,6 @@
 class FloatingButton {
     constructor(props) {
+        console.log("FloatingButton constructor", window?.GentooIO);
         // Validate required props
         if (!props.partnerId || !props.authCode) {
             throw new Error(
@@ -77,6 +78,7 @@ class FloatingButton {
     }
 
     async init(params) {
+        console.log("FloatingButton init", window?.GentooIO);
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
