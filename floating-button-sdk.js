@@ -123,8 +123,14 @@ class FloatingButton {
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
+                if (this.isDev) {
+                    console.log("createUIElements1");
+                }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
+                if (this.isDev) {
+                    console.log("createUIElements2");
+                }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
                 this.destroy();
