@@ -94,7 +94,7 @@ class FloatingButton {
 
     async init(params) {
         // if (window.GentooIO) return;
-        // if (FloatingButton.isGentooInitialized) return;
+        if (FloatingButton.isGentooInitialized) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
@@ -139,13 +139,16 @@ class FloatingButton {
                 }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
+                if (this.isDev) {
+                    console.log('destroy called');
+                }
                 this.destroy();
             }
         } catch (error) {
             console.error("Failed to initialize:", error);
             throw error;
         }
-        // FloatingButton.isGentooInitialized = true;
+        FloatingButton.isGentooInitialized = true;
     }
 
     // Separate UI creation into its own method for clarity
