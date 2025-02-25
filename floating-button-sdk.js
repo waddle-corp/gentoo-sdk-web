@@ -3,7 +3,7 @@ class FloatingButton {
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
-            console.log('constructor is called', window.__GentooInited);
+            console.log('constructor is called', window.__GentooInited, window.location.pathname);
         }
         if (!props.partnerId || !props.authCode) {
             throw new Error(
@@ -83,7 +83,7 @@ class FloatingButton {
     }
 
     async init(params) {
-        if (this.isDev) console.log('init is called', window.__GentooInited);
+        if (this.isDev) console.log('init is called', window.__GentooInited, window.location.pathname);
         if (window.__GentooInited) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
@@ -92,13 +92,13 @@ class FloatingButton {
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             if (this.isDev) {
-                console.log('bootPromise is called', window.__GentooInited);
+                console.log('bootPromise is called', window.__GentooInited, window.location.pathname);
             }
             // Wait for boot process to complete
             await this.bootPromise;
 
             if (this.isDev) {
-                console.log('bootPromise is done', window.__GentooInited);
+                console.log('bootPromise is done', window.__GentooInited, window.location.pathname);
             }
 
             if (this.isInitialized) {
@@ -118,7 +118,7 @@ class FloatingButton {
                 throw new Error("Failed to fetch floating data");
             }
             if (this.isDev) {
-                console.log('floatingData is fetched', window.__GentooInited);
+                console.log('floatingData is fetched', window.__GentooInited, window.location.pathname);
             }
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
@@ -130,13 +130,13 @@ class FloatingButton {
             }
 
             if (this.isDev) {
-                console.log('chatUrl', window.__GentooInited);
+                console.log('chatUrl', window.__GentooInited, window.location.pathname);
             }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
                 if (this.isDev) {
-                    console.log("createUIElements1", window.__GentooInited);
+                    console.log("createUIElements1", window.__GentooInited, window.location.pathname);
                 }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
@@ -154,7 +154,7 @@ class FloatingButton {
             console.error("Failed to initialize:", error);
             throw error;
         }
-        if (this.isDev) console.log('init is done', window.__GentooInited);
+        if (this.isDev) console.log('init is done', window.__GentooInited, window.location.pathname);
     }
 
     // Separate UI creation into its own method for clarity
@@ -521,7 +521,7 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = false;
-        console.log("FloatingButton instance destroyed", window.__GentooInited);
+        console.log("FloatingButton instance destroyed", window.__GentooInited, window.location.pathname);
     }
 
     setPageList(pageList) {
