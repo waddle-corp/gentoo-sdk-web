@@ -2,7 +2,7 @@ class FloatingButton {
     static gentooInstance = null;
     static isGentooInitialized = false;
     constructor(props) {
-        console.log('constructor is called');
+        if (this.isDev) console.log('constructor is called');
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
@@ -17,7 +17,7 @@ class FloatingButton {
                 console.log("GentooIO doesn't initialized", FloatingButton.isGentooInitialized);
             }
         }
-        console.log("keep processing for construction", FloatingButton.gentooInstance);
+        if (this.isDev) console.log("keep processing for construction", FloatingButton.gentooInstance);
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -93,11 +93,11 @@ class FloatingButton {
         });
         FloatingButton.gentooInstance = true;
         // FloatingButton.gentooInstance = this;
-        console.log('constructor is done');
+        if (this.isDev) console.log('constructor is done');
     }
 
     async init(params) {
-        console.log('init is called');
+        if (this.isDev) console.log('init is called');
         // if (window.GentooIO) return;
         if (FloatingButton.isGentooInitialized) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
@@ -154,12 +154,12 @@ class FloatingButton {
             throw error;
         }
         FloatingButton.isGentooInitialized = true;
-        console.log('init is done');
+        if (this.isDev) console.log('init is done');
     }
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
-        console.log('createUIElements is called');
+        if (this.isDev) console.log('createUIElements is called');
         this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
@@ -306,7 +306,7 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
-        console.log('createUIElements is done');
+        if (this.isDev) console.log('createUIElements is done');
     }
 
     setupEventListeners(position, isCustomButton = false) {
