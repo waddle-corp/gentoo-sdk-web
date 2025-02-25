@@ -478,7 +478,6 @@ class FloatingButton {
     destroy() {
         if (window.__GentooInited !== 'created') {
             console.log('FloatingButton instance is not created');
-            window.__GentooInited = 'destroyed';
             return;
         }
         this.isDestroyed = true;
