@@ -276,6 +276,7 @@ class FloatingButton {
                         // Add text animation
                         let i = 0;
                         const addLetter = () => {
+                            if (!this.floatingData) return;
                             if (i < this.floatingData.comment.length && !this.isDestroyed) {
                                 this.expandedText.innerText += this.floatingData.comment[i];
                                 i++;
