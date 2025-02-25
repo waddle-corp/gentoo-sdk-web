@@ -2,15 +2,14 @@ class FloatingButton {
     static gentooInstance = null;
     static isGentooInitialized = false;
     constructor(props) {
-        if (this.isDev) console.log('constructor is called');
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
+            console.log('constructor is called');
             if (FloatingButton.gentooInstance !== null) {
                 console.log("GentooIO already exists", FloatingButton.gentooInstance);
                 console.log("GentooIO already initialized", FloatingButton.isGentooInitialized);
                 // FloatingButton.gentooInstance.destroy();
-                return;
             } else {
                 // FloatingButton.gentooInstance = this;
                 console.log("GentooIO doesn't exists", FloatingButton.gentooInstance);
