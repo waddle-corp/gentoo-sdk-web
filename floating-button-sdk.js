@@ -511,7 +511,7 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = false;
-        console.log("FloatingButton instance destroyed", FloatingButton.isGentooConstructed, FloatingButton.isGentooInitialized);
+        console.log("FloatingButton instance destroyed", window.__GentooInited);
     }
 
     setPageList(pageList) {
