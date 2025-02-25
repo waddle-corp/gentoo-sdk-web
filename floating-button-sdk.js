@@ -1,15 +1,18 @@
 class FloatingButton {
-    static isGentooInstance = null;
+    static isGentooConstructed = false;
+    static isGentooInitialized = false;
     constructor(props) {
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
-            if (FloatingButton.isGentooInstance) {
-                console.log("GentooIO already exists", FloatingButton.isGentooInstance);
+            if (FloatingButton.isGentooConstructed) {
+                console.log("GentooIO already exists", FloatingButton.isGentooConstructed);
+                console.log("GentooIO already initialized", FloatingButton.isGentooInitialized);
                 return;
             } else {
                 // FloatingButton.isGentooInstance = this;
-                console.log("GentooIO doesn't exists", FloatingButton.isGentooInstance);
+                console.log("GentooIO doesn't exists", FloatingButton.isGentooConstructed);
+                console.log("GentooIO doesn't initialized", FloatingButton.isGentooInitialized);
             }
         }
         if (!props.partnerId || !props.authCode) {
@@ -85,6 +88,7 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
+        FloatingButton.isGentooConstructed = this;
     }
 
     async init(params) {
@@ -139,6 +143,7 @@ class FloatingButton {
             console.error("Failed to initialize:", error);
             throw error;
         }
+        FloatingButton.isGentooInitialized = true;
     }
 
     // Separate UI creation into its own method for clarity
