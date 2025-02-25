@@ -89,12 +89,12 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
-        FloatingButton.isGentooConstructed = this;
+        // FloatingButton.isGentooConstructed = this;
     }
 
     async init(params) {
         // if (window.GentooIO) return;
-        if (FloatingButton.isGentooInitialized) return;
+        // if (FloatingButton.isGentooInitialized) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
@@ -145,7 +145,7 @@ class FloatingButton {
             console.error("Failed to initialize:", error);
             throw error;
         }
-        FloatingButton.isGentooInitialized = true;
+        // FloatingButton.isGentooInitialized = true;
     }
 
     // Separate UI creation into its own method for clarity
