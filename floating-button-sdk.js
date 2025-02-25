@@ -8,6 +8,7 @@ class FloatingButton {
             if (FloatingButton.isGentooConstructed) {
                 console.log("GentooIO already exists", FloatingButton.isGentooConstructed);
                 console.log("GentooIO already initialized", FloatingButton.isGentooInitialized);
+                FloatingButton.isGentooConstructed.destroy();
                 return;
             } else {
                 // FloatingButton.isGentooInstance = this;
@@ -93,6 +94,7 @@ class FloatingButton {
 
     async init(params) {
         // if (window.GentooIO) return;
+        if (FloatingButton.isGentooInitialized) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
