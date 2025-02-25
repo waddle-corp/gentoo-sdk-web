@@ -84,11 +84,11 @@ class FloatingButton {
 
     async init(params) {
         if (this.isDev) console.log('init is called', window.__GentooInited, window.location.pathname);
-        if (window.__GentooInited) {
+        if (window.__GentooInited !== null) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        window.__GentooInited = true;
+        window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             if (this.isDev) {
@@ -159,7 +159,7 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
-        window.__GentooInited = true;
+        window.__GentooInited = 'creating';
         if (this.isDev) console.log('createUIElements is called');
         this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
@@ -307,6 +307,7 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
+        window.__GentooInited = 'created';
         if (this.isDev) console.log('createUIElements is done');
     }
 
@@ -471,6 +472,7 @@ class FloatingButton {
     }
 
     destroy() {
+        if (window.__GentooInited !== 'created') return;
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
@@ -521,7 +523,7 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
 
-        window.__GentooInited = false;
+        window.__GentooInited = null;
         console.log("FloatingButton instance destroyed", window.__GentooInited, window.location.pathname);
     }
 
