@@ -1,22 +1,10 @@
 class FloatingButton {
-    static gentooInstance = null;
-    static isGentooInitialized = false;
     constructor(props) {
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
             console.log('constructor is called');
-            if (FloatingButton.gentooInstance !== null) {
-                console.log("GentooIO already exists", FloatingButton.gentooInstance);
-                console.log("GentooIO already initialized", FloatingButton.isGentooInitialized);
-                // FloatingButton.gentooInstance.destroy();
-            } else {
-                // FloatingButton.gentooInstance = this;
-                console.log("GentooIO doesn't exists", FloatingButton.gentooInstance);
-                console.log("GentooIO doesn't initialized", FloatingButton.isGentooInitialized);
-            }
         }
-        if (this.isDev) console.log("keep processing for construction", FloatingButton.gentooInstance);
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -91,15 +79,16 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
-        FloatingButton.gentooInstance = true;
-        // FloatingButton.gentooInstance = this;
         if (this.isDev) console.log('constructor is done');
     }
 
     async init(params) {
         if (this.isDev) console.log('init is called');
-        // if (window.GentooIO) return;
-        if (FloatingButton.isGentooInitialized) return;
+        if (window.__GentooInited) {
+            console.warn("GentooIO init called twice, skipping second call.");
+            return;
+        }
+        window.__GentooInited = true;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
@@ -125,9 +114,9 @@ class FloatingButton {
             this.remove(this.button, this.expandedButton, this.iframeContainer);
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`; 
-            }  else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`; 
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } else if (this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
@@ -153,7 +142,6 @@ class FloatingButton {
             console.error("Failed to initialize:", error);
             throw error;
         }
-        FloatingButton.isGentooInitialized = true;
         if (this.isDev) console.log('init is done');
     }
 
@@ -520,9 +508,8 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
 
-        FloatingButton.isGentooConstructed = null;
-        FloatingButton.isGentooInitialized = false;
-        console.log("FloatingButton instance destroyed", FloatingButton.isGentooConstructed, FloatingButton.isGentooInitialized);    
+        window.__GentooInited = false;
+        console.log("FloatingButton instance destroyed", FloatingButton.isGentooConstructed, FloatingButton.isGentooInitialized);
     }
 
     setPageList(pageList) {
