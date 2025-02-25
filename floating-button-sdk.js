@@ -37,9 +37,10 @@ class FloatingButton {
 
         if (this.isDev) {
             console.log("FloatingButton constructor", window?.GentooIO, window.location);
+            console.log("isInitialized", this.isInitialized);
         }
 
-        if (this.isInitialized && !this.isDev) return;
+        if (this.isInitialized && this.isDev) return;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -91,8 +92,9 @@ class FloatingButton {
         if (this.isDev) {
             console.log("FloatingButton init", window?.GentooIO, window.location);
             console.log("GentooIO", window?.GentooIO ? "true" : "false");
+            console.log("isInitialized", this.isInitialized);
         }
-        if (this.isInitialized && !this.isDev) return;
+        if (this.isInitialized && this.isDev) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
