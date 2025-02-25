@@ -37,7 +37,7 @@ class FloatingButton {
 
         if (this.isDev) {
             console.log("FloatingButton constructor", window?.GentooIO, window.location);
-            console.log("isInitialized", this.isInitialized);
+            console.log("isInitialized", document.getElementsByClassName('floating-container').length, this.isInitialized);
         }
 
         if (this.isInitialized && this.isDev) return;
