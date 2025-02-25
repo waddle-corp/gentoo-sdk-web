@@ -753,21 +753,21 @@ class FloatingButton {
 
     getGentooShowEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.show = callback;
         }
     }
 
     getGentooClickEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.click = callback;
         }
     }
 
     getFormSubmittedEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.formSubmitted = callback;
         }
     }
