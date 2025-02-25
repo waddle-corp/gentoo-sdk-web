@@ -78,6 +78,7 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
+            console.log('bootPromise is called'),
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
