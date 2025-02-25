@@ -512,7 +512,9 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
 
-        console.log("FloatingButton instance destroyed");
+        FloatingButton.isGentooConstructed = null;
+        FloatingButton.isGentooInitialized = false;
+        console.log("FloatingButton instance destroyed", FloatingButton.isGentooConstructed, FloatingButton.isGentooInitialized);    
     }
 
     setPageList(pageList) {
