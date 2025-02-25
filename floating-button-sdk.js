@@ -1,7 +1,10 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
-        console.log('iframeContainer already exists', document.getElementsByClassName('floating-container').length === 0);
+        this.isDev = window.location.hostname === 'www.lycle.kr';
+        if (this.isDev) {
+            console.log('iframeContainer already exists', document.getElementsByClassName('floating-container').length === 0);
+        }
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -32,11 +35,11 @@ class FloatingButton {
             formSubmitted: null,
         }
 
-        this.isDev = window.location.hostname === 'www.lycle.kr';
-
         if (this.isDev) {
             console.log("FloatingButton constructor", window?.GentooIO, window.location);
         }
+
+        if (this.isInitialized && !this.isDev) return;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -89,6 +92,7 @@ class FloatingButton {
             console.log("FloatingButton init", window?.GentooIO, window.location);
             console.log("GentooIO", window?.GentooIO ? "true" : "false");
         }
+        if (this.isInitialized && !this.isDev) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
