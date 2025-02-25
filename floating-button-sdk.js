@@ -5,6 +5,10 @@ class FloatingButton {
         if (this.isDev) {
             console.log('constructor is called', window.__GentooInited, window.location.pathname);
         }
+        if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
+            console.warn("GentooIO constructor called twice, skipping second call.");
+            return;
+        }
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -472,7 +476,11 @@ class FloatingButton {
     }
 
     destroy() {
-        if (window.__GentooInited !== 'created') return;
+        if (window.__GentooInited !== 'created') {
+            console.log('FloatingButton instance is not created');
+            window.__GentooInited = 'destroyed';
+            return;
+        }
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
