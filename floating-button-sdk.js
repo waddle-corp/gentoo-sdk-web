@@ -4,13 +4,12 @@ class FloatingButton {
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
-            console.log('iframeContainer already exists', document.getElementsByClassName('floating-container').length === 0);
             if (FloatingButton.isGentooInstance) {
-                console.log("GentooIO already exists");
+                console.log("GentooIO already exists", FloatingButton.isGentooInstance);
                 return;
             } else {
-                FloatingButton.isGentooInstance = this;
-                console.log("GentooIO already exists", FloatingButton.isGentooInstance);
+                // FloatingButton.isGentooInstance = this;
+                console.log("GentooIO doesn't exists", FloatingButton.isGentooInstance);
             }
         }
         if (!props.partnerId || !props.authCode) {
@@ -32,7 +31,7 @@ class FloatingButton {
         this.hostSrc;
         this.domains;
         this.isDestroyed = false;
-        this.isInitialized = document.getElementsByClassName('floating-container').length === 0 ? false : true; // Add flag to track initialization
+        this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.floatingData;
@@ -42,13 +41,6 @@ class FloatingButton {
             click: null,
             formSubmitted: null,
         }
-
-        if (this.isDev) {
-            console.log("FloatingButton constructor", window?.GentooIO, window.location);
-            console.log("isInitialized", document.getElementsByClassName('floating-container').length, this.isInitialized);
-        }
-
-        if (this.isInitialized && this.isDev) return;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -97,12 +89,6 @@ class FloatingButton {
 
     async init(params) {
         // if (window.GentooIO) return;
-        if (this.isDev) {
-            console.log("FloatingButton init", window?.GentooIO, window.location);
-            console.log("GentooIO", window?.GentooIO ? "true" : "false");
-            console.log("isInitialized", this.isInitialized);
-        }
-        if (this.isInitialized && this.isDev) return;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
             // Wait for boot process to complete
