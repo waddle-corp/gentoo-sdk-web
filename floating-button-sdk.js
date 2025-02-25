@@ -1,9 +1,17 @@
 class FloatingButton {
+    static isGentooInstance = null;
     constructor(props) {
         // Validate required props
         this.isDev = window.location.hostname === 'www.lycle.kr';
         if (this.isDev) {
             console.log('iframeContainer already exists', document.getElementsByClassName('floating-container').length === 0);
+            if (FloatingButton.isGentooInstance) {
+                console.log("GentooIO already exists");
+                return;
+            } else {
+                FloatingButton.isGentooInstance = this;
+                console.log("GentooIO already exists", FloatingButton.isGentooInstance);
+            }
         }
         if (!props.partnerId || !props.authCode) {
             throw new Error(
