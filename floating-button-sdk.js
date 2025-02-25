@@ -159,6 +159,7 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
+        window.__GentooInited = true;
         if (this.isDev) console.log('createUIElements is called');
         this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
