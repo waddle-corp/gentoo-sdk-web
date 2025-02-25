@@ -91,8 +91,15 @@ class FloatingButton {
         window.__GentooInited = true;
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
+            if (this.isDev) {
+                console.log('bootPromise is called', window.__GentooInited);
+            }
             // Wait for boot process to complete
             await this.bootPromise;
+
+            if (this.isDev) {
+                console.log('bootPromise is done', window.__GentooInited);
+            }
 
             if (this.isInitialized) {
                 console.warn("FloatingButton is already initialized");
@@ -109,6 +116,9 @@ class FloatingButton {
             this.floatingData = await this.fetchFloatingData(this.partnerId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
+            }
+            if (this.isDev) {
+                console.log('floatingData is fetched', window.__GentooInited);
             }
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
