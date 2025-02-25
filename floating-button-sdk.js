@@ -84,7 +84,7 @@ class FloatingButton {
 
     async init(params) {
         if (this.isDev) console.log('init is called', window.__GentooInited, window.location.pathname);
-        if (window.__GentooInited !== null || window.__GentooInited !== undefined) {
+        if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
