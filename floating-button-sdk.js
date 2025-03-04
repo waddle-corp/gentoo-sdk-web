@@ -736,7 +736,7 @@ class FloatingButton {
         try {
             await this.bootPromise;
             // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await this.fetchChatUserId(input.chatUserId);
+            this.chatUserId = await this.fetchChatUserId(input.authCode);
 
             const payload = {
                 eventCategory: input.eventCategory,
