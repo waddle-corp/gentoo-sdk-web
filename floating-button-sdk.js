@@ -1,6 +1,14 @@
 class FloatingButton {
     constructor(props) {
         // Validate required props
+        this.isDev = window.location.hostname === 'www.lycle.kr';
+        if (this.isDev) {
+            console.log('constructor is called', window.__GentooInited, window.location.pathname);
+        }
+        if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
+            console.warn("GentooIO constructor called twice, skipping second call.");
+            return;
+        }
         if (!props.partnerId || !props.authCode) {
             throw new Error(
                 "Missing required parameters: partnerId, authCode are required"
@@ -62,6 +70,7 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
+            console.log('bootPromise is called'),
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
@@ -74,13 +83,27 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
+        if (this.isDev) console.log('constructor is done');
     }
 
     async init(params) {
+        if (this.isDev) console.log('init is called', window.__GentooInited, window.location.pathname);
+        if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
+            console.warn("GentooIO init called twice, skipping second call.");
+            return;
+        }
+        window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
         try {
+            if (this.isDev) {
+                console.log('bootPromise is called', window.__GentooInited, window.location.pathname);
+            }
             // Wait for boot process to complete
             await this.bootPromise;
+
+            if (this.isDev) {
+                console.log('bootPromise is done', window.__GentooInited, window.location.pathname);
+            }
 
             if (this.isInitialized) {
                 console.warn("FloatingButton is already initialized");
@@ -98,31 +121,50 @@ class FloatingButton {
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
             }
+            if (this.isDev) {
+                console.log('floatingData is fetched', window.__GentooInited, window.location.pathname);
+            }
 
-            this.remove(this.button, this.expandedButton, this.iframeContainer);
-
-            if (this.partnerId === '676a4cef7efd43d2d6a93cd7' || this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}`; 
+            if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } else if (this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
 
+            if (this.isDev) {
+                console.log('chatUrl', window.__GentooInited, window.location.pathname);
+            }
+
             // Create UI elements after data is ready
             if (!this.isDestroyed || this.pageList.length === 0) {
+                if (this.isDev) {
+                    console.log("createUIElements1", window.__GentooInited, window.location.pathname);
+                }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
+                if (this.isDev) {
+                    console.log("createUIElements2");
+                }
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else {
+                if (this.isDev) {
+                    console.log('destroy called');
+                }
                 this.destroy();
             }
         } catch (error) {
             console.error("Failed to initialize:", error);
             throw error;
         }
+        if (this.isDev) console.log('init is done', window.__GentooInited, window.location.pathname);
     }
 
     // Separate UI creation into its own method for clarity
     createUIElements(position, showGentooButton, isCustomButton = false) {
+        window.__GentooInited = 'creating';
+        if (this.isDev) console.log('createUIElements is called');
         this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
@@ -234,6 +276,7 @@ class FloatingButton {
                         // Add text animation
                         let i = 0;
                         const addLetter = () => {
+                            if (!this.floatingData) return;
                             if (i < this.floatingData.comment.length && !this.isDestroyed) {
                                 this.expandedText.innerText += this.floatingData.comment[i];
                                 i++;
@@ -269,6 +312,8 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
+        window.__GentooInited = 'created';
+        if (this.isDev) console.log('createUIElements is done');
     }
 
     setupEventListeners(position, isCustomButton = false) {
@@ -432,6 +477,10 @@ class FloatingButton {
     }
 
     destroy() {
+        if (window.__GentooInited !== 'created') {
+            console.log('FloatingButton instance is not created');
+            return;
+        }
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
@@ -482,7 +531,8 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
 
-        console.log("FloatingButton instance destroyed");
+        window.__GentooInited = null;
+        console.log("FloatingButton instance destroyed", window.__GentooInited, window.location.pathname);
     }
 
     setPageList(pageList) {
@@ -686,7 +736,7 @@ class FloatingButton {
         try {
             await this.bootPromise;
             // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await this.fetchChatUserId(input.chatUserId);
+            this.chatUserId = await this.fetchChatUserId(input.authCode);
 
             const payload = {
                 eventCategory: input.eventCategory,
@@ -704,21 +754,21 @@ class FloatingButton {
 
     getGentooShowEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.show = callback;
         }
     }
 
     getGentooClickEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.click = callback;
         }
     }
 
     getFormSubmittedEvent(callback) {
         // Execute the callback function
-        if (typeof callback === "function") {
+        if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.formSubmitted = callback;
         }
     }
