@@ -145,7 +145,7 @@ class FloatingButton {
     // Separate UI creation into its own method for clarity
     createUIElements() {
         // Add null checks before accessing properties
-        if (!this.chatbotData || !this.chatbotData.position) {
+        if (!this.chatbotData || !this.chatbotData.position || !this.chatbotData.mobilePosition ) {
             console.error('Chatbot data is incomplete');
             return;
         }
@@ -192,8 +192,8 @@ class FloatingButton {
         // Create floating button
         this.floatingContainer = document.createElement('div');
         this.floatingContainer.className = `floating-container`;
-        this.floatingContainer.style.bottom = `${this.chatbotData.position.bottom}px`;
-        this.floatingContainer.style.right = `${this.chatbotData.position.right}px`;
+        this.floatingContainer.style.bottom = `${this.isSmallResolution ? this.chatbotData.mobilePosition.bottom : this.chatbotData.position.bottom}px`;
+        this.floatingContainer.style.right = `${this.isSmallResolution ? this.chatbotData.mobilePosition.right : this.chatbotData.position.right}px`;
         this.button = document.createElement('div');
         this.button.className = `floating-button-common button-image`;
         this.button.type = 'button';
