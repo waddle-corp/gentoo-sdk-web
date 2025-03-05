@@ -165,7 +165,7 @@ class FloatingButton {
     createUIElements(position, showGentooButton, isCustomButton = false) {
         window.__GentooInited = 'creating';
         if (this.isDev) console.log('createUIElements is called');
-        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
+        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -221,7 +221,6 @@ class FloatingButton {
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.closeButtonContainer);
-
         }
 
         this.iframeContainer.appendChild(this.chatHeader);
@@ -300,6 +299,7 @@ class FloatingButton {
                 }, 3000);
             }
         }
+
         this.elems = {
             iframeContainer: this.iframeContainer,
             iframe: this.iframe,
@@ -425,6 +425,7 @@ class FloatingButton {
         chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, iframeContainer);
         });
+
         chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
                 e,
@@ -929,6 +930,4 @@ window.FloatingButton = FloatingButton;
             w.GentooIO.process(args);
         });
     }
-
-    w?.addEventListener("message", () => { });
 })(window, document);
