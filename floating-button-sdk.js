@@ -165,7 +165,7 @@ class FloatingButton {
     createUIElements(position, showGentooButton, isCustomButton = false) {
         window.__GentooInited = 'creating';
         if (this.isDev) console.log('createUIElements is called');
-        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
+        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelector('[data-testId="gentoo-custom-button"]')) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
