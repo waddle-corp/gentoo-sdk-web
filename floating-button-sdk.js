@@ -388,7 +388,9 @@ class FloatingButton {
         }
     }
 
-    async openChat() {
+    async openChat(e) {
+        e.stopPropagation();
+        e.preventDefault();
         // Chat being visible
         this.enableChat("shrink");
 
@@ -823,7 +825,7 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "openChat":
                     if (typeof fb.openChat === "function") {
-                        Promise.resolve(fb.openChat()).catch((error) => {
+                        Promise.resolve((e) => fb.openChat(e)).catch((error) => {
                             console.error("Failed to open GentooIO chat:", error);
                         });
                     }
