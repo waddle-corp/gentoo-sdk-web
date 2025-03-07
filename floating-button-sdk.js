@@ -70,7 +70,6 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
-            console.log('bootPromise is called'),
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
@@ -316,7 +315,7 @@ class FloatingButton {
         if (this.isDev) console.log('createUIElements is done');
     }
 
-    setupEventListeners(position, isCustomButton = false) {
+    setupEventListeners(position) {
         // Button click event
         var buttonClickHandler = (e) => {
             e.stopPropagation();
@@ -358,13 +357,7 @@ class FloatingButton {
                 }
             }
             if (this.isSmallResolution && e.data.inputFocusState) {
-                this.enableChat(
-                    this.elems.iframeContainer,
-                    this.elems.button,
-                    this.elems.expandedButton,
-                    this.elems.dimmedBackground,
-                    "full"
-                );
+                this.enableChat("full");
             }
         });
 
@@ -395,64 +388,49 @@ class FloatingButton {
         }
     }
 
-    openChat(e, elems) {
-        e.stopPropagation();
-        e.preventDefault();
-        const iframeContainer = elems.iframeContainer;
-        const iframe = elems.iframe;
-        const chatHeader = elems.chatHeader;
-        const dimmedBackground = elems.dimmedBackground;
-        const button = elems.button;
-        const expandedButton = elems.expandedButton;
-
+    openChat() {
         // Chat being visible
-        this.enableChat(
-            iframeContainer,
-            button,
-            expandedButton,
-            dimmedBackground,
-            "shrink"
-        );
+        this.enableChat("shrink");
 
-        dimmedBackground?.addEventListener("click", (e) => {
+        this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            dimmedBackground.className = "dimmed-background hide";
-            this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
-            if (button) button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            this.dimmedBackground.className = "dimmed-background hide";
+            this.hideChat();
+            if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         });
 
-        chatHeader?.addEventListener("touchmove", (e) => {
-            this.handleTouchMove(e, iframeContainer);
+        this.chatHeader?.addEventListener("touchmove", (e) => {
+            this.handleTouchMove(e, this.iframeContainer);
         });
 
-        chatHeader?.addEventListener("touchend", (e) => {
+        this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
                 e,
-                iframeContainer,
-                button,
-                expandedButton,
-                dimmedBackground
+                this.iframeContainer,
+                this.button,
+                this.expandedButton,
+                this.dimmedBackground
             );
         });
 
-        chatHeader?.addEventListener("mousedown", (e) => {
+        this.chatHeader?.addEventListener("mousedown", (e) => {
             e.preventDefault();
-            this.handleMouseDown(e, iframe);
+            this.handleMouseDown(e, this.iframe);
             const onMouseMove = (e) => {
                 e.preventDefault();
-                this.handleMouseMove(e, iframeContainer);
+                this.handleMouseMove(e, this.iframeContainer);
             };
             const onMouseUp = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.handleMouseUp(
                     e,
-                    iframeContainer,
-                    iframe,
-                    button,
-                    expandedButton,
-                    dimmedBackground,
+                    this.iframeContainer,
+                    this.iframe,
+                    this.button,
+                    this.expandedButton,
+                    this.dimmedBackground,
                 );
                 document.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
@@ -533,7 +511,6 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = null;
-        console.log("FloatingButton instance destroyed", window.__GentooInited, window.location.pathname);
     }
 
     setPageList(pageList) {
@@ -631,15 +608,9 @@ class FloatingButton {
     handleTouchEnd(e, iframeContainer, button, expandedButton, dimmedBackground) {
         e.preventDefault();
         if (this.scrollDir === "up") {
-            this.enableChat(
-                iframeContainer,
-                button,
-                expandedButton,
-                dimmedBackground,
-                "full"
-            );
+            this.enableChat("full");
         } else if (this.scrollDir === "down") {
-            this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+            this.hideChat();
         }
 
         this.prevPosition = null;
@@ -674,16 +645,10 @@ class FloatingButton {
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
             iframeContainer.style.height = "100%";
-            this.enableChat(
-                iframeContainer,
-                button,
-                expandedButton,
-                dimmedBackground,
-                "shrink"
-            );
+            this.enableChat("shrink");
         } else if (this.scrollDir === "down") {
             iframeContainer.style.height = "90%";
-            this.hideChat(iframeContainer, button, expandedButton, dimmedBackground);
+            this.hideChat();
         }
 
         this.prevPosition = null;
@@ -691,7 +656,7 @@ class FloatingButton {
         this.scrollDir = "";
     }
 
-    enableChat(iframeContainer, button, expandedButton, dimmedBackground, mode) {
+    enableChat(mode) {
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
@@ -700,31 +665,31 @@ class FloatingButton {
         });
 
         if (this.isSmallResolution) {
-            dimmedBackground.className = "dimmed-background";
-            if (button) button.className = "floating-button-common hide";
-            if (expandedButton) expandedButton.className = "expanded-button hide";
+            this.dimmedBackground.className = "dimmed-background";
+            if (this.button) this.button.className = "floating-button-common hide";
+            if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         }
         if (mode === "shrink") {
-            iframeContainer.className = "iframe-container-shrink";
+            this.iframeContainer.className = "iframe-container-shrink";
         } else if (mode === "full") {
-            iframeContainer.className = "iframe-container";
-            iframeContainer.style.height = "100%";
+            this.iframeContainer.className = "iframe-container";
+            this.iframeContainer.style.height = "100%";
         } else {
             return;
         }
     }
 
-    hideChat(iframeContainer, button, expandedButton, dimmedBackground) {
-        if (button) {
+    hideChat() {
+        if (this.button) {
             if (this.isSmallResolution) {
-                button.className = "floating-button-common button-image-md";
+                this.button.className = "floating-button-common button-image-md";
             } else {
-                button.className = "floating-button-common button-image";
+                this.button.className = "floating-button-common button-image";
             }
         }
-        if (expandedButton) expandedButton.className = "expanded-button hide";
-        iframeContainer.className = "iframe-container iframe-container-hide";
-        dimmedBackground.className = "dimmed-background hide";
+        if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+        this.iframeContainer.className = "iframe-container iframe-container-hide";
+        this.dimmedBackground.className = "dimmed-background hide";
     }
 
     // Function to log the current window width
