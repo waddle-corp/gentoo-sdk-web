@@ -795,6 +795,7 @@ window.FloatingButton = FloatingButton;
         ge.process = function (args) {
             var method = args[0];
             var params = args[1] || {};
+            console.log('args', args);
 
             // Add UTM parameters
             const parsedUrl = new URL(window.location.href);
@@ -828,6 +829,7 @@ window.FloatingButton = FloatingButton;
             }
 
             // Process method
+            console.log('method', method);
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
