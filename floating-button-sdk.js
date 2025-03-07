@@ -70,7 +70,6 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
-            console.log('bootPromise is called'),
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
@@ -94,7 +93,6 @@ class FloatingButton {
         }
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
-        console.log('params @ init', params);
         try {
             if (this.isDev) {
                 console.log('bootPromise is called', window.__GentooInited, window.location.pathname);
@@ -166,8 +164,7 @@ class FloatingButton {
     createUIElements(position, showGentooButton, isCustomButton = false) {
         window.__GentooInited = 'creating';
         if (this.isDev) console.log('createUIElements is called');
-        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelector('[data-testId="gentoo-custom-button"]')) : null;
-        console.log('customButton', this.customButton, document.getElementsByClassName("gentoo-custom-button"), document.querySelector('[data-testId="gentoo-custom-button"]'));
+        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -318,7 +315,7 @@ class FloatingButton {
         if (this.isDev) console.log('createUIElements is done');
     }
 
-    setupEventListeners(position, isCustomButton = false) {
+    setupEventListeners(position) {
         // Button click event
         var buttonClickHandler = (e) => {
             e.stopPropagation();
@@ -391,16 +388,7 @@ class FloatingButton {
         }
     }
 
-    async openChat(e) {
-        // e.stopPropagation();
-        // e.preventDefault();
-        // const iframeContainer = elems.iframeContainer;
-        // const iframe = elems.iframe;
-        // const chatHeader = elems.chatHeader;
-        // const dimmedBackground = elems.dimmedBackground;
-        // const button = elems.button;
-        // const expandedButton = elems.expandedButton;
-        console.log('openChat chatUserId, partnerId', this.chatUserId, this.partnerId);
+    async openChat() {
         // Chat being visible
         this.enableChat("shrink");
 
@@ -523,7 +511,6 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = null;
-        console.log("FloatingButton instance destroyed", window.__GentooInited, window.location.pathname);
     }
 
     setPageList(pageList) {
@@ -531,7 +518,6 @@ class FloatingButton {
     }
 
     async logEvent(payload) {
-        console.log('logEvent', payload);
         try {
             const params = {
                 eventCategory: String(payload.eventCategory),
@@ -671,7 +657,6 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        console.log('enableChat chatUserId, partnerId', this.chatUserId, this.partnerId);
         this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
@@ -795,7 +780,6 @@ window.FloatingButton = FloatingButton;
         ge.process = function (args) {
             var method = args[0];
             var params = args[1] || {};
-            console.log('args', args);
 
             // Add UTM parameters
             const parsedUrl = new URL(window.location.href);
@@ -829,7 +813,6 @@ window.FloatingButton = FloatingButton;
             }
 
             // Process method
-            console.log('method', method);
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
@@ -840,7 +823,6 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "openChat":
                     if (typeof fb.openChat === "function") {
-                        console.log('openChat called');
                         Promise.resolve(fb.openChat()).catch((error) => {
                             console.error("Failed to open GentooIO chat:", error);
                         });
