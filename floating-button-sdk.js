@@ -226,6 +226,13 @@ class FloatingButton {
         this.iframeContainer.appendChild(this.iframe);
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
+        
+        this.logEvent({
+            eventCategory: "SDKFloatingRendered",
+            partnerId: this.partnerId,
+            chatUserId: this.chatUserId,
+            products: [],
+        });
 
         // Create floating button
         if (showGentooButton) {
@@ -242,13 +249,6 @@ class FloatingButton {
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
-
-            this.logEvent({
-                eventCategory: "SDKFloatingRendered",
-                partnerId: this.partnerId,
-                chatUserId: this.chatUserId,
-                products: [],
-            });
 
             if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
