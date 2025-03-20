@@ -93,20 +93,23 @@ class FloatingButton {
                     .then(res => {
                         console.log('Customer ID Info:', res);
                         if (res.id.member_id) {
-                            this.chatUserId = res.id.member_id;
+                            this.cafe24UserId = res.id.member_id;
                         } else {
-                            this.chatUserId = res.id['guest_id'];
+                            this.cafe24UserId = res.id['guest_id'];
                         }
 
                         // Fetch additional data
                         return Promise.all([
+                            this.fetchChatUserId(this.cafe24UserId),
                             this.fetchChatbotData(this.partnerId),
                             this.fetchFloatingData(this.partnerId)
                         ]);
                     })
-                    .then(([chatbotData, floatingData]) => {
+                    .then(([chatUserId, chatbotData, floatingData]) => {
+                        console.log('chatUserId', chatUserId);
                         console.log('Chatbot Data:', chatbotData);
                         console.log('Floating Data:', floatingData);
+                        this.chatUserId = chatUserId;
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         resolve();
@@ -636,7 +639,7 @@ class FloatingButton {
 
     async fetchChatUserId (userToken, udid = "") {
         try {
-            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}`;
+            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}&chatUserId=${this.chatUserId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}
