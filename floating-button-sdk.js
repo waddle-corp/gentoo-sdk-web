@@ -371,6 +371,9 @@ class FloatingButton {
                     this.iframeContainer.style.height = "449px";
                 }
             }
+            if (e.data.closeRequestState) {
+                this.hideChat();
+            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
