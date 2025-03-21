@@ -643,7 +643,7 @@ class FloatingButton {
             externalKey: String(this.partnerId),
             userToken: String(userToken),
             udid: String(udid),
-            chatUserId: String(this.chatUserId)
+            chatUserId: this.chatUserId ? String(this.chatUserId) : null
         }
 
         try {
