@@ -640,9 +640,10 @@ class FloatingButton {
 
     async fetchChatUserId (userToken, udid = "") {
         const params = {
-            userToken: userToken,
-            udid: udid,
-            chatUserId: this.chatUserId
+            externalKey: String(this.partnerId),
+            userToken: String(userToken),
+            udid: String(udid),
+            chatUserId: String(this.chatUserId)
         }
 
         try {
