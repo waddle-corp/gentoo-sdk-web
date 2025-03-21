@@ -442,7 +442,7 @@ class FloatingButton {
                 this.enableChat("full");
             }
             if (e.data.resetState) {
-                if (this.iframeContainer) {
+                if (this.isMobileDevice && this.iframeContainer) {
                     this.iframeContainer.style.height = "449px";
                 }
             }
