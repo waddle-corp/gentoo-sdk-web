@@ -22,7 +22,7 @@ class FloatingButton {
         // this.floatingData;
         this.itemId = this.getProductNo();
         
-        if (window.location.hostname === 'localhost' || window.location.hostname === 'kickthefence.com') {
+        if (window.location.hostname === 'localhost' || window.location.hostname === 'kickthefence.com' || window.location.hostname === 'm.kickthefence.com') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
