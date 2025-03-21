@@ -650,7 +650,9 @@ class FloatingButton {
             const url = `${this.domains.auth}`;
             const response = await fetch(url, {
                 method: "POST",
-                headers: {},
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(params)
             });
 
