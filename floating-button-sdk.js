@@ -330,7 +330,6 @@ class FloatingButton {
     setupEventListeners(position) {
         // Button click event
         var buttonClickHandler = (e) => {
-            console.log('buttonClickHandler is called', e.target);
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
@@ -387,7 +386,6 @@ class FloatingButton {
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", buttonClickHandler);
-        console.log('setupEventListeners is done', this.closeButtonContainer);
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
