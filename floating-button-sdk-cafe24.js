@@ -7,7 +7,7 @@ class FloatingButton {
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
-        this.chatUserId = null;
+        this.chatUserId = sessionStorage.getItem('sdk-cuid') || null;
         this.displayLocation;
         // this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -110,6 +110,7 @@ class FloatingButton {
                         console.log('Chatbot Data:', chatbotData);
                         console.log('Floating Data:', floatingData);
                         this.chatUserId = chatUserId;
+                        sessionStorage.setItem('sdk-cuid', chatUserId);
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         resolve();
