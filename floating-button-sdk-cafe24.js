@@ -492,7 +492,7 @@ class FloatingButton {
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            dimmedBackground.className = 'dimmed-background hide';
+            this.dimmedBackground.className = 'dimmed-background hide';
             this.hideChat();
             if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
         })
