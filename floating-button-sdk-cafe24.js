@@ -639,11 +639,18 @@ class FloatingButton {
     }
 
     async fetchChatUserId (userToken, udid = "") {
+        const params = {
+            userToken: userToken,
+            udid: udid,
+            chatUserId: this.chatUserId
+        }
+
         try {
-            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}&chatUserId=${this.chatUserId}`;
+            const url = `${this.domains.auth}`;
             const response = await fetch(url, {
-                method: "GET",
-                headers: {}
+                method: "POST",
+                headers: {},
+                body: JSON.stringify(params)
             });
 
             const res = await response.json();
