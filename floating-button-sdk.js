@@ -140,7 +140,7 @@ class FloatingButton {
             else {
                 // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
                 // this.chatUrl = `https://accio-webclient-git-gent-2559-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                this.chatUrl = `https://accio-webclient-git-gent-2559-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `https://dev-demo.gentooai.com/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
 
             if (this.isDev) {
@@ -218,12 +218,15 @@ class FloatingButton {
             this.closeButtonIcon.className = "chat-close-button-icon-md";
             this.closeButtonText.className = "chat-close-button-text-md";
             this.closeButtonText.innerText = "접기";
+            this.closeActionArea = document.createElement("div");
+            this.closeActionArea.className = "chat-close-action-area-md";
             this.iframe.className = "chat-iframe-md";
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.chatHandler);
             this.chatHeader.appendChild(this.closeButtonContainer);
+            this.iframeContainer.appendChild(this.closeActionArea);
         } else {
             this.chatHeader.className = "chat-header";
             this.chatHeaderText.className = "chat-header-text";
@@ -390,6 +393,7 @@ class FloatingButton {
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", buttonClickHandler);
         console.log('setupEventListeners is done', this.closeButtonContainer);
 

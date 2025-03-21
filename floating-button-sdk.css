@@ -396,6 +396,16 @@
     color: #C0C0C0;
 }
 
+.chat-close-action-area-md {
+    position: absolute;
+    width: 46px;
+    height: 40px;
+    min-width: 46px;
+    min-height: 40px;
+    top: 0;
+    right: 16px;
+}
+
 .hide {
     display: none;
 }
