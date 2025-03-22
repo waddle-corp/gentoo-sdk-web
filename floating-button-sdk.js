@@ -41,7 +41,8 @@ class FloatingButton {
 
         if (
             window.location.hostname === "dailyshot.co" ||
-            window.location.hostname === "dev-demo.gentooai.com"
+            window.location.hostname === "dev-demo.gentooai.com" ||
+            window.location.hostname === "127.0.0.1"
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
@@ -671,10 +672,9 @@ class FloatingButton {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
-            iframeContainer.style.height = "100%";
+            iframeContainer.style.height = "99%";
             this.enableChat("shrink");
         } else if (this.scrollDir === "down") {
-            iframeContainer.style.height = "90%";
             this.hideChat();
         }
 

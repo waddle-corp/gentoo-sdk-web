@@ -761,10 +761,9 @@ class FloatingButton {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
-            iframeContainer.style.height = "100%";
+            iframeContainer.style.height = "99%";
             this.enableChat("shrink");
         } else if (this.scrollDir === "down") {
-            iframeContainer.style.height = "90%";
             this.hideChat();
         }
 
@@ -790,7 +789,7 @@ class FloatingButton {
             this.iframeContainer.className = "iframe-container-shrink";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
-            this.iframeContainer.style.height = "100%";
+            this.iframeContainer.style.height = "99%";
         } else {
             return;
         }
