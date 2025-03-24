@@ -38,10 +38,12 @@ class FloatingButton {
             click: null,
             formSubmitted: null,
         }
+        this.iframeHeightState;
 
         if (
             window.location.hostname === "dailyshot.co" ||
-            window.location.hostname === "dev-demo.gentooai.com"
+            window.location.hostname === "dev-demo.gentooai.com" ||
+            window.location.hostname === "127.0.0.1"
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
@@ -126,10 +128,14 @@ class FloatingButton {
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
                 this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } else if (this.partnerId === '676a4b3cac97386117d1838d') {
+            } 
+            else if (this.partnerId === '676a4b3cac97386117d1838d') {
                 this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } else {
+            } 
+            else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://accio-webclient-git-gent-2559-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://dev-demo.gentooai.com/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
 
             if (this.isDev) {
@@ -141,6 +147,7 @@ class FloatingButton {
                 if (this.isDev) {
                     console.log("createUIElements1", window.__GentooInited, window.location.pathname);
                 }
+                console.log('isCustomeButton', isCustomButton);
                 this.createUIElements(position, showGentooButton, isCustomButton);
             } else if (this.pageList.includes(window.location.pathname)) {
                 if (this.isDev) {
@@ -195,7 +202,7 @@ class FloatingButton {
         this.closeButtonContainer = document.createElement("div");
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
-        this.chatHeaderText.innerText = "Powered by Gentoo";
+        this.chatHeaderText.innerText = "Gentoo";
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
 
@@ -203,11 +210,19 @@ class FloatingButton {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
             this.chatHeaderText.className = "chat-header-text-md";
+            this.closeButtonContainer.className = "chat-close-button-container-md";
             this.closeButtonIcon.className = "chat-close-button-icon-md";
+            this.closeButtonText.className = "chat-close-button-text-md";
+            this.closeButtonText.innerText = "접기";
+            this.closeActionArea = document.createElement("div");
+            this.closeActionArea.className = "chat-close-action-area-md";
             this.iframe.className = "chat-iframe-md";
-            this.chatHeader.appendChild(this.chatHandler);
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
-            this.chatHeader.appendChild(this.closeButtonIcon);
+            this.chatHeader.appendChild(this.chatHandler);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+            this.iframeContainer.appendChild(this.closeActionArea);
         } else {
             this.chatHeader.className = "chat-header";
             this.chatHeaderText.className = "chat-header-text";
@@ -325,8 +340,13 @@ class FloatingButton {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
                 if (this.button) {
-                    this.button.className =
-                        "floating-button-common button-image-close-mr hide";
+                    if (this.isSmallResolution) {
+                        this.button.className =
+                            "floating-button-common button-image-close-mr hide";
+                    } else {
+                        this.button.className =
+                            "floating-button-common button-image-close hide";
+                    }
                 }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
@@ -340,7 +360,11 @@ class FloatingButton {
                     this.elems.dimmedBackground
                 );
                 if (this.button) {
-                    this.button.className = "floating-button-common button-image";
+                    if (this.isSmallResolution) {
+                        this.button.className = "floating-button-common button-image-md";
+                    } else {
+                        this.button.className = "floating-button-common button-image";
+                    }
                     this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
                 }
             }
@@ -359,19 +383,38 @@ class FloatingButton {
             if (this.isSmallResolution && e.data.inputFocusState) {
                 this.enableChat("full");
             }
+            if (e.data.resetState) {
+                if (this.isMobileDevice && this.iframeContainer) {
+                    this.iframeContainer.style.height = "449px";
+                }
+            }
+            if (e.data.closeRequestState) {
+                this.hideChat();
+            }
+            if (e.data.messageExistence === 'exist') {
+                this.iframeHeightState = 'full';
+            } else if (e.data.messageExistence === 'none') {
+                this.iframeHeightState = 'shrink';
+            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", buttonClickHandler);
-
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
             this.browserWidth = this.logWindowWidth();
             this.isSmallResolution = this.browserWidth < 601;
             this.updateFloatingContainerPosition(position); // Update position on resize
+        });
+
+        window?.addEventListener('popstate', () => {
+            if (this.isMobileDevice) {
+                this.hideChat();
+            }
         });
     }
 
@@ -390,7 +433,8 @@ class FloatingButton {
 
     openChat() {
         // Chat being visible
-        this.enableChat("shrink");
+        this.enableChat(this.iframeHeightState);
+        history.pushState({ chatOpen: true }, '', window.location.href);
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -402,7 +446,7 @@ class FloatingButton {
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        });
+        }, {passive: true});
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -644,10 +688,9 @@ class FloatingButton {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
-            iframeContainer.style.height = "100%";
+            iframeContainer.style.height = "99%";
             this.enableChat("shrink");
         } else if (this.scrollDir === "down") {
-            iframeContainer.style.height = "90%";
             this.hideChat();
         }
 
@@ -671,9 +714,10 @@ class FloatingButton {
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
+            this.iframeContainer.style.height = "449px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
-            this.iframeContainer.style.height = "100%";
+            this.iframeContainer.style.height = "99%";
         } else {
             return;
         }
@@ -762,7 +806,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk.css");
+    injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
