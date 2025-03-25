@@ -18,8 +18,8 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.js"; 
-            s.src = 'https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js'; // dev
+            s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.js"; 
+            // s.src = 'https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./floating-button-sdk-cafe24.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})

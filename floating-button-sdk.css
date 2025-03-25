@@ -229,8 +229,7 @@
 
     @media screen and (min-width: 600px) {
         width: 390px;
-        height: calc(100% - 180px);
-        height: 100%;
+        height: calc(100% - 100px);
         bottom: 32px;
         right: 24px;
         box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.25);

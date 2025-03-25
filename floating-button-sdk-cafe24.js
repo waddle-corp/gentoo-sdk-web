@@ -832,12 +832,9 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        console.log('getProductNo called', urlString);
         if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
         else if (urlString.includes('/category')) {this.displayLocation = 'PRODUCT_LIST'}
         else {this.displayLocation = 'HOME'}
-        console.log('displayLocation @ getProductNo', this.displayLocation);
-
         try {
             // URL 객체 생성
             const url = new URL(urlString);
@@ -897,8 +894,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
-    injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
+    // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
