@@ -894,8 +894,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
-    // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
+    injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
