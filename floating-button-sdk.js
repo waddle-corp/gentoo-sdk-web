@@ -775,7 +775,7 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://sdk-gentooai.com/floating-button-sdk.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
