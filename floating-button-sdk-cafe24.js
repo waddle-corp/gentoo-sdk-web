@@ -797,10 +797,10 @@ class FloatingButton {
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
-            this.iframeContainer.style.height = "449px";
+            if (this.isMobileDevice) this.iframeContainer.style.height = "449px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
-            this.iframeContainer.style.height = "99%";
+            if (this.isMobileDevice) this.iframeContainer.style.height = "99%";
         } else {
             return;
         }
