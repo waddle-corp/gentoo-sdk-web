@@ -21,6 +21,7 @@ class FloatingButton {
         this.floatingClicked = false;
         // this.floatingData;
         this.itemId = this.getProductNo();
+        console.log('itemId', this.itemId);
         this.iframeHeightState;
         
         if (window.location.hostname === 'localhost') {
