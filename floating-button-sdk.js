@@ -27,6 +27,8 @@ class FloatingButton {
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.warningMessage;
+        this.warningActivated;
         this.floatingData;
         this.pageList = [];
         this.eventCallback = {
@@ -75,6 +77,9 @@ class FloatingButton {
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
+                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                this.warningMessage = warningMessageData?.extra?.message;
+                this.warningActivated = warningMessageData?.activated;
             }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
@@ -171,6 +176,11 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Gentoo";
+        this.footer = document.createElement("div");
+        this.footer.className = "chat-footer";
+        this.footerText = document.createElement("p");
+        this.footerText.className = "chat-footer-text";
+        this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
 
@@ -184,7 +194,7 @@ class FloatingButton {
             this.closeButtonText.innerText = "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
-            this.iframe.className = "chat-iframe-md";
+            this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -198,7 +208,7 @@ class FloatingButton {
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
             this.closeButtonText.innerText = "채팅창 축소";
-            this.iframe.className = "chat-iframe";
+            this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -207,6 +217,10 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
+        if (this.warningActivated) {
+            this.footerText.innerText = this.warningMessage;
+            this.iframeContainer.appendChild(this.footer);
+        }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
         
@@ -776,7 +790,7 @@ window.FloatingButton = FloatingButton;
 
     // Inject the CSS automatically
     injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope

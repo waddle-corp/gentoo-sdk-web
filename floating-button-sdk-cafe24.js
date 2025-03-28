@@ -19,10 +19,13 @@ class FloatingButton {
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.warningMessage;
+        this.warningActivated;
         // this.floatingData;
         this.itemId = this.getProductNo();
+        console.log('itemId, url', this.itemId, window.location.hostname, window.location.hostname.includes('kickthefence'));
         this.iframeHeightState;
-        
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -35,7 +38,7 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname === 'kickthefence.com' || window.location.hostname === 'm.kickthefence.com') {
+        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
@@ -60,7 +63,7 @@ class FloatingButton {
                 log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
-                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall', 
+                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
             }
         }
 
@@ -108,6 +111,9 @@ class FloatingButton {
                         sessionStorage.setItem('sdk-cuid', chatUserId);
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
+                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                        this.warningMessage = warningMessageData?.extra?.message;
+                        this.warningActivated = warningMessageData?.activated;
                         resolve();
                     })
                     .catch(error => {
@@ -115,97 +121,97 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id : 'ckUs4MK3KhZixizocrCmTA',
-                version : '2022-12-01'
+                client_id: 'ckUs4MK3KhZixizocrCmTA',
+                version: '2022-12-01'
             }));
         });
-    //     this.floatingData = {
-    //         imageUrl: "https://d3qrvyizob9ouf.cloudfront.net/public/img/units/gentoo-anime-web-default.gif",
-    //         comment: "오늘의 쇼핑은 저와 함께하실래요?",
-    //     };
+        //     this.floatingData = {
+        //         imageUrl: "https://d3qrvyizob9ouf.cloudfront.net/public/img/units/gentoo-anime-web-default.gif",
+        //         comment: "오늘의 쇼핑은 저와 함께하실래요?",
+        //     };
 
-    //     this.chatbotData = {
-    //         "chatbotId": 0,
-    //         "name": "젠투",
-    //         "profileImg": "https://df4n10wq26cwv.cloudfront.net/gentoo.png",
-    //         "greetingMessage": "어서오세요 😊 어떤 상품을 찾아드릴까요?\n젠투가 추천해드릴게요.",
-    //         "colorCode": [
-    //             {
-    //                 "hex": "#154cca",
-    //                 "rgb": {
-    //                     "r": 21,
-    //                     "g": 76,
-    //                     "b": 202,
-    //                     "a": 1
-    //                 },
-    //                 "red": 21,
-    //                 "green": 76,
-    //                 "blue": 202,
-    //                 "alpha": 1
-    //             },
-    //             {
-    //                 "hex": "#bbc8e5",
-    //                 "rgb": {
-    //                     "r": 187,
-    //                     "g": 200,
-    //                     "b": 229,
-    //                     "a": 1
-    //                 },
-    //                 "red": 187,
-    //                 "green": 200,
-    //                 "blue": 229,
-    //                 "alpha": 1
-    //             },
-    //             {
-    //                 "hex": "#e0e6f3",
-    //                 "rgb": {
-    //                     "r": 224,
-    //                     "g": 230,
-    //                     "b": 243,
-    //                     "a": 1
-    //                 },
-    //                 "red": 224,
-    //                 "green": 230,
-    //                 "blue": 243,
-    //                 "alpha": 1
-    //             }
-    //         ],
-    //         "recommendSize": "multi",
-    //         "carouselType": "single",
-    //         "exceptKeyword": [],
-    //         "examples": [
-    //             "회랑 어울리는 화이트 와인 찾아줘",
-    //             "오크 풍미가 있는 버번 중에 7만 원대로 찾아줘",
-    //             "부드러운 싱글몰트 위스키 몇 가지 추천해줘"
-    //         ],
-    //         "chatAgent": "anchovy",
-    //         "position": {
-    //             "top": null,
-    //             "bottom": 32,
-    //             "left": null,
-    //             "right": 0
-    //         },
-    //         "mobilePosition": {
-    //             "top": null,
-    //             "bottom": 32,
-    //             "left": null,
-    //             "right": 0
-    //         },
-    //         "preQuestion": {
-    //             "count": 0,
-    //             "questions": []
-    //         },
-    //         "isDummy": true,
-    //         "planType": "PRO",
-    //         "planExpirationTime": "2100-01-01T08:59:59",
-    //         "partnerType": "dummy"
-    //     }
+        //     this.chatbotData = {
+        //         "chatbotId": 0,
+        //         "name": "젠투",
+        //         "profileImg": "https://df4n10wq26cwv.cloudfront.net/gentoo.png",
+        //         "greetingMessage": "어서오세요 😊 어떤 상품을 찾아드릴까요?\n젠투가 추천해드릴게요.",
+        //         "colorCode": [
+        //             {
+        //                 "hex": "#154cca",
+        //                 "rgb": {
+        //                     "r": 21,
+        //                     "g": 76,
+        //                     "b": 202,
+        //                     "a": 1
+        //                 },
+        //                 "red": 21,
+        //                 "green": 76,
+        //                 "blue": 202,
+        //                 "alpha": 1
+        //             },
+        //             {
+        //                 "hex": "#bbc8e5",
+        //                 "rgb": {
+        //                     "r": 187,
+        //                     "g": 200,
+        //                     "b": 229,
+        //                     "a": 1
+        //                 },
+        //                 "red": 187,
+        //                 "green": 200,
+        //                 "blue": 229,
+        //                 "alpha": 1
+        //             },
+        //             {
+        //                 "hex": "#e0e6f3",
+        //                 "rgb": {
+        //                     "r": 224,
+        //                     "g": 230,
+        //                     "b": 243,
+        //                     "a": 1
+        //                 },
+        //                 "red": 224,
+        //                 "green": 230,
+        //                 "blue": 243,
+        //                 "alpha": 1
+        //             }
+        //         ],
+        //         "recommendSize": "multi",
+        //         "carouselType": "single",
+        //         "exceptKeyword": [],
+        //         "examples": [
+        //             "회랑 어울리는 화이트 와인 찾아줘",
+        //             "오크 풍미가 있는 버번 중에 7만 원대로 찾아줘",
+        //             "부드러운 싱글몰트 위스키 몇 가지 추천해줘"
+        //         ],
+        //         "chatAgent": "anchovy",
+        //         "position": {
+        //             "top": null,
+        //             "bottom": 32,
+        //             "left": null,
+        //             "right": 0
+        //         },
+        //         "mobilePosition": {
+        //             "top": null,
+        //             "bottom": 32,
+        //             "left": null,
+        //             "right": 0
+        //         },
+        //         "preQuestion": {
+        //             "count": 0,
+        //             "questions": []
+        //         },
+        //         "isDummy": true,
+        //         "planType": "PRO",
+        //         "planExpirationTime": "2100-01-01T08:59:59",
+        //         "partnerType": "dummy"
+        //     }
 
-    //     this.chatUserId = 'selentest';
-    //     this.partnerId = '6737041bcf517dbd2b8b6458';
-    }    
+        //     this.chatUserId = 'selentest';
+        //     this.partnerId = '6737041bcf517dbd2b8b6458';
+    }
 
-    
+
     async init(params) {
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
@@ -227,7 +233,7 @@ class FloatingButton {
             }
 
             this.isInitialized = true;
-            
+
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
@@ -246,9 +252,9 @@ class FloatingButton {
         this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
         // Add null checks before accessing properties
         if (
-            !this.chatbotData || 
-            !this.chatbotData.position || 
-            !this.chatbotData.mobilePosition 
+            !this.chatbotData ||
+            !this.chatbotData.position ||
+            !this.chatbotData.mobilePosition
         ) {
             console.error('Chatbot data is incomplete');
             return;
@@ -271,9 +277,14 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Gentoo";
+        this.footer = document.createElement("div");
+        this.footer.className = "chat-footer";
+        this.footerText = document.createElement("p");
+        this.footerText.className = "chat-footer-text";
+        this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        
+
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
@@ -284,7 +295,7 @@ class FloatingButton {
             this.closeButtonText.innerText = "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
-            this.iframe.className = "chat-iframe-md";
+            this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -298,7 +309,7 @@ class FloatingButton {
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
             this.closeButtonText.innerText = "채팅창 축소";
-            this.iframe.className = "chat-iframe";
+            this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -307,6 +318,10 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
+        if (this.warningActivated) {
+            this.footerText.innerText = this.warningMessage;
+            this.iframeContainer.appendChild(this.footer);
+        }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
@@ -568,9 +583,9 @@ class FloatingButton {
             return;
         }
         this.isDestroyed = true;
-        
+
         console.log('Destroying FloatingButton instance');
-        
+
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
         if (this.button) {
@@ -676,7 +691,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -688,7 +703,7 @@ class FloatingButton {
         } catch (error) {
             console.error(`Error while calling fetchFloatingData API: ${error}`);
         }
-    } 
+    }
 
     async fetchPartnerId(mallId) {
         try {
@@ -710,7 +725,7 @@ class FloatingButton {
         if (!this.prevPosition) {
             this.prevPosition = touch.clientY;
         }
-        
+
         const diff = touch.clientY - this.prevPosition;
         this.scrollPosition += diff;
         this.prevPosition = touch.clientY;
@@ -822,22 +837,22 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product')) {this.displayLocation = 'PRODUCT_DETAIL'}
-        else if (urlString.includes('/category')) {this.displayLocation = 'PRODUCT_LIST'}
-        else {this.displayLocation = 'HOME'}
+        if (urlString.includes('/product')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        else if (urlString.includes('/category')) { this.displayLocation = 'PRODUCT_LIST' }
+        else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
-    
+
             // 1. 쿼리 파라미터에서 product_no 추출 시도
             const productNoFromQuery = url.searchParams.get('product_no');
             if (productNoFromQuery) {
                 return productNoFromQuery;
             }
-    
+
             // 2. 경로 기반 URL에서 product_no 추출 시도
             const path = url.pathname;
-    
+
             /**
              * 정규 표현식 설명:
              * ^\/product\/            - '/product/'로 시작
@@ -847,12 +862,12 @@ class FloatingButton {
              * display\/[^\/]+\/?$     - '/display/' 다음에 display_group_no 그리고 슬래시 또는 끝
              */
             const regex = /^\/product\/[^\/]+\/([^\/]+)\/category\/[^\/]+\/display\/[^\/]+\/?$/;
-    
+
             const match = path.match(regex);
             if (match && match[1]) {
                 return match[1];
             }
-    
+
             // 3. 찾을 수 없는 경우 null 반환
             return null;
         } catch (error) {
@@ -884,8 +899,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
-    injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
