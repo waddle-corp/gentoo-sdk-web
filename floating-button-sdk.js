@@ -77,7 +77,7 @@ class FloatingButton {
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
-                const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
             }),
