@@ -313,7 +313,7 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (!this.chatbotData?.experimentalData[1]?.activated) {
+        if (this.chatbotData?.experimentalData[1]?.activated) {
             console.log('chatbotData', this.chatbotData?.experimentalData[1]);
             this.footerText.innerText = this.chatbotData?.experimentalData[1]?.extra?.message;
             this.iframeContainer.appendChild(this.footer);
