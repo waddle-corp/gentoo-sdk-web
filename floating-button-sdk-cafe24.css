@@ -268,7 +268,7 @@
 
 .chat-iframe-md {
     width: 100%;
-    height: calc(100% - 63px);
+    height: calc(100% - 44px);
     border: none;
 
     @media screen and (min-width: 600px) {
@@ -278,7 +278,7 @@
 
 .chat-iframe {
     width: 100%;
-    height: calc(100% - 75px);
+    height: calc(100% - 56px);
     border: none;
 
     @media screen and (min-width: 600px) {
