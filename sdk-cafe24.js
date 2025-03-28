@@ -20,8 +20,8 @@
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
             // s.src = "https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.js"; 
-            // s.src = 'https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.js'; // dev
-            s.src = "./floating-button-sdk-cafe24.js"; 
+            s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
+            // s.src = "./floating-button-sdk-cafe24.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
