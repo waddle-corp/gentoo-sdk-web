@@ -114,7 +114,6 @@ class FloatingButton {
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                         this.warningMessage = warningMessageData?.extra?.message;
                         this.warningActivated = warningMessageData?.activated;
-                        console.log('warningActivated', this.warningActivated);
                         resolve();
                     })
                     .catch(error => {
@@ -320,7 +319,6 @@ class FloatingButton {
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
         if (this.warningActivated) {
-            console.log('warningMessageData', this.warningMessage);
             this.footerText.innerText = this.warningMessage;
             this.iframeContainer.appendChild(this.footer);
         }
@@ -911,8 +909,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
