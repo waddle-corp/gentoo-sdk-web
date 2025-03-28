@@ -787,10 +787,10 @@ class FloatingButton {
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
-            this.iframeContainer.style.height = "449px";
+            if (this.isMobileDevice) this.iframeContainer.style.height = "449px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
-            this.iframeContainer.style.height = "99%";
+            if (this.isMobileDevice) this.iframeContainer.style.height = "99%";
         } else {
             return;
         }
@@ -884,8 +884,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
-    // injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
+    // injectCSS("https://d3qrvyizob9ouf.cloudfront.net/floating-button-sdk-cafe24.css");
+    injectCSS("https://d32xcphivq9687.cloudfront.net/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
