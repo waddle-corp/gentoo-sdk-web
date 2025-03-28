@@ -23,7 +23,7 @@ class FloatingButton {
         this.warningActivated;
         // this.floatingData;
         this.itemId = this.getProductNo();
-        console.log('itemId', this.itemId);
+        console.log('itemId, url', this.itemId, window.location.hostname, window.location.hostname.includes('kickthefence'));
         this.iframeHeightState;
 
         if (window.location.hostname === 'localhost') {
@@ -38,7 +38,7 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname === 'kickthefence.com' || window.location.hostname === 'm.kickthefence.com') {
+        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
