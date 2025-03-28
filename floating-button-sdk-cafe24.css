@@ -248,6 +248,7 @@
     padding: 0px;
     border: 1px solid #999;
     border-radius: 10px;
+    
 
     transition: all 1s ease;
     
@@ -257,6 +258,7 @@
         bottom: 32px;
         right: 24px;
         box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.25);
+        overflow: hidden;
     }
 }
 
@@ -266,7 +268,7 @@
 
 .chat-iframe-md {
     width: 100%;
-    height: calc(100% - 30px);
+    height: calc(100% - 63px);
     border: none;
 
     @media screen and (min-width: 600px) {
@@ -276,7 +278,7 @@
 
 .chat-iframe {
     width: 100%;
-    height: calc(100% - 56px);
+    height: calc(100% - 75px);
     border: none;
 
     @media screen and (min-width: 600px) {
