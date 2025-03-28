@@ -429,6 +429,14 @@
     color: #C0C0C0;
 }
 
+.footer-add-height {
+    height: calc(100% - 75px);
+}
+
+.footer-add-height-md {
+    height: calc(100% - 63px);
+}
+
 .hide {
     display: none;
 }

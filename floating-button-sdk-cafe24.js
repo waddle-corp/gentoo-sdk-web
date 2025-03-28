@@ -290,7 +290,7 @@ class FloatingButton {
             this.closeButtonText.innerText = "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
-            this.iframe.className = "chat-iframe-md";
+            this.iframe.className = `chat-iframe-md ${this.chatbotData?.experimentalData[1]?.activated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -304,7 +304,7 @@ class FloatingButton {
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
             this.closeButtonText.innerText = "채팅창 축소";
-            this.iframe.className = "chat-iframe";
+            this.iframe.className = `chat-iframe ${this.chatbotData?.experimentalData[1]?.activated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
             this.chatHeader.appendChild(this.chatHeaderText);
@@ -313,7 +313,7 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (this.chatbotData?.experimentalData[1]?.activated) {
+        if (!this.chatbotData?.experimentalData[1]?.activated) {
             console.log('chatbotData', this.chatbotData?.experimentalData[1]);
             this.footerText.innerText = this.chatbotData?.experimentalData[1]?.extra?.message;
             this.iframeContainer.appendChild(this.footer);
