@@ -272,6 +272,12 @@ class FloatingButton {
         this.closeButtonIcon = document.createElement("div");
         this.closeButtonText = document.createElement("p");
         this.chatHeaderText.innerText = "Gentoo";
+        this.footer = document.createElement("div");
+        this.footer.className = "chat-footer";
+        this.footerText = document.createElement("p");
+        this.footerText.className = "chat-footer-text";
+        this.footerText.innerText = "젠투는 실수를 할 수 있습니다. 중요한 정보는 재차 확인하세요";
+        this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
         
@@ -308,6 +314,7 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
+        this.iframeContainer.appendChild(this.footer);
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
