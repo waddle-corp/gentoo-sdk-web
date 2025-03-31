@@ -423,6 +423,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
+
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -451,6 +452,16 @@ class FloatingButton {
                 }
             }
         };
+
+        var sendPostMessageHandler = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log('sendPostMessageHandler');
+            const buttonClickState = {
+                buttonClickState: true,
+            }
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+        }
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
@@ -482,10 +493,7 @@ class FloatingButton {
 
         this.floatingContainer?.addEventListener("click", (e) => {
             buttonClickHandler(e);
-            const buttonClickState = {
-                buttonClickState: true,
-            }
-            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+            sendPostMessageHandler(e);
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
