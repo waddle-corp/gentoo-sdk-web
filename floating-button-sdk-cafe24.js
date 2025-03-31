@@ -691,7 +691,8 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
+                // `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`,
                 {
                     method: "GET",
                     headers: {},
