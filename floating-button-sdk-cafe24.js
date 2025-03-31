@@ -498,6 +498,7 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeButtonContainer'));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeActionArea'));
         this.customButton?.addEventListener("click", buttonClickHandler);
 
         // Add event listener for the resize event
