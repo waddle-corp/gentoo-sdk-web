@@ -453,12 +453,13 @@ class FloatingButton {
             }
         };
 
-        var sendPostMessageHandler = (e) => {
+        var sendPostMessageHandler = (e, clickedElement) => {
             e.stopPropagation();
             e.preventDefault();
             console.log('sendPostMessageHandler');
             const buttonClickState = {
                 buttonClickState: true,
+                clickedElement: clickedElement,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
@@ -492,8 +493,9 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click",buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", sendPostMessageHandler);
+        this.floatingContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'floatingContainer'));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeButtonContainer'));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", buttonClickHandler);
