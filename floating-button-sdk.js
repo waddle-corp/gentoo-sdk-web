@@ -324,7 +324,7 @@ class FloatingButton {
             const buttonClickState = {
                 buttonClickState: true,
             }
-            this.iframe.postMessage(buttonClickState, "*");
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
