@@ -423,10 +423,6 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            const buttonClickState = {
-                buttonClickState: true,
-            }
-            this.iframe.contentWindow.postMessage(buttonClickState, "*");
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -484,7 +480,13 @@ class FloatingButton {
             }
         });
 
-        this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => {
+            buttonClickHandler(e);
+            const buttonClickState = {
+                buttonClickState: true,
+            }
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+        });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
