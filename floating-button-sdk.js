@@ -16,7 +16,8 @@ class FloatingButton {
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.utm = props.utm;
-        this.chatUserId;
+        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.chatUserId = this.gentooSessionData?.cuid || null;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -73,6 +74,8 @@ class FloatingButton {
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
+                this.gentooSessionData.cuid = res;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }),
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");

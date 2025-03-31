@@ -7,7 +7,8 @@ class FloatingButton {
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
-        this.chatUserId = sessionStorage.getItem('sdk-cuid') || null;
+        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.chatUserId = this.gentooSessionData?.cuid || null;
         this.displayLocation;
         // this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -108,7 +109,8 @@ class FloatingButton {
                     })
                     .then(([chatUserId, chatbotData, floatingData]) => {
                         this.chatUserId = chatUserId;
-                        sessionStorage.setItem('sdk-cuid', chatUserId);
+                        this.gentooSessionData.cuid = chatUserId;
+                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
