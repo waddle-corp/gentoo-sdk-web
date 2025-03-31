@@ -16,7 +16,9 @@ class FloatingButton {
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.utm = props.utm;
-        this.chatUserId;
+        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.chatUserId = this.gentooSessionData?.cuid || null;
+        console.log('chatUserId @ constructor', this.chatUserId);
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -73,6 +75,8 @@ class FloatingButton {
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
+                this.gentooSessionData.cuid = res;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }),
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
@@ -570,17 +574,27 @@ class FloatingButton {
     }
 
     async fetchChatUserId(userToken, udid = "") {
+        const params = {
+            externalKey: String(this.partnerId),
+            userToken: String(userToken),
+            udid: String(udid),
+            chatUserId: this.chatUserId ? String(this.chatUserId) : null
+        }
+
         try {
-            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}`;
+            const url = `${this.domains.auth}`;
             const response = await fetch(url, {
-                method: "GET",
-                headers: {},
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params)
             });
 
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`);
+            console.error(`Error while calling fetchChatUserId API: ${error}`)
         }
     }
 
