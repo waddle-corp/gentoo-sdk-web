@@ -432,7 +432,7 @@ class FloatingButton {
                         "floating-button-common button-image-close-mr hide";
                 }
                 this.openChat(e, this.elems);
-                if (this.eventCallback.click !== null) {
+                if (this.eventCallback?.click !== null) {
                     this.eventCallback.click();
                 }
             } else {
@@ -491,10 +491,8 @@ class FloatingButton {
             }
         });
 
-        this.floatingContainer?.addEventListener("click", (e) => {
-            buttonClickHandler(e);
-            sendPostMessageHandler(e);
-        });
+        this.floatingContainer?.addEventListener("click",buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", sendPostMessageHandler);
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
