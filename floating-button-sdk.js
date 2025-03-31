@@ -570,17 +570,27 @@ class FloatingButton {
     }
 
     async fetchChatUserId(userToken, udid = "") {
+        const params = {
+            externalKey: String(this.partnerId),
+            userToken: String(userToken),
+            udid: String(udid),
+            chatUserId: this.chatUserId ? String(this.chatUserId) : null
+        }
+
         try {
-            const url = `${this.domains.auth}?userToken=${userToken}&udid=${udid}`;
+            const url = `${this.domains.auth}`;
             const response = await fetch(url, {
-                method: "GET",
-                headers: {},
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params)
             });
 
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`);
+            console.error(`Error while calling fetchChatUserId API: ${error}`)
         }
     }
 
