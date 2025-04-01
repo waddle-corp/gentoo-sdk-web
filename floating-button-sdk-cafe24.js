@@ -489,6 +489,7 @@ class FloatingButton {
                 this.iframeHeightState = 'shrink';
             }
             if (e.data.openRequestState) {
+                console.log('openRequestState');
                 this.openChat();
             }
         });
