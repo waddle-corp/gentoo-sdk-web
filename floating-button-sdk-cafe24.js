@@ -866,8 +866,8 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/category')) { this.displayLocation = 'PRODUCT_LIST' }
+        if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
+        else if (urlString.includes('/product')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
@@ -884,17 +884,17 @@ class FloatingButton {
 
             /**
              * 정규 표현식 설명:
-             * ^\/product\/            - '/product/'로 시작
-             * [^\/]+\/                - 상품명 (슬래시가 아닌 문자들) 다음에 슬래시
-             * ([^\/]+)\/              - product_no 캡처 그룹 (슬래시가 아닌 문자들) 다음에 슬래시
-             * category\/[^\/]+\/      - '/category/' 다음에 category_no 그리고 슬래시
-             * display\/[^\/]+\/?$     - '/display/' 다음에 display_group_no 그리고 슬래시 또는 끝
+                ^\/product\/	/product/로 시작
+                [^\/]+\/	product_name (슬래시 제외)
+                ([^\/]+)	✅ 캡처할 product_no
+                (?: ... )?	(optional non-capturing group)
+                \/category\/[^\/]+\/display\/[^\/]+\/?	전체 경로가 있을 수도 있고 없을 수도 있음
              */
-            const regex = /^\/product\/[^\/]+\/([^\/]+)\/category\/[^\/]+\/display\/[^\/]+\/?$/;
+            const regex = /^\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
 
             const match = path.match(regex);
             if (match && match[1]) {
-                return match[1];
+                return match[1]; // product_no
             }
 
             // 3. 찾을 수 없는 경우 null 반환
