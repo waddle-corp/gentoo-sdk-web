@@ -883,14 +883,21 @@ class FloatingButton {
             const path = url.pathname;
 
             /**
-             * 정규 표현식 설명:
-                ^\/product\/	/product/로 시작
-                [^\/]+\/	product_name (슬래시 제외)
-                ([^\/]+)	✅ 캡처할 product_no
-                (?: ... )?	(optional non-capturing group)
-                \/category\/[^\/]+\/display\/[^\/]+\/?	전체 경로가 있을 수도 있고 없을 수도 있음
+             * 고려가 필요한 cafe24 경로 패턴
+                /product/{product_name}/{product_no}
+                /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
+                /{shop_no}/product/{product_name}/{product_no}
              */
-            const regex = /^\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
+
+            /**
+             * 정규 표현식 설명:
+                (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
+                \/product\/	/product/ 고정
+                [^\/]+	product_name
+                \/([^\/]+)	✅ 캡처할 product_no
+                (?:\/category/...)?	🔹 optional category/display path
+             */
+            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
 
             const match = path.match(regex);
             if (match && match[1]) {
