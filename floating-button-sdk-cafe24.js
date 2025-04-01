@@ -350,9 +350,9 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
-
+            console.log('gentooSessionData', this.gentooSessionData);
             if (this.gentooSessionData?.redirectState) {
-                console.log('gentooSessionData.redirectState', gentooSessionData.redirectState);
+                console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
                 this.openChat();
                 this.floatingClicked = true;
             }
@@ -471,7 +471,7 @@ class FloatingButton {
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
-                sessionStorage.setItem('gentooSessionData', JSON.stringify(this.gentooSessionData));
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
