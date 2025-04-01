@@ -221,7 +221,7 @@
     width: 100%;
     height: 99%;
     background-color: #fff;
-    z-index: 1000000;
+    z-index: 1000002;
     padding: 0px;
     border-radius: 10px;
 
@@ -243,7 +243,7 @@
     width: 100%;
     height: 449px;
     background-color: #fff;
-    z-index: 1000000;
+    z-index: 1000002;
     padding: 0px;
     border: 1px solid #999;
     border-radius: 10px;
