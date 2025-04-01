@@ -351,7 +351,7 @@ class FloatingButton {
             this.floatingContainer.appendChild(this.button);
 
 
-            if (gentooSessionData.redirectState) {
+            if (this.gentooSessionData?.redirectState) {
                 console.log('gentooSessionData.redirectState', gentooSessionData.redirectState);
                 this.openChat();
                 this.floatingClicked = true;
