@@ -242,13 +242,6 @@ class FloatingButton {
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
             else this.destroy();
 
-            // Check redirectState after initialization
-            if (this.gentooSessionData?.redirectState) {
-                console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
-                this.openChat();
-                this.floatingClicked = true;
-            }
-
         } catch (error) {
             console.error('Failed to initialize:', error);
             throw error;
@@ -419,6 +412,11 @@ class FloatingButton {
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
         window.__GentooInited = 'created';
+
+        if (this.gentooSessionData?.redirectState) {
+            console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
+            this.openChat();
+        }
     }
 
     setupEventListeners(position, isCustomButton = false) {
