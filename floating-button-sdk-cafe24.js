@@ -350,7 +350,10 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
-            if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (this.gentooSessionData?.redirectState) {
+                console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
+                this.openChat();
+            } else if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
@@ -412,11 +415,6 @@ class FloatingButton {
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
         window.__GentooInited = 'created';
-
-        if (this.gentooSessionData?.redirectState) {
-            console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
-            this.openChat();
-        }
     }
 
     setupEventListeners(position, isCustomButton = false) {
