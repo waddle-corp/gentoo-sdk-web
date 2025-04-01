@@ -242,6 +242,13 @@ class FloatingButton {
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
             else this.destroy();
 
+            // Check redirectState after initialization
+            if (this.gentooSessionData?.redirectState) {
+                console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
+                this.openChat();
+                this.floatingClicked = true;
+            }
+
         } catch (error) {
             console.error('Failed to initialize:', error);
             throw error;
@@ -349,13 +356,6 @@ class FloatingButton {
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
-
-            console.log('gentooSessionData', this.gentooSessionData);
-            if (this.gentooSessionData?.redirectState) {
-                console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
-                this.openChat();
-                this.floatingClicked = true;
-            }
 
             if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
