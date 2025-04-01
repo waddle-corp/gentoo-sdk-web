@@ -249,7 +249,7 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements(position, showGentooButton, isCustomButton = false) {
+    createUIElements( position, showGentooButton, isCustomButton = false ) {
         window.__GentooInited = 'creating';
         this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
         // Add null checks before accessing properties
@@ -350,6 +350,12 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
+
+            if (gentooSessionData.redirectState) {
+                console.log('gentooSessionData.redirectState', gentooSessionData.redirectState);
+                this.openChat();
+                this.floatingClicked = true;
+            }
 
             if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
@@ -464,6 +470,8 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
+                this.gentooSessionData.redirectState = true;
+                sessionStorage.setItem('gentooSessionData', JSON.stringify(this.gentooSessionData));
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
