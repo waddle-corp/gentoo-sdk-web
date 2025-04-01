@@ -9,7 +9,6 @@ class FloatingButton {
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
-        console.log('chatUserId @ constructor', this.chatUserId);
         this.displayLocation;
         // this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -26,7 +25,6 @@ class FloatingButton {
 
         // this.floatingData;
         this.itemId = this.getProductNo();
-        console.log('itemId, url', this.itemId, window.location.hostname, window.location.hostname.includes('kickthefence'));
         this.iframeHeightState;
 
         if (window.location.hostname === 'localhost') {
@@ -489,6 +487,9 @@ class FloatingButton {
                 this.iframeHeightState = 'full';
             } else if (e.data.messageExistence === 'none') {
                 this.iframeHeightState = 'shrink';
+            }
+            if (e.data.openRequestState) {
+                this.openChat();
             }
         });
 
