@@ -514,7 +514,7 @@ class FloatingButton {
     openChat() {
         // Chat being visible
         this.enableChat(this.iframeHeightState);
-        history.pushState({ chatOpen: true }, '', window.location.href);
+        if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
