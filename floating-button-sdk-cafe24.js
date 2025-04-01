@@ -413,7 +413,9 @@ class FloatingButton {
         this.setupEventListeners(position, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
             console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
-            this.openChat();
+            setTimeout(() => {
+                this.openChat();
+            }, 1000);
         }
         window.__GentooInited = 'created';
     }
