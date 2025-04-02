@@ -337,13 +337,12 @@ class FloatingButton {
         // Create floating button
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
-            this.floatingContainer.className = `floating-container ${this.gentooSessionData?.redirectState ? 'hide' : ''}`;
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
                 this.button.className = `floating-button-common button-image-md`;
             } else {
-                this.button.className = `floating-button-common button-image`;
+                this.button.className = `floating-button-common button-image ${this.gentooSessionData?.redirectState ? 'hide-visibility' : ''}`;
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
@@ -423,7 +422,7 @@ class FloatingButton {
                 this.openChat();
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-            }, 300);
+            }, 500);
         }
         window.__GentooInited = 'created';
     }
