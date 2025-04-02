@@ -349,7 +349,7 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
-             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+             if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
