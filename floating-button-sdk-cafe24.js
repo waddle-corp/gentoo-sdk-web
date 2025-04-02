@@ -417,7 +417,7 @@ class FloatingButton {
                 this.openChat();
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-            }, 1000);
+            }, 100);
         }
         window.__GentooInited = 'created';
     }
