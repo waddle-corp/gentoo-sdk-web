@@ -414,6 +414,12 @@ class FloatingButton {
         if (this.gentooSessionData?.redirectState) {
             console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
             setTimeout(() => {
+                if (this.expandedButton)
+                    this.expandedButton.className = "expanded-area hide";
+                if (this.button) {
+                    this.button.className =
+                        "floating-button-common button-image-close-mr hide";
+                }
                 this.openChat();
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
