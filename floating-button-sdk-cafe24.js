@@ -342,7 +342,7 @@ class FloatingButton {
             if (this.isSmallResolution) {
                 this.button.className = `floating-button-common button-image-md`;
             } else {
-                this.button.className = `floating-button-common button-image ${this.gentooSessionData?.redirectState ? 'hide-visibility' : ''}`;
+                this.button.className = `floating-button-common button-image`;
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
@@ -416,6 +416,7 @@ class FloatingButton {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
                 if (this.button) {
+                    console.log('button @ 1st', this.button);
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
                 }
@@ -859,6 +860,7 @@ class FloatingButton {
 
     hideChat() {
         if (this.button) {
+            console.log('button @ 2nd', this.button);
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
             } else {
