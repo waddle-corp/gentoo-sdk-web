@@ -335,7 +335,7 @@ class FloatingButton {
         });
 
         // Create floating button
-        if (showGentooButton) {
+        if (showGentooButton && !this.gentooSessionData?.redirectState) {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
             this.updateFloatingContainerPosition(position); // Set initial position
