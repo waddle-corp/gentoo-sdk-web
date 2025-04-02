@@ -38,7 +38,7 @@
     right: 0;
     display: flex;
     flex-direction: row-reverse;
-    z-index: 10000001;
+    z-index: 9999999;
 }
 
 .floating-button-common {
@@ -49,7 +49,7 @@
     color: white;
     border: none;
     cursor: pointer;
-    z-index: 10000001;
+    z-index: 9999999;
 
     /* @media screen and (min-width: 600px) {
         bottom: 66px;
@@ -110,7 +110,7 @@
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     padding: 16px 24px;
     padding-right: 56px;
-    z-index: 10000001;
+    z-index: 9999999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -131,7 +131,7 @@
     margin-top: 20px;
     background-color: #222;
     border-radius: 12px 0 12px 12px;
-    z-index: 10000001;
+    z-index: 9999999;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -146,7 +146,7 @@
     margin-top: 14px;
     background-color: #222;
     border-radius: 12px 0 12px 12px;
-    z-index: 10000001;
+    z-index: 9999999;
     display: flex;
     justify-content: center;
     align-items: center;
