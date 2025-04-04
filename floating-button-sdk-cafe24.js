@@ -223,7 +223,7 @@ class FloatingButton {
         const { position, showGentooButton = true, isCustomButton = false } = params;
         const gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         const isPageTransition = this.getPageTransitionState(gentooSessionData?.page, window.location.pathname);
-        g
+        
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -481,7 +481,7 @@ class FloatingButton {
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
-                currentPage: window.location.pathname,
+                currentPage: window?.location?.pathname,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
