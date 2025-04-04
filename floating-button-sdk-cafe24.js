@@ -221,6 +221,9 @@ class FloatingButton {
         }
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
+        const gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        const isPageTransition = this.getPageTransitionState(gentooSessionData?.page, window.location.pathname);
+        g
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -236,7 +239,11 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            if (window.location.hostname.includes('y6company')) {
+                this.chatUrl = `https://accio-webclient-git-gent-2784-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&cp=${isPageTransition}`;
+            } else {
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&cp=${isPageTransition}`;
+            }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -474,6 +481,7 @@ class FloatingButton {
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
+                currentPage: window.location.pathname,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
@@ -931,6 +939,17 @@ class FloatingButton {
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
+        }
+    }
+
+    getPageTransitionState(originState, newState) {
+        if (originState === newState) {
+            return false;
+        } else {
+            const gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+            gentooSessionData.page = newState;
+            sessionStorage.setItem('gentoo', JSON.stringify(gentooSessionData));
+            return true;
         }
     }
 }
