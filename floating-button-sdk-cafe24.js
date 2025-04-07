@@ -22,9 +22,9 @@ class FloatingButton {
         this.floatingClicked = false;
         this.warningMessage;
         this.warningActivated;
+
         // this.floatingData;
         this.itemId = this.getProductNo();
-        console.log('itemId, url', this.itemId, window.location.hostname, window.location.hostname.includes('kickthefence'));
         this.iframeHeightState;
 
         if (window.location.hostname === 'localhost') {
@@ -39,7 +39,7 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence')) {
+        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
@@ -127,90 +127,6 @@ class FloatingButton {
                 version: '2022-12-01'
             }));
         });
-        //     this.floatingData = {
-        //         imageUrl: "https://d3qrvyizob9ouf.cloudfront.net/public/img/units/gentoo-anime-web-default.gif",
-        //         comment: "오늘의 쇼핑은 저와 함께하실래요?",
-        //     };
-
-        //     this.chatbotData = {
-        //         "chatbotId": 0,
-        //         "name": "젠투",
-        //         "profileImg": "https://df4n10wq26cwv.cloudfront.net/gentoo.png",
-        //         "greetingMessage": "어서오세요 😊 어떤 상품을 찾아드릴까요?\n젠투가 추천해드릴게요.",
-        //         "colorCode": [
-        //             {
-        //                 "hex": "#154cca",
-        //                 "rgb": {
-        //                     "r": 21,
-        //                     "g": 76,
-        //                     "b": 202,
-        //                     "a": 1
-        //                 },
-        //                 "red": 21,
-        //                 "green": 76,
-        //                 "blue": 202,
-        //                 "alpha": 1
-        //             },
-        //             {
-        //                 "hex": "#bbc8e5",
-        //                 "rgb": {
-        //                     "r": 187,
-        //                     "g": 200,
-        //                     "b": 229,
-        //                     "a": 1
-        //                 },
-        //                 "red": 187,
-        //                 "green": 200,
-        //                 "blue": 229,
-        //                 "alpha": 1
-        //             },
-        //             {
-        //                 "hex": "#e0e6f3",
-        //                 "rgb": {
-        //                     "r": 224,
-        //                     "g": 230,
-        //                     "b": 243,
-        //                     "a": 1
-        //                 },
-        //                 "red": 224,
-        //                 "green": 230,
-        //                 "blue": 243,
-        //                 "alpha": 1
-        //             }
-        //         ],
-        //         "recommendSize": "multi",
-        //         "carouselType": "single",
-        //         "exceptKeyword": [],
-        //         "examples": [
-        //             "회랑 어울리는 화이트 와인 찾아줘",
-        //             "오크 풍미가 있는 버번 중에 7만 원대로 찾아줘",
-        //             "부드러운 싱글몰트 위스키 몇 가지 추천해줘"
-        //         ],
-        //         "chatAgent": "anchovy",
-        //         "position": {
-        //             "top": null,
-        //             "bottom": 32,
-        //             "left": null,
-        //             "right": 0
-        //         },
-        //         "mobilePosition": {
-        //             "top": null,
-        //             "bottom": 32,
-        //             "left": null,
-        //             "right": 0
-        //         },
-        //         "preQuestion": {
-        //             "count": 0,
-        //             "questions": []
-        //         },
-        //         "isDummy": true,
-        //         "planType": "PRO",
-        //         "planExpirationTime": "2100-01-01T08:59:59",
-        //         "partnerType": "dummy"
-        //     }
-
-        //     this.chatUserId = 'selentest';
-        //     this.partnerId = '6737041bcf517dbd2b8b6458';
     }
 
 
@@ -221,6 +137,7 @@ class FloatingButton {
         }
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
+
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -236,7 +153,7 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -249,9 +166,9 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements(position, showGentooButton, isCustomButton = false) {
+    createUIElements( position, showGentooButton, isCustomButton = false ) {
         window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
+        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -350,8 +267,7 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
-
-            if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
@@ -412,21 +328,42 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
-        window.__GentooInited = 'created';
-    }
-
-    setupEventListeners(position, isCustomButton = false) {
-        // Button click event
-        var buttonClickHandler = (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            this.floatingClicked = true;
-            if (this.iframeContainer.classList.contains("iframe-container-hide")) {
+        if (this.gentooSessionData?.redirectState) {
+            setTimeout(() => {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
                 if (this.button) {
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
+                }
+            }, 100);
+            setTimeout(() => {
+                this.openChat();
+                this.gentooSessionData.redirectState = false;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            }, 500);
+        }
+        window.__GentooInited = 'created';
+    }
+
+    setupEventListeners(position) {
+        // Button click event
+        var buttonClickHandler = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.floatingClicked = true;
+            
+            if (this.iframeContainer.classList.contains("iframe-container-hide")) {
+                if (this.expandedButton)
+                    this.expandedButton.className = "expanded-area hide";
+                if (this.button) {
+                    if (this.isSmallResolution) {
+                        this.button.className =
+                            "floating-button-common button-image-close-mr hide";
+                    } else {
+                        this.button.className =
+                            "floating-button-common button-image-close hide";
+                    }
                 }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
@@ -450,8 +387,21 @@ class FloatingButton {
             }
         };
 
+        var sendPostMessageHandler = (e, clickedElement) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const buttonClickState = {
+                buttonClickState: true,
+                clickedElement: clickedElement,
+                currentPage: window?.location?.pathname,
+            }
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+        }
+
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
+                this.gentooSessionData.redirectState = true;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -471,17 +421,22 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (e.data.messageExistence === 'exist') {
-                this.iframeHeightState = 'full';
-            } else if (e.data.messageExistence === 'none') {
-                this.iframeHeightState = 'shrink';
+            if (this.isMobileDevice) {
+                if (e.data.messageExistence === 'exist') {
+                    this.iframeHeightState = 'full';
+                } else if (e.data.messageExistence === 'none') {
+                    this.iframeHeightState = 'shrink';
+                }
             }
         });
 
-        this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        this.floatingContainer?.addEventListener("click",buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'floatingContainer'));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeButtonContainer'));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeActionArea'));
         this.customButton?.addEventListener("click", buttonClickHandler);
 
         // Add event listener for the resize event
@@ -526,7 +481,7 @@ class FloatingButton {
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        });
+        }, {passive: true});
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -663,9 +618,10 @@ class FloatingButton {
     }
 
     async fetchChatUserId(userToken, udid = "") {
+        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const params = {
             externalKey: String(this.partnerId),
-            userToken: userToken ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+            userToken: convertedUserToken,
             udid: String(udid),
             chatUserId: this.chatUserId ? String(this.chatUserId) : null
         }
@@ -750,7 +706,7 @@ class FloatingButton {
         }
     }
 
-    handleTouchEnd(e, iframeContainer, button, expandedButton, dimmedBackground) {
+    handleTouchEnd(e) {
         e.preventDefault();
         if (this.scrollDir === "up") {
             this.enableChat("full");
@@ -785,7 +741,7 @@ class FloatingButton {
         }
     }
 
-    handleMouseUp(e, iframeContainer, iframe, button, expandedButton, dimmedBackground) {
+    handleMouseUp(e, iframeContainer, iframe) {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
