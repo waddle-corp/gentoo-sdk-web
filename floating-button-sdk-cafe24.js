@@ -352,10 +352,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            const buttonClickState = {
-                buttonClickState: true,
-            }
-            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+            
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -877,8 +874,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
