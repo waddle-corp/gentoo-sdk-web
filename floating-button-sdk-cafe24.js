@@ -127,90 +127,6 @@ class FloatingButton {
                 version: '2022-12-01'
             }));
         });
-        //     this.floatingData = {
-        //         imageUrl: "https://d3qrvyizob9ouf.cloudfront.net/public/img/units/gentoo-anime-web-default.gif",
-        //         comment: "오늘의 쇼핑은 저와 함께하실래요?",
-        //     };
-
-        //     this.chatbotData = {
-        //         "chatbotId": 0,
-        //         "name": "젠투",
-        //         "profileImg": "https://df4n10wq26cwv.cloudfront.net/gentoo.png",
-        //         "greetingMessage": "어서오세요 😊 어떤 상품을 찾아드릴까요?\n젠투가 추천해드릴게요.",
-        //         "colorCode": [
-        //             {
-        //                 "hex": "#154cca",
-        //                 "rgb": {
-        //                     "r": 21,
-        //                     "g": 76,
-        //                     "b": 202,
-        //                     "a": 1
-        //                 },
-        //                 "red": 21,
-        //                 "green": 76,
-        //                 "blue": 202,
-        //                 "alpha": 1
-        //             },
-        //             {
-        //                 "hex": "#bbc8e5",
-        //                 "rgb": {
-        //                     "r": 187,
-        //                     "g": 200,
-        //                     "b": 229,
-        //                     "a": 1
-        //                 },
-        //                 "red": 187,
-        //                 "green": 200,
-        //                 "blue": 229,
-        //                 "alpha": 1
-        //             },
-        //             {
-        //                 "hex": "#e0e6f3",
-        //                 "rgb": {
-        //                     "r": 224,
-        //                     "g": 230,
-        //                     "b": 243,
-        //                     "a": 1
-        //                 },
-        //                 "red": 224,
-        //                 "green": 230,
-        //                 "blue": 243,
-        //                 "alpha": 1
-        //             }
-        //         ],
-        //         "recommendSize": "multi",
-        //         "carouselType": "single",
-        //         "exceptKeyword": [],
-        //         "examples": [
-        //             "회랑 어울리는 화이트 와인 찾아줘",
-        //             "오크 풍미가 있는 버번 중에 7만 원대로 찾아줘",
-        //             "부드러운 싱글몰트 위스키 몇 가지 추천해줘"
-        //         ],
-        //         "chatAgent": "anchovy",
-        //         "position": {
-        //             "top": null,
-        //             "bottom": 32,
-        //             "left": null,
-        //             "right": 0
-        //         },
-        //         "mobilePosition": {
-        //             "top": null,
-        //             "bottom": 32,
-        //             "left": null,
-        //             "right": 0
-        //         },
-        //         "preQuestion": {
-        //             "count": 0,
-        //             "questions": []
-        //         },
-        //         "isDummy": true,
-        //         "planType": "PRO",
-        //         "planExpirationTime": "2100-01-01T08:59:59",
-        //         "partnerType": "dummy"
-        //     }
-
-        //     this.chatUserId = 'selentest';
-        //     this.partnerId = '6737041bcf517dbd2b8b6458';
     }
 
 
@@ -221,9 +137,7 @@ class FloatingButton {
         }
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
-        const gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
-        const isPageTransition = this.getPageTransitionState(gentooSessionData?.page, window.location.pathname);
-        
+
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -239,11 +153,7 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            // if (window.location.hostname.includes('y6company')) {
-            //     this.chatUrl = `https://accio-webclient-git-gent-2784-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&cp=${isPageTransition}`;
-            // } else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&cp=${isPageTransition}`;
-            // }
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -258,7 +168,7 @@ class FloatingButton {
     // Separate UI creation into its own method for clarity
     createUIElements( position, showGentooButton, isCustomButton = false ) {
         window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0] || document.querySelectorAll('[data-gentooCustomButton="gentooCustomButton"]')[0]) : null;
+        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -419,12 +329,10 @@ class FloatingButton {
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
-            console.log('gentooSessionData.redirectState', this.gentooSessionData.redirectState);
             setTimeout(() => {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
                 if (this.button) {
-                    console.log('button @ 1st', this.button);
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
                 }
@@ -438,22 +346,30 @@ class FloatingButton {
         window.__GentooInited = 'created';
     }
 
-    setupEventListeners(position, isCustomButton = false) {
+    setupEventListeners(position) {
         // Button click event
         var buttonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-
+            const buttonClickState = {
+                buttonClickState: true,
+            }
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
                 if (this.button) {
-                    this.button.className =
-                        "floating-button-common button-image-close-mr hide";
+                    if (this.isSmallResolution) {
+                        this.button.className =
+                            "floating-button-common button-image-close-mr hide";
+                    } else {
+                        this.button.className =
+                            "floating-button-common button-image-close hide";
+                    }
                 }
                 this.openChat(e, this.elems);
-                if (this.eventCallback?.click !== null) {
+                if (this.eventCallback.click !== null) {
                     this.eventCallback.click();
                 }
             } else {
@@ -477,7 +393,6 @@ class FloatingButton {
         var sendPostMessageHandler = (e, clickedElement) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log('sendPostMessageHandler');
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
@@ -509,14 +424,12 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (e.data.messageExistence === 'exist') {
-                this.iframeHeightState = 'full';
-            } else if (e.data.messageExistence === 'none') {
-                this.iframeHeightState = 'shrink';
-            }
-            if (e.data.openRequestState) {
-                console.log('openRequestState');
-                this.openChat();
+            if (this.isMobileDevice) {
+                if (e.data.messageExistence === 'exist') {
+                    this.iframeHeightState = 'full';
+                } else if (e.data.messageExistence === 'none') {
+                    this.iframeHeightState = 'shrink';
+                }
             }
         });
 
@@ -558,8 +471,7 @@ class FloatingButton {
 
     openChat() {
         // Chat being visible
-        console.log('openChat');
-        this.enableChat(this.iframeHeightState);
+        this.enableChat(this.iframeHeightState || 'full');
         history.pushState({ chatOpen: true }, '', window.location.href);
 
         this.dimmedBackground?.addEventListener("click", (e) => {
@@ -572,7 +484,7 @@ class FloatingButton {
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        });
+        }, {passive: true});
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -709,9 +621,10 @@ class FloatingButton {
     }
 
     async fetchChatUserId(userToken, udid = "") {
+        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const params = {
             externalKey: String(this.partnerId),
-            userToken: userToken ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+            userToken: convertedUserToken,
             udid: String(udid),
             chatUserId: this.chatUserId ? String(this.chatUserId) : null
         }
@@ -795,7 +708,7 @@ class FloatingButton {
         }
     }
 
-    handleTouchEnd(e, iframeContainer, button, expandedButton, dimmedBackground) {
+    handleTouchEnd(e) {
         e.preventDefault();
         if (this.scrollDir === "up") {
             this.enableChat("full");
@@ -830,7 +743,7 @@ class FloatingButton {
         }
     }
 
-    handleMouseUp(e, iframeContainer, iframe, button, expandedButton, dimmedBackground) {
+    handleMouseUp(e, iframeContainer, iframe) {
         e.preventDefault();
         iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
@@ -871,7 +784,6 @@ class FloatingButton {
 
     hideChat() {
         if (this.button) {
-            console.log('button @ 2nd', this.button);
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
             } else {
@@ -939,17 +851,6 @@ class FloatingButton {
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
-        }
-    }
-
-    getPageTransitionState(originState, newState) {
-        if (originState === newState) {
-            return false;
-        } else {
-            const gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
-            gentooSessionData.page = newState;
-            sessionStorage.setItem('gentoo', JSON.stringify(gentooSessionData));
-            return true;
         }
     }
 }

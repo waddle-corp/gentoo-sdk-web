@@ -98,6 +98,7 @@ class FloatingButton {
         }
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
+        
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -127,18 +128,12 @@ class FloatingButton {
             } 
             else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                // this.chatUrl = `https://accio-webclient-git-gent-2559-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                // this.chatUrl = `https://dev-demo.gentooai.com/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
 
             // Create UI elements after data is ready
-            if (!this.isDestroyed || this.pageList.length === 0) {
-                this.createUIElements(position, showGentooButton, isCustomButton);
-            } else if (this.pageList.includes(window.location.pathname)) {
-                this.createUIElements(position, showGentooButton, isCustomButton);
-            } else {
-                this.destroy();
-            }
+            if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
+            else this.destroy();
+
         } catch (error) {
             console.error("Failed to initialize:", error);
             throw error;
@@ -251,7 +246,7 @@ class FloatingButton {
             document.body.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.button);
 
-            if (this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
@@ -312,6 +307,21 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
+        if (this.gentooSessionData?.redirectState) {
+            setTimeout(() => {
+                if (this.expandedButton)
+                    this.expandedButton.className = "expanded-area hide";
+                if (this.button) {
+                    this.button.className =
+                        "floating-button-common button-image-close-mr hide";
+                }
+            }, 100);
+            setTimeout(() => {
+                this.openChat();
+                this.gentooSessionData.redirectState = false;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            }, 500);
+        }
         window.__GentooInited = 'created';
     }
 
@@ -359,8 +369,21 @@ class FloatingButton {
             }
         };
 
+        var sendPostMessageHandler = (e, clickedElement) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const buttonClickState = {
+                buttonClickState: true,
+                clickedElement: clickedElement,
+                currentPage: window?.location?.pathname,
+            }
+            this.iframe.contentWindow.postMessage(buttonClickState, "*");
+        }
+
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
+                this.gentooSessionData.redirectState = true;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -390,9 +413,12 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'floatingContainer'));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeButtonContainer'));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeActionArea'));
         this.customButton?.addEventListener("click", buttonClickHandler);
 
         // Add event listener for the resize event
@@ -578,9 +604,10 @@ class FloatingButton {
     }
 
     async fetchChatUserId(userToken, udid = "") {
+        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const params = {
             externalKey: String(this.partnerId),
-            userToken: String(userToken),
+            userToken: convertedUserToken,
             udid: String(udid),
             chatUserId: this.chatUserId ? String(this.chatUserId) : null
         }
@@ -618,7 +645,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
                 {
                     method: "GET",
                     headers: {},
