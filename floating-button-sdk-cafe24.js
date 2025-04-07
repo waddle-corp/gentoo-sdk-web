@@ -366,9 +366,9 @@ class FloatingButton {
                     }
                 }
                 this.openChat(e, this.elems);
-                if (this.eventCallback?.click !== null) {
-                    this.eventCallback?.click();
-                }
+                // if (this.eventCallback?.click !== null) {
+                //     this.eventCallback?.click();
+                // }
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -468,7 +468,7 @@ class FloatingButton {
 
     openChat() {
         // Chat being visible
-        this.enableChat(this.iframeHeightState);
+        this.enableChat(this.iframeHeightState || 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
