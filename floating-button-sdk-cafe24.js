@@ -366,7 +366,7 @@ class FloatingButton {
                     }
                 }
                 this.openChat(e, this.elems);
-                if (this.eventCallback.click !== null) {
+                if (this.eventCallback?.click !== null) {
                     this.eventCallback.click();
                 }
             } else {
