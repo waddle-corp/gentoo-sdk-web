@@ -391,14 +391,14 @@ class FloatingButton {
             }
         };
 
-        var sendPostMessageHandler = (e, clickedElement) => {
+        var sendPostMessageHandler = (e, clickedElement, currentPage = window?.location?.pathname) => {
             e.stopPropagation();
             e.preventDefault();
             console.log('sendPostMessageHandler', e, clickedElement);
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
-                currentPage: window?.location?.pathname,
+                currentPage: currentPage,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
@@ -407,8 +407,9 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                console.log('carouselRedirect', e.data.redirectUrl.pathname);
+                sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl.pathname);
                 window.location.href = e.data.redirectUrl;
-                sendPostMessageHandler(e, 'carouselRedirect');
             }
             if (e.data.formSubmittedState) {
                 const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
