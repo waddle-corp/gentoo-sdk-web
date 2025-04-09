@@ -407,12 +407,7 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                console.log('carouselRedirect', e.data.redirectUrl.pathname);
                 window.location.href = e.data.redirectUrl;
-                setTimeout(() => {
-                    console.log('carouselRedirect after', window.location.pathname);
-                    sendPostMessageHandler(e, 'carouselRedirect');
-                }, 1000);
             }
             if (e.data.formSubmittedState) {
                 const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
