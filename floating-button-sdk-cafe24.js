@@ -407,6 +407,7 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
