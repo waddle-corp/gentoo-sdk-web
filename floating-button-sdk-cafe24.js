@@ -394,6 +394,7 @@ class FloatingButton {
         var sendPostMessageHandler = (e, clickedElement) => {
             e.stopPropagation();
             e.preventDefault();
+            console.log('sendPostMessageHandler', e, clickedElement);
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
@@ -406,8 +407,8 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                sendPostMessageHandler(e, 'carouselRedirect');
                 window.location.href = e.data.redirectUrl;
+                sendPostMessageHandler(e, 'carouselRedirect');
             }
             if (e.data.formSubmittedState) {
                 const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
