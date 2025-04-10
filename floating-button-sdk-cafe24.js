@@ -387,13 +387,13 @@ class FloatingButton {
             }
         };
 
-        var sendPostMessageHandler = (e, clickedElement) => {
+        var sendPostMessageHandler = (e, clickedElement, currentPage = window?.location?.pathname) => {
             e.stopPropagation();
             e.preventDefault();
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
-                currentPage: window?.location?.pathname,
+                currentPage: currentPage,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
@@ -402,6 +402,7 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -659,8 +660,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                // `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -875,8 +875,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
