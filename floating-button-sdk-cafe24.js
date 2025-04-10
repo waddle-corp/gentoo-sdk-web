@@ -153,11 +153,7 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            if (window.location.hostname.includes('y6company') || window.location.hostname.includes('kickthefence')) {
-                this.chatUrl = `https://accio-webclient-git-gent-2784-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            }
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -394,7 +390,6 @@ class FloatingButton {
         var sendPostMessageHandler = (e, clickedElement, currentPage = window?.location?.pathname) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log('sendPostMessageHandler', e, clickedElement);
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
@@ -665,9 +660,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                // it should be deployed to production matching to BE
                 `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
-                // `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}`,
                 {
                     method: "GET",
                     headers: {},

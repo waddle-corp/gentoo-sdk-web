@@ -365,13 +365,13 @@ class FloatingButton {
             }
         };
 
-        var sendPostMessageHandler = (e, clickedElement) => {
+        var sendPostMessageHandler = (e, clickedElement, currentPage = window?.location?.pathname) => {
             e.stopPropagation();
             e.preventDefault();
             const buttonClickState = {
                 buttonClickState: true,
                 clickedElement: clickedElement,
-                currentPage: window?.location?.pathname,
+                currentPage: currentPage,
             }
             this.iframe.contentWindow.postMessage(buttonClickState, "*");
         }
@@ -380,6 +380,7 @@ class FloatingButton {
             if (e.data.redirectState) {
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -447,7 +448,6 @@ class FloatingButton {
     openChat() {
         // Chat being visible
         this.enableChat(this.iframeHeightState || 'full');
-        console.log('history', history, history.length)
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
