@@ -236,9 +236,9 @@ class FloatingButton {
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common button-image-md jumper`;
+                this.button.className = `floating-button-common button-image-md`;
             } else {
-                this.button.className = `floating-button-common button-image jumper`;
+                this.button.className = `floating-button-common button-image`;
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
@@ -289,6 +289,10 @@ class FloatingButton {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
                         }, 5000);
+                        setTimeout(() => {
+                            this.button.classList.add('jumper');
+                        }, 7000);
+                        // add jumper class
                     }
                 }, 2000);
             }
@@ -356,9 +360,9 @@ class FloatingButton {
                 );
                 if (this.button) {
                     if (this.isSmallResolution) {
-                        this.button.className = "floating-button-common button-image-md jumper";
+                        this.button.className = "floating-button-common button-image-md";
                     } else {
-                        this.button.className = "floating-button-common button-image jumper";
+                        this.button.className = "floating-button-common button-image";
                     }
                     this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
                 }
@@ -751,9 +755,9 @@ class FloatingButton {
     hideChat() {
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = "floating-button-common button-image-md jumper";
+                this.button.className = "floating-button-common button-image-md";
             } else {
-                this.button.className = "floating-button-common button-image jumper";
+                this.button.className = "floating-button-common button-image";
             }
         }
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
