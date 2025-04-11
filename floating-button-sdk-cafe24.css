@@ -30,6 +30,20 @@
     /* regular */
 }
 
+@keyframes jumpSequence {
+    0%   { transform: translateY(0); }        /* 7초 대기 시작 */
+    85%  { transform: translateY(0); }        /* 7초 대기 끝 */
+    86%  { transform: translateY(-10px); }    /* FirstJump 시작 */
+    91%  { transform: translateY(10px); }     /* FirstLand */
+    96%  { transform: translateY(-10px); }    /* SecondJump */
+    100% { transform: translateY(0); }        /* 복귀 */
+}
+
+.jumper {
+    animation: jumpSequence 8.2s linear infinite;
+    animation-fill-mode: forwards;
+}
+
 .floating-container {
     width: fit-content;
     height: fit-content;

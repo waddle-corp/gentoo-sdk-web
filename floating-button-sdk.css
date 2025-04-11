@@ -30,6 +30,20 @@
     /* regular */
 }
 
+@keyframes jumpSequence {
+    0%   { transform: translateY(0); }        /* 7초 대기 시작 */
+    85%  { transform: translateY(0); }        /* 7초 대기 끝 */
+    86%  { transform: translateY(-10px); }    /* FirstJump 시작 */
+    91%  { transform: translateY(10px); }     /* FirstLand */
+    96%  { transform: translateY(-10px); }    /* SecondJump */
+    100% { transform: translateY(0); }        /* 복귀 */
+}
+
+.jumper {
+    animation: jumpSequence 8.2s linear infinite;
+    animation-fill-mode: forwards;
+}
+
 .floating-container {
     width: fit-content;
     height: fit-content;
@@ -62,14 +76,14 @@
     height: 80px;
     /* box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%; */
-    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif');
+    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-default.gif');
     background-repeat: no-repeat;
 }
 
 .button-image-md {
     width: 60px;
     height: 60px;
-    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif');
+    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-default.gif');
     background-repeat: no-repeat;
 }
 
