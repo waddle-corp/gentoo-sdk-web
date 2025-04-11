@@ -181,20 +181,7 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        this.canvas = document.createElement("canvas");
-        this.canvas.style.width = '60px';
-        this.canvas.style.height = '60px';
-        this.dotLottiePlayer = new DotLottiePlayer({
-            autoplay: true,
-            loop: true,
-            speed: 1,
-            canvas: this.canvas,
-            style: {
-                width: '100%',
-                height: '100%',
-            },
-            src: 'https://dev-sdk.gentooai.com/public/img/units/gentoo-floating.lottie',
-        });
+
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
@@ -301,9 +288,9 @@ class FloatingButton {
                             ) {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
-                        }, 8000);
+                        }, 7000);
                     }
-                }, 3000);
+                }, 2000);
             }
         }
 
@@ -843,17 +830,10 @@ window.FloatingButton = FloatingButton;
         document.head.appendChild(link);
     }
 
-    function injectLottie() {
-        var dotLottie = document.createElement('script');
-        dotLottie.src = 'https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm';
-        document.head.appendChild(dotLottie);
-    }
-
     // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("./floating-button-sdk.css");
-    injectLottie();
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("./floating-button-sdk.css");
     var fb; // Keep fb in closure scope
 
     // Create a persistent queue processor
