@@ -32,15 +32,14 @@
 
 @keyframes jumpSequence {
     0%   { transform: translateY(0); }        /* 7초 대기 시작 */
-    85%  { transform: translateY(0); }        /* 7초 대기 끝 */
-    86%  { transform: translateY(-10px); }    /* FirstJump 시작 */
-    91%  { transform: translateY(10px); }     /* FirstLand */
-    96%  { transform: translateY(-10px); }    /* SecondJump */
-    100% { transform: translateY(0); }        /* 복귀 */
+    85%  { transform: translateY(-10px); }    /* 7초 대기 후 FirstJump 시작 */
+    88%  { transform: translateY(10px); }     /* FirstLand */
+    93%  { transform: translateY(-10px); }    /* SecondJump */
+    96% { transform: translateY(0); }        /* 복귀 */
 }
 
 .jumper {
-    animation: jumpSequence 8.2s linear infinite;
+    animation: jumpSequence 8.2s ease-in-out infinite;
     animation-fill-mode: forwards;
 }
 
