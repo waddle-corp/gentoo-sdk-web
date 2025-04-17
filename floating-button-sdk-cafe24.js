@@ -1,5 +1,11 @@
+import ENV_CONFIG from './src/config/env';
+
+const currentEnv = SDK_ENV; // Webpack으로 주입됨
+const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+
 class FloatingButton {
     constructor(props) {
+        console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;

@@ -1,7 +1,10 @@
 {
   "homepage": "https://waddle-corp.github.io/sdk-js-web/",
   "scripts": {
-    "deploy": "gh-pages -d public"
+    "deploy": "gh-pages -d public",
+    "build:dev": "cross-env SDK_ENV=dev webpack --config webpack.config.js",
+    "build:stage": "cross-env SDK_ENV=stage webpack --config webpack.config.js",
+    "build:prod": "cross-env SDK_ENV=prod webpack --config webpack.config.js"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.42.0",
@@ -13,5 +16,10 @@
   "version": "1.0.0",
   "main": "floating-button-sdk.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "webpack": "^5.99.5",
+    "webpack-cli": "^6.0.1"
+  }
 }
