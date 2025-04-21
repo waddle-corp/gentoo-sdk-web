@@ -295,9 +295,9 @@ class FloatingButton {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
                         }, 5000);
-                        setTimeout(() => {
-                            this.button.classList.add('jumper');
-                        }, 7000);
+                        // setTimeout(() => {
+                        //     this.button.classList.add('jumper');
+                        // }, 7000);
                         // add jumper class
                     }
                 }, 2000);
@@ -842,8 +842,8 @@ window.FloatingButton = FloatingButton;
 
     // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("./floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("./floating-button-sdk.css");
     var fb; // Keep fb in closure scope
 
     // Create a persistent queue processor

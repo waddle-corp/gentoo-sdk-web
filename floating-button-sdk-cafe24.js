@@ -318,9 +318,9 @@ class FloatingButton {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
                         }, 5000);
-                        setTimeout(() => {
-                            this.button.classList.add('jumper');
-                        }, 7000);
+                        // setTimeout(() => {
+                        //     this.button.classList.add('jumper');
+                        // }, 7000);
                     }
                 }, 2000);
             }
