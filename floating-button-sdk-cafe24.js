@@ -160,8 +160,8 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://accio-webclient-git-gent-2821-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `https://accio-webclient-git-gent-2821-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -211,15 +211,17 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        const player = document.createElement('dotlottie-player');
-        player.setAttribute('autoplay', '');
-        player.setAttribute('loop', '');
-        player.setAttribute('mode', 'normal');
-        player.setAttribute('src', this.floatingData.imageUrl);
-        player.style.width = this.isSmallResolution ? '68px' : '94px';
-        player.style.height = this.isSmallResolution ? '68px' : '94px';
-        
-        this.dotLottiePlayer = player;
+        if (this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+            const player = document.createElement('dotlottie-player');
+            player.setAttribute('autoplay', '');
+            player.setAttribute('loop', '');
+            player.setAttribute('mode', 'normal');
+            player.setAttribute('src', this.floatingData.imageUrl);
+            player.style.width = this.isSmallResolution ? '68px' : '94px';
+            player.style.height = this.isSmallResolution ? '68px' : '94px';
+            
+            this.dotLottiePlayer = player;
+        }
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -282,8 +284,11 @@ class FloatingButton {
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
-            // this.floatingContainer.appendChild(this.button);
-            this.floatingContainer.appendChild(this.dotLottiePlayer);
+            if (this.dotLottiePlayer) {
+                this.floatingContainer.appendChild(this.dotLottiePlayer);
+            } else {
+                this.floatingContainer.appendChild(this.button);
+            }
 
              if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
