@@ -1,5 +1,11 @@
+// import ENV_CONFIG from './src/config/env';
+
+// const currentEnv = SDK_ENV; // Webpack으로 주입됨
+// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+
 class FloatingButton {
     constructor(props) {
+        // console.log("API:", apiDomain, "HOST:", hostSrc);
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -95,6 +101,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
+        await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
         
@@ -181,6 +188,17 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
+        if (this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+            const player = document.createElement('dotlottie-player');
+            player.setAttribute('autoplay', '');
+            player.setAttribute('loop', '');
+            player.setAttribute('mode', 'normal');
+            player.setAttribute('src', this.floatingData.imageUrl);
+            player.style.width = this.isSmallResolution ? '68px' : '94px';
+            player.style.height = this.isSmallResolution ? '68px' : '94px';
+            
+            this.dotLottiePlayer = player;
+        }
 
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
@@ -243,8 +261,11 @@ class FloatingButton {
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
-            this.floatingContainer.appendChild(this.button);
-
+            if (this.dotLottiePlayer) {
+                this.floatingContainer.appendChild(this.dotLottiePlayer);
+            } else {
+                this.floatingContainer.appendChild(this.button);
+            }
             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 setTimeout(() => {
                     // Check if component is destroyed or clicked
@@ -288,9 +309,13 @@ class FloatingButton {
                             ) {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
-                        }, 8000);
+                        }, 5000);
+                        // setTimeout(() => {
+                        //     this.button.classList.add('jumper');
+                        // }, 7000);
+                        // add jumper class
                     }
-                }, 3000);
+                }, 2000);
             }
         }
 
@@ -654,6 +679,21 @@ class FloatingButton {
         } catch (error) {
             console.error(`Error while calling fetchFloatingData API: ${error}`);
         }
+    }
+
+    // Function to inject Lottie
+    async injectLottie() {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
+            script.onload = () => {
+                console.log('DotLottiePlayer loaded!');
+                resolve();
+            };
+            script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
+            document.head.appendChild(script);
+        });
     }
 
     handleTouchMove(e, iframeContainer) {
