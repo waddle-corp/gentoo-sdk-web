@@ -19,6 +19,7 @@ class FloatingButton {
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
+        this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.utm = props.utm;
