@@ -197,6 +197,7 @@ class FloatingButton {
             player.setAttribute('src', this.floatingData.imageUrl);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
+            player.style.cursor = 'pointer';
             
             this.dotLottiePlayer = player;
         }
@@ -363,6 +364,9 @@ class FloatingButton {
                             "floating-button-common button-image-close hide";
                     }
                 }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
+                }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
                     this.eventCallback.click();
@@ -381,6 +385,9 @@ class FloatingButton {
                         this.button.className = "floating-button-common button-image";
                     }
                     this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                    if (this.dotLottiePlayer) {
+                        this.dotLottiePlayer.classList.remove('hide');
+                    }
                 }
             }
         };
@@ -683,7 +690,6 @@ class FloatingButton {
             script.type = 'module';
             script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
             script.onload = () => {
-                console.log('DotLottiePlayer loaded!');
                 resolve();
             };
             script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
