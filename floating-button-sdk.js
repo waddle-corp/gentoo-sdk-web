@@ -268,55 +268,49 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
-                setTimeout(() => {
-                    // Check if component is destroyed or clicked
-                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                        return;
+                // Check if component is destroyed or clicked
+                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                    return;
 
-                    this.expandedButton = document.createElement("div");
-                    this.expandedText = document.createElement("p");
-                    if (this.isSmallResolution) {
-                        this.expandedButton.className = "expanded-area-md";
-                        this.expandedText.className = "expanded-area-text-md";
-                    } else {
-                        this.expandedButton.className = "expanded-area";
-                        this.expandedText.className = "expanded-area-text";
-                    }
-                    this.expandedButton.appendChild(this.expandedText);
+                this.expandedButton = document.createElement("div");
+                this.expandedText = document.createElement("p");
+                if (this.isSmallResolution) {
+                    this.expandedButton.className = "expanded-area-md";
+                    this.expandedText.className = "expanded-area-text-md";
+                } else {
+                    this.expandedButton.className = "expanded-area";
+                    this.expandedText.className = "expanded-area-text";
+                }
+                this.expandedButton.appendChild(this.expandedText);
 
-                    // Double check if floatingContainer still exists before appending
-                    if (this.floatingContainer && this.floatingContainer.parentNode) {
-                        this.floatingContainer.appendChild(this.expandedButton);
+                // Double check if floatingContainer still exists before appending
+                if (this.floatingContainer && this.floatingContainer.parentNode) {
+                    this.floatingContainer.appendChild(this.expandedButton);
 
-                        // Add text animation
-                        let i = 0;
-                        const addLetter = () => {
-                            if (!this.floatingData) return;
-                            if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                                this.expandedText.innerText += this.floatingData.comment[i];
-                                i++;
-                                setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                            }
-                        };
-                        addLetter();
-                        this.floatingCount += 1;
+                    // Add text animation
+                    let i = 0;
+                    const addLetter = () => {
+                        if (!this.floatingData) return;
+                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                            this.expandedText.innerText += this.floatingData.comment[i];
+                            i++;
+                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                        }
+                    };
+                    addLetter();
+                    this.floatingCount += 1;
 
-                        // Remove expanded button after delay
-                        setTimeout(() => {
-                            if (
-                                this.floatingContainer &&
-                                this.expandedButton &&
-                                this.expandedButton.parentNode === this.floatingContainer
-                            ) {
-                                this.floatingContainer.removeChild(this.expandedButton);
-                            }
-                        }, 5000);
-                        // setTimeout(() => {
-                        //     this.button.classList.add('jumper');
-                        // }, 7000);
-                        // add jumper class
-                    }
-                }, 2000);
+                    // Remove expanded button after delay
+                    setTimeout(() => {
+                        if (
+                            this.floatingContainer &&
+                            this.expandedButton &&
+                            this.expandedButton.parentNode === this.floatingContainer
+                        ) {
+                            this.floatingContainer.removeChild(this.expandedButton);
+                        }
+                    }, 7000);
+                }
             }
         }
 
