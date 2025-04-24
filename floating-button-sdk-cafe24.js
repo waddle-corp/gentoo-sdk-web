@@ -312,6 +312,7 @@ class FloatingButton {
 
                         // Add text animation
                         let i = 0;
+                        console.log('floatingData', this.floatingData);
                         const addLetter = () => {
                             if (!this.floatingData) return;
                             if (i < this.floatingData.comment.length && !this.isDestroyed) {
