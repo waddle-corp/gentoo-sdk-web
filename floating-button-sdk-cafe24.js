@@ -350,6 +350,7 @@ class FloatingButton {
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
+            console.log('redirectState', this.gentooSessionData.redirectState);
             setTimeout(() => {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -430,6 +431,7 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
+                console.log('redirectState message', e.data.redirectState);
                 this.gentooSessionData.redirectState = true;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
