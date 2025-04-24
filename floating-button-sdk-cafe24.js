@@ -430,7 +430,6 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
-                console.log('redirectState message', e.data.redirectState);
                 if (!this.isSmallResolution) {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -455,13 +454,13 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (this.isMobileDevice) {
-                if (e.data.messageExistence === 'exist') {
-                    this.iframeHeightState = 'full';
-                } else if (e.data.messageExistence === 'none') {
-                    this.iframeHeightState = 'shrink';
-                }
-            }
+            // if (this.isMobileDevice) {
+            //     if (e.data.messageExistence === 'exist') {
+            //         this.iframeHeightState = 'full';
+            //     } else if (e.data.messageExistence === 'none') {
+            //         this.iframeHeightState = 'shrink';
+            //     }
+            // }
         });
 
         this.floatingContainer?.addEventListener("click",buttonClickHandler);
@@ -502,7 +501,7 @@ class FloatingButton {
 
     openChat() {
         // Chat being visible
-        this.enableChat(this.iframeHeightState || 'full');
+        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {

@@ -335,6 +335,9 @@ class FloatingButton {
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
                 }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
+                }
             }, 100);
             setTimeout(() => {
                 this.openChat();
@@ -405,8 +408,10 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
-                this.gentooSessionData.redirectState = true;
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                if (!this.isSmallResolution) {
+                    this.gentooSessionData.redirectState = true;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                }
                 sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
                 window.location.href = e.data.redirectUrl;
             }
@@ -427,13 +432,13 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (this.isMobileDevice) {
-                if (e.data.messageExistence === 'exist') {
-                    this.iframeHeightState = 'full';
-                } else if (e.data.messageExistence === 'none') {
-                    this.iframeHeightState = 'shrink';
-                }
-            }
+            // if (this.isMobileDevice) {
+            //     if (e.data.messageExistence === 'exist') {
+            //         this.iframeHeightState = 'full';
+            //     } else if (e.data.messageExistence === 'none') {
+            //         this.iframeHeightState = 'shrink';
+            //     }
+            // }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
