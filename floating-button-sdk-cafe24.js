@@ -363,7 +363,7 @@ class FloatingButton {
                 }
             }, 100);
             setTimeout(() => {
-                this.openChat();
+                if (this.isSmallResolution) {this.openChat();}
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);
