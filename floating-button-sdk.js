@@ -268,7 +268,6 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
-                setTimeout(() => {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                         return;
@@ -310,13 +309,8 @@ class FloatingButton {
                             ) {
                                 this.floatingContainer.removeChild(this.expandedButton);
                             }
-                        }, 5000);
-                        // setTimeout(() => {
-                        //     this.button.classList.add('jumper');
-                        // }, 7000);
-                        // add jumper class
+                        }, 7000);
                     }
-                }, 2000);
             }
         }
 
