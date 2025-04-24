@@ -290,7 +290,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {z
+             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                         return;
@@ -312,7 +312,6 @@ class FloatingButton {
 
                         // Add text animation
                         let i = 0;
-                        console.log('floatingData', this.floatingData);
                         const addLetter = () => {
                             if (!this.floatingData) return;
                             if (i < this.floatingData.comment.length && !this.isDestroyed) {
