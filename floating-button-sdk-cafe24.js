@@ -357,6 +357,9 @@ class FloatingButton {
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
                 }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
+                }
             }, 100);
             setTimeout(() => {
                 this.openChat();
@@ -810,6 +813,7 @@ class FloatingButton {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -830,6 +834,7 @@ class FloatingButton {
                 this.button.className = "floating-button-common button-image";
             }
         }
+        if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
