@@ -349,7 +349,7 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
-        if (this.gentooSessionData?.redirectState && !this.isSmallResolution) {
+        if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -366,9 +366,6 @@ class FloatingButton {
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);
-        } else {
-            this.gentooSessionData.redirectState = false;
-            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
         }
         window.__GentooInited = 'created';
     }
@@ -434,8 +431,10 @@ class FloatingButton {
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 console.log('redirectState message', e.data.redirectState);
-                this.gentooSessionData.redirectState = true;
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                if (!this.isSmallResolution) {
+                    this.gentooSessionData.redirectState = true;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                }
                 sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
                 window.location.href = e.data.redirectUrl;
             }
