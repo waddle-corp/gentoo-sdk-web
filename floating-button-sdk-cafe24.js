@@ -349,8 +349,7 @@ class FloatingButton {
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
-        if (this.gentooSessionData?.redirectState) {
-            console.log('redirectState', this.gentooSessionData.redirectState);
+        if (this.gentooSessionData?.redirectState && !this.isSmallResolution) {
             setTimeout(() => {
                 if (this.expandedButton)
                     this.expandedButton.className = "expanded-area hide";
@@ -363,10 +362,13 @@ class FloatingButton {
                 }
             }, 100);
             setTimeout(() => {
-                if (!this.isSmallResolution) {this.openChat();}
+                this.openChat();
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);
+        } else {
+            this.gentooSessionData.redirectState = false;
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
         }
         window.__GentooInited = 'created';
     }
