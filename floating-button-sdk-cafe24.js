@@ -161,7 +161,6 @@ class FloatingButton {
             this.isInitialized = true;
 
             this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            // this.chatUrl = `https://accio-webclient-git-gent-2821-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -219,7 +218,7 @@ class FloatingButton {
             player.setAttribute('src', this.floatingData.imageUrl);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
-            
+            player.style.cursor = 'pointer';
             this.dotLottiePlayer = player;
         }
 
@@ -291,49 +290,49 @@ class FloatingButton {
             }
 
              if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
-                    // Check if component is destroyed or clicked
-                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                        return;
+                // Check if component is destroyed or clicked
+                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                    return;
 
-                    this.expandedButton = document.createElement("div");
-                    this.expandedText = document.createElement("p");
-                    if (this.isSmallResolution) {
-                        this.expandedButton.className = "expanded-area-md";
-                        this.expandedText.className = "expanded-area-text-md";
-                    } else {
-                        this.expandedButton.className = "expanded-area";
-                        this.expandedText.className = "expanded-area-text";
-                    }
-                    this.expandedButton.appendChild(this.expandedText);
+                this.expandedButton = document.createElement("div");
+                this.expandedText = document.createElement("p");
+                if (this.isSmallResolution) {
+                    this.expandedButton.className = "expanded-area-md";
+                    this.expandedText.className = "expanded-area-text-md";
+                } else {
+                    this.expandedButton.className = "expanded-area";
+                    this.expandedText.className = "expanded-area-text";
+                }
+                this.expandedButton.appendChild(this.expandedText);
 
-                    // Double check if floatingContainer still exists before appending
-                    if (this.floatingContainer && this.floatingContainer.parentNode) {
-                        this.floatingContainer.appendChild(this.expandedButton);
+                // Double check if floatingContainer still exists before appending
+                if (this.floatingContainer && this.floatingContainer.parentNode) {
+                    this.floatingContainer.appendChild(this.expandedButton);
 
-                        // Add text animation
-                        let i = 0;
-                        const addLetter = () => {
-                            if (!this.floatingData) return;
-                            if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                                this.expandedText.innerText += this.floatingData.comment[i];
-                                i++;
-                                setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                            }
-                        };
-                        addLetter();
-                        this.floatingCount += 1;
+                    // Add text animation
+                    let i = 0;
+                    const addLetter = () => {
+                        if (!this.floatingData) return;
+                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                            this.expandedText.innerText += this.floatingData.comment[i];
+                            i++;
+                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                        }
+                    };
+                    addLetter();
+                    this.floatingCount += 1;
 
-                        // Remove expanded button after delay
-                        setTimeout(() => {
-                            if (
-                                this.floatingContainer &&
-                                this.expandedButton &&
-                                this.expandedButton.parentNode === this.floatingContainer
-                            ) {
-                                this.floatingContainer.removeChild(this.expandedButton);
-                            }
-                        }, 7000);
-                    }
+                    // Remove expanded button after delay
+                    setTimeout(() => {
+                        if (
+                            this.floatingContainer &&
+                            this.expandedButton &&
+                            this.expandedButton.parentNode === this.floatingContainer
+                        ) {
+                            this.floatingContainer.removeChild(this.expandedButton);
+                        }
+                    }, 7000);
+                }
             }
         }
 
@@ -356,6 +355,9 @@ class FloatingButton {
                 if (this.button) {
                     this.button.className =
                         "floating-button-common button-image-close-mr hide";
+                }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
                 }
             }, 100);
             setTimeout(() => {
@@ -386,6 +388,9 @@ class FloatingButton {
                             "floating-button-common button-image-close hide";
                     }
                 }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
+                }
                 this.openChat(e, this.elems);
                 // if (this.eventCallback?.click !== null) {
                 //     this.eventCallback?.click();
@@ -405,25 +410,19 @@ class FloatingButton {
                     }
                     this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
                 }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.remove('hide');
+                }
             }
         };
 
-        var sendPostMessageHandler = (e, clickedElement, currentPage = window?.location?.pathname) => {
-            e.stopPropagation();
-            e.preventDefault();
-            const buttonClickState = {
-                buttonClickState: true,
-                clickedElement: clickedElement,
-                currentPage: currentPage,
-            }
-            this.iframe.contentWindow.postMessage(buttonClickState, "*");
-        }
-
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
-                this.gentooSessionData.redirectState = true;
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                sendPostMessageHandler(e, 'carouselRedirect', e.data.redirectUrl);
+                if (!this.isSmallResolution) {
+                    this.gentooSessionData.redirectState = true;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                }
+                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -443,23 +442,24 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (this.isMobileDevice) {
-                if (e.data.messageExistence === 'exist') {
-                    this.iframeHeightState = 'full';
-                } else if (e.data.messageExistence === 'none') {
-                    this.iframeHeightState = 'shrink';
-                }
-            }
+            // if (this.isMobileDevice) {
+            //     if (e.data.messageExistence === 'exist') {
+            //         this.iframeHeightState = 'full';
+            //     } else if (e.data.messageExistence === 'none') {
+            //         this.iframeHeightState = 'shrink';
+            //     }
+            // }
         });
 
         this.floatingContainer?.addEventListener("click",buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'floatingContainer'));
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeButtonContainer'));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => sendPostMessageHandler(e, 'closeActionArea'));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.pathname}));
         this.customButton?.addEventListener("click", buttonClickHandler);
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -490,7 +490,7 @@ class FloatingButton {
 
     openChat() {
         // Chat being visible
-        this.enableChat(this.iframeHeightState || 'full');
+        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
@@ -716,7 +716,6 @@ class FloatingButton {
             script.type = 'module';
             script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
             script.onload = () => {
-                console.log('DotLottiePlayer loaded!');
                 resolve();
             };
             script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
@@ -800,10 +799,13 @@ class FloatingButton {
             products: [],
         });
 
+        this.sendPostMessageHandler({enableMode: mode});
+
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -824,9 +826,14 @@ class FloatingButton {
                 this.button.className = "floating-button-common button-image";
             }
         }
+        if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
+    }
+
+    sendPostMessageHandler(payload) {
+        this.iframe.contentWindow.postMessage(payload, "*");
     }
 
     // Function to log the current window width
