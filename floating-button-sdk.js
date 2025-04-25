@@ -395,17 +395,13 @@ class FloatingButton {
             }
         };
 
-        var sendPostMessageHandler = (payload) => {
-            this.iframe.contentWindow.postMessage(payload, "*");
-        }
-
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 if (!this.isSmallResolution) {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
+                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -435,14 +431,14 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.pathname}));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.pathname}));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -801,6 +797,10 @@ class FloatingButton {
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
+    }
+
+    sendPostMessageHandler(payload) {
+        this.iframe.contentWindow.postMessage(payload, "*");
     }
 
     // Function to log the current window width
