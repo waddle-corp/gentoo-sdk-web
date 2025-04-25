@@ -716,7 +716,6 @@ class FloatingButton {
             script.type = 'module';
             script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
             script.onload = () => {
-                console.log('DotLottiePlayer loaded!');
                 resolve();
             };
             script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
