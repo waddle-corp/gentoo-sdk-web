@@ -279,14 +279,12 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    console.log('floatingAvatar', this.floatingAvatar);
                     this.expandedButton.className = 
                         !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
-                    console.log('floatingAvatar', this.floatingAvatar, !this.floatingAvatar);
                     this.expandedButton.className = 
                         !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
