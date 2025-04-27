@@ -28,6 +28,7 @@ class FloatingButton {
         this.floatingClicked = false;
         this.warningMessage;
         this.warningActivated;
+        this.floatingAvatar;
 
         // this.floatingData;
         this.itemId = this.getProductNo();
@@ -122,6 +123,7 @@ class FloatingButton {
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                         this.warningMessage = warningMessageData?.extra?.message;
                         this.warningActivated = warningMessageData?.activated;
+                        this.floatingAvatar = chatbotData?.avatar;
                         resolve();
                     })
                     .catch(error => {
@@ -210,12 +212,12 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            player.setAttribute('src', this.floatingData.imageUrl);
+            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
@@ -297,10 +299,16 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    this.expandedButton.className = "expanded-area-md";
+                    this.expandedButton.className = 
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        "expanded-area-md" :
+                        "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
-                    this.expandedButton.className = "expanded-area";
+                    this.expandedButton.className = 
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        "expanded-area" :
+                        "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
                 }
                 this.expandedButton.appendChild(this.expandedText);
@@ -351,10 +359,9 @@ class FloatingButton {
         if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
                 if (this.expandedButton)
-                    this.expandedButton.className = "expanded-area hide";
+                    this.expandedButton.classList.add('hide');
                 if (this.button) {
-                    this.button.className =
-                        "floating-button-common button-image-close-mr hide";
+                    this.button.classList.add('hide');
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
@@ -378,7 +385,7 @@ class FloatingButton {
             
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
-                    this.expandedButton.className = "expanded-area hide";
+                    this.expandedButton.classList.add('hide');
                 if (this.button) {
                     if (this.isSmallResolution) {
                         this.button.className =

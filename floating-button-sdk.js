@@ -38,6 +38,7 @@ class FloatingButton {
         this.warningMessage;
         this.warningActivated;
         this.floatingData;
+        this.floatingAvatar;
         this.pageList = [];
         this.eventCallback = {
             show: null,
@@ -54,7 +55,7 @@ class FloatingButton {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "  https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
@@ -87,6 +88,7 @@ class FloatingButton {
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
+                this.floatingAvatar = res?.avatar || null;
                 const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
@@ -128,8 +130,8 @@ class FloatingButton {
             }
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                // this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
                 this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
@@ -190,12 +192,12 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            player.setAttribute('src', this.floatingData.imageUrl);
+            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
@@ -277,10 +279,18 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    this.expandedButton.className = "expanded-area-md";
+                    console.log('floatingAvatar', this.floatingAvatar);
+                    this.expandedButton.className = 
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        "expanded-area-md" :
+                        "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
-                    this.expandedButton.className = "expanded-area";
+                    console.log('floatingAvatar', this.floatingAvatar, !this.floatingAvatar);
+                    this.expandedButton.className = 
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        "expanded-area" :
+                        "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
                 }
                 this.expandedButton.appendChild(this.expandedText);
@@ -331,10 +341,9 @@ class FloatingButton {
         if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
                 if (this.expandedButton)
-                    this.expandedButton.className = "expanded-area hide";
+                    this.expandedButton.classList.add('hide');
                 if (this.button) {
-                    this.button.className =
-                        "floating-button-common button-image-close-mr hide";
+                    this.button.classList.add('hide');
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
@@ -358,7 +367,7 @@ class FloatingButton {
             
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
-                    this.expandedButton.className = "expanded-area hide";
+                    this.expandedButton.classList.add('hide');
                 if (this.button) {
                     if (this.isSmallResolution) {
                         this.button.className =
@@ -875,8 +884,8 @@ window.FloatingButton = FloatingButton;
 
     // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("./floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
