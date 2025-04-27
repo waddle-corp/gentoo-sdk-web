@@ -169,6 +169,16 @@
     transition: all 0.5s;
 }
 
+.expanded-area-neutral {
+    background-color: #444;
+    border-radius: 12px;
+}
+
+.expanded-area-neutral-md {
+    background-color: #444;
+    border-radius: 8px;
+}
+
 .expanded-area-text {
     font-family: "pretendard";
     font-size: 14px;
