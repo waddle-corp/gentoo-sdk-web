@@ -105,6 +105,7 @@ class FloatingButton {
             return;
         }
         if (document.getElementsByClassName('floating-container')[0]) {
+            console.log('floating-container already exists', document.getElementsByClassName('floating-container')[0]);
             return;
         }
         // this.remove();
