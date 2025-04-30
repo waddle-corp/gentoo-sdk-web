@@ -834,6 +834,9 @@ class FloatingButton {
                 this.button.className = "floating-button-common button-image";
             }
         }
+        if (this.dotLottiePlayer) {
+            this.dotLottiePlayer.classList.remove('hide');
+        }
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
