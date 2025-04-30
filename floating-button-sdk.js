@@ -23,7 +23,7 @@ class FloatingButton {
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.utm = props.utm;
-        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {loaded: true};
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -100,6 +100,8 @@ class FloatingButton {
     }
 
     async init(params) {
+        var loaded = this.gentooSessionData.loaded;
+        console.log('loaded', loaded);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
