@@ -104,7 +104,10 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        this.remove();
+        if (document.getElementsByClassName('floating-container')[0]) {
+            return;
+        }
+        // this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
