@@ -105,7 +105,6 @@ class FloatingButton {
             return;
         }
         if (document.getElementsByClassName('floating-container')[0]) {
-            console.log('floating-container already exists', document.getElementsByClassName('floating-container')[0]);
             return;
         }
         // this.remove();
@@ -534,7 +533,6 @@ class FloatingButton {
     }
 
     remove() {
-        console.log('remove');
         if (this.floatingContainer) {
             document.body.removeChild(this.floatingContainer);
         }
@@ -970,7 +968,6 @@ window.FloatingButton = FloatingButton;
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
-                        console.log('init');
                         Promise.resolve(fb.init(params)).catch((error) => {
                             console.error("Failed to initialize GentooIO:", error);
                         });
@@ -985,7 +982,6 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "unmount":
                     if (typeof fb.destroy === "function") {
-                        console.log('unmount');
                         Promise.resolve(fb.destroy()).catch((error) => {
                             console.error("Failed to unmount GentooIO:", error);
                         });
@@ -1007,7 +1003,6 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getGentooShowEvent":
                     if (typeof fb.getGentooShowEvent === "function") {
-                        console.log('getGentooShowEvent');
                         Promise.resolve(fb.getGentooShowEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
@@ -1015,7 +1010,6 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getGentooClickEvent":
                     if (typeof fb.getGentooClickEvent === "function") {
-                        console.log('getGentooClickEvent');
                         Promise.resolve(fb.getGentooClickEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
@@ -1023,7 +1017,6 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getFormSubmittedEvent":
                     if (typeof fb.getFormSubmittedEvent === "function") {
-                        console.log('getFormSubmittedEvent');
                         Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
