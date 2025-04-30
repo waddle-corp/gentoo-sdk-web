@@ -23,8 +23,7 @@ class FloatingButton {
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.utm = props.utm;
-        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {loaded: true};
-        console.log('gentooSessionData 1', this.gentooSessionData);
+        this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
@@ -84,7 +83,6 @@ class FloatingButton {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
-                console.log('gentooSessionData 2', this.gentooSessionData);
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }),
             this.fetchChatbotData(this.partnerId).then((res) => {
@@ -102,8 +100,6 @@ class FloatingButton {
     }
 
     async init(params) {
-        var loaded = this.gentooSessionData.loaded;
-        console.log('loaded', loaded, this.gentooSessionData);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
@@ -533,6 +529,9 @@ class FloatingButton {
     }
 
     remove() {
+        if (this.floatingContainer) {
+            document.body.removeChild(this.floatingContainer);
+        }
         if (this.button) {
             document.body.removeChild(this.button);
         }
@@ -542,9 +541,14 @@ class FloatingButton {
         if (this.iframeContainer) {
             document.body.removeChild(this.iframeContainer);
         }
+        if (this.dimmedBackground) {
+            document.body.removeChild(this.dimmedBackground);
+        }
+        this.floatingContainer = null;
         this.button = null;
         this.expandedButton = null;
         this.iframeContainer = null;
+        this.dimmedBackground = null;
     }
 
     destroy() {
@@ -555,6 +559,21 @@ class FloatingButton {
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
+
+        // Remove all known DOM elements
+        const elemsToRemove = [
+            this.floatingContainer,
+            this.iframeContainer,
+            this.dimmedBackground,
+            this.button,
+            this.expandedButton,
+            this.dotLottiePlayer,
+        ];
+        elemsToRemove.forEach((el) => {
+            if (el && el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
@@ -592,12 +611,13 @@ class FloatingButton {
         this.closeButtonContainer = null;
         this.closeButtonIcon = null;
         this.closeButtonText = null;
+        this.dotLottiePlayer = null;
+    
         this.chatUserId = null;
         this.floatingData = null;
         this.chatbotData = null;
         this.chatUrl = null;
-
-        // Reset state flags
+    
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
@@ -940,6 +960,7 @@ window.FloatingButton = FloatingButton;
             switch (method) {
                 case "init":
                     if (typeof fb.init === "function") {
+                        console.log('init');
                         Promise.resolve(fb.init(params)).catch((error) => {
                             console.error("Failed to initialize GentooIO:", error);
                         });
@@ -954,6 +975,7 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "unmount":
                     if (typeof fb.destroy === "function") {
+                        console.log('unmount');
                         Promise.resolve(fb.destroy()).catch((error) => {
                             console.error("Failed to unmount GentooIO:", error);
                         });
@@ -975,6 +997,7 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getGentooShowEvent":
                     if (typeof fb.getGentooShowEvent === "function") {
+                        console.log('getGentooShowEvent');
                         Promise.resolve(fb.getGentooShowEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
@@ -982,6 +1005,7 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getGentooClickEvent":
                     if (typeof fb.getGentooClickEvent === "function") {
+                        console.log('getGentooClickEvent');
                         Promise.resolve(fb.getGentooClickEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
@@ -989,6 +1013,7 @@ window.FloatingButton = FloatingButton;
                     break;
                 case "getFormSubmittedEvent":
                     if (typeof fb.getFormSubmittedEvent === "function") {
+                        console.log('getFormSubmittedEvent');
                         Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
