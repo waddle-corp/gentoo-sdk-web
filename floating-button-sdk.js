@@ -104,6 +104,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
+        this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
@@ -529,11 +530,15 @@ class FloatingButton {
     }
 
     remove() {
+        console.log('remove');
         if (this.floatingContainer) {
             document.body.removeChild(this.floatingContainer);
         }
         if (this.button) {
             document.body.removeChild(this.button);
+        }
+        if (this.dotLottiePlayer) {
+            document.body.removeChild(this.dotLottiePlayer);
         }
         if (this.expandedButton) {
             document.body.removeChild(this.expandedButton);
@@ -546,6 +551,7 @@ class FloatingButton {
         }
         this.floatingContainer = null;
         this.button = null;
+        this.dotLottiePlayer = null;
         this.expandedButton = null;
         this.iframeContainer = null;
         this.dimmedBackground = null;
