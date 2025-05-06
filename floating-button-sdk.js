@@ -1,11 +1,11 @@
-// import ENV_CONFIG from './src/config/env';
+import ENV_CONFIG from './src/config/env';
 
-// const currentEnv = SDK_ENV; // Webpack으로 주입됨
-// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+const currentEnv = SDK_ENV; // Webpack으로 주입됨
+const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
 
 class FloatingButton {
     constructor(props) {
-        // console.log("API:", apiDomain, "HOST:", hostSrc);
+        console.log("API:", apiDomain, "HOST:", hostSrc);
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -84,6 +84,9 @@ class FloatingButton {
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            })
+            .catch(() => {
+                this.chatUserId = 'test';
             }),
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
@@ -684,7 +687,7 @@ class FloatingButton {
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`)
+            // console.error(`Error while calling fetchChatUserId API: ${error}`)
         }
     }
 

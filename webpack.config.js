@@ -9,6 +9,7 @@ module.exports = {
     filename: 'floating-button-sdk.js',
     library: 'GentooSDK',
     libraryTarget: 'umd',
+    clean: true,
   },
   plugins: [
     new webpack.DefinePlugin({
