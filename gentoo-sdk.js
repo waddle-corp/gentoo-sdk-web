@@ -1,5 +1,12 @@
+import ENV_CONFIG from './src/config/env';
+import './gentoo-sdk.css';
+
+const currentEnv = SDK_ENV; // Webpack으로 주입됨
+const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+
 class FloatingButton {
     constructor(props) {
+        console.log("API:", apiDomain, "HOST:", hostSrc);
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -23,8 +30,6 @@ class FloatingButton {
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.hostSrc;
-        this.domains;
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
@@ -40,36 +45,6 @@ class FloatingButton {
             formSubmitted: null,
         }
         this.iframeHeightState;
-
-        if (
-            window.location.hostname === "dailyshot.co" ||
-            window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1"
-        ) {
-            this.hostSrc = "https://dev-demo.gentooai.com";
-            this.domains = {
-                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else if (window.location.hostname === "stage-demo.gentooai.com") {
-            this.hostSrc = "https://stage-demo.gentooai.com";
-            this.domains = {
-                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else {
-            this.hostSrc = "https://demo.gentooai.com";
-            this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        }
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
@@ -131,14 +106,14 @@ class FloatingButton {
             }
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
                 // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             }
 
             // Create UI elements after data is ready
@@ -644,7 +619,7 @@ class FloatingButton {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${apiDomain.log}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -669,7 +644,7 @@ class FloatingButton {
         }
 
         try {
-            const url = `${this.domains.auth}`;
+            const url = `${apiDomain.auth}`;
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -687,7 +662,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}`, {
+            const response = await fetch(`${apiDomain.chatbot}/${partnerId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -701,7 +676,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
+                `${apiDomain.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -898,24 +873,24 @@ window.FloatingButton = FloatingButton;
     var w = global;
 
     // Function to inject CSS
-    // function injectCSS(href) {
-    //     var existingLink = document.querySelector('link[href="' + href + '"]');
-    //     if (existingLink) return;
+    function injectCSS(href) {
+        var existingLink = document.querySelector('link[href="' + href + '"]');
+        if (existingLink) return;
 
-    //     var link = document.createElement("link");
-    //     link.rel = "stylesheet";
-    //     link.href = href;
-    //     link.type = "text/css";
-    //     link.onerror = function () {
-    //         console.error("Failed to load GentooIO CSS.");
-    //     };
-    //     document.head.appendChild(link);
-    // }
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        link.type = "text/css";
+        link.onerror = function () {
+            console.error("Failed to load GentooIO CSS.");
+        };
+        document.head.appendChild(link);
+    }
 
-    // // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    // // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
-    // // injectCSS("./floating-button-sdk.css");
+    // Inject the CSS automatically
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 

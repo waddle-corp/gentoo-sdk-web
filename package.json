@@ -19,7 +19,10 @@
   "license": "ISC",
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
     "webpack": "^5.99.5",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"
   }
 }

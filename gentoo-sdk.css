@@ -1,0 +1,473 @@
+@font-face {
+    font-family: "pretendard";
+    font-style: normal;
+    font-weight: 300;
+    src: url("/public/fonts/Pretendard-Light.woff") format("woff");
+    /* light */
+}
+
+@font-face {
+    font-family: "pretendard";
+    font-style: normal;
+    font-weight: 400;
+    src: url("/public/fonts/Pretendard-Regular.woff") format("woff");
+    /* regular */
+}
+
+@font-face {
+    font-family: "pretendard";
+    font-style: normal;
+    font-weight: 600;
+    src: url("/public/fonts/Pretendard-SemiBold.woff") format("woff");
+    /* semi bold */
+}
+
+@font-face {
+    font-family: "pretendard";
+    font-style: normal;
+    font-weight: 700;
+    src: url("/public/fonts/Pretendard-Bold.woff") format("woff");
+    /* regular */
+}
+
+@keyframes jumpSequence {
+    0%   { transform: translateY(0); }        /* 7초 대기 시작 */
+    85%  { transform: translateY(-10px); }    /* 7초 대기 후 FirstJump 시작 */
+    88%  { transform: translateY(10px); }     /* FirstLand */
+    93%  { transform: translateY(-10px); }    /* SecondJump */
+    96% { transform: translateY(0); }        /* 복귀 */
+}
+
+.jumper {
+    animation: jumpSequence 8.2s ease-in-out infinite;
+    animation-fill-mode: forwards;
+}
+
+.floating-container {
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    bottom: 66px;
+    right: 0;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    z-index: 9999999;
+}
+
+.floating-button-common {
+    /* position: fixed;
+    bottom: 66px;
+    right: 0px; */
+    background-size: contain;
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 9999999;
+
+    /* @media screen and (min-width: 600px) {
+        bottom: 66px;
+        right: 0px;
+    } */
+}
+
+.button-image {
+    width: 94px;
+    height: 94px;
+    /* box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
+    border-radius: 50%; */
+    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-default.gif');
+    background-repeat: no-repeat;
+}
+
+.button-image-md {
+    width: 68px;
+    height: 68px;
+    background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-default.gif');
+    background-repeat: no-repeat;
+}
+
+.button-image-close {
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
+    border-radius: 50%;
+    background-image: url('public/img/units/sdk-floating-close.png');
+}
+
+.button-image-close-mr {
+    width: 54px;
+    height: 54px;
+    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
+    border-radius: 50%;
+    background-image: url('public/img/units/sdk-floating-close.png');
+    margin-right: 24px;
+}
+
+.button-image-shrink {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background-image: url('public/img/units/floating-gentoo-shrink.png');
+}
+
+.expanded-button {
+    position: fixed;
+    bottom: 110px;
+    right: 16px;
+    width: fit-content;
+    max-width: 300px;
+    height: 50px;
+    background: #fff;
+    border: 1px solid #222;
+    border-radius: 795px;
+    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
+    padding: 16px 24px;
+    padding-right: 56px;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    transition: all 1s;
+
+    @media screen and (min-width: 600px) {
+        bottom: 90px;
+        right: 24px;
+    }
+}
+
+.expanded-area {
+    width: fit-content;
+    height: fit-content;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    background-color: #222;
+    border-radius: 12px 0 12px 12px;
+    z-index: 9999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: all 0.5s;
+}
+
+.expanded-area-md {
+    width: fit-content;
+    height: fit-content;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background-color: #222;
+    border-radius: 8px 0 8px 8px;
+    z-index: 9999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: all 0.5s;
+}
+
+.expanded-area-neutral {
+    background-color: #444;
+    border-radius: 12px;
+}
+
+.expanded-area-neutral-md {
+    background-color: #444;
+    border-radius: 8px;
+}
+
+.expanded-area-text {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 17px;
+    letter-spacing: -0.025em;
+    margin: 0;
+    width: fit-content;
+    max-width: 152px;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    white-space: pre-wrap;
+    -webkit-line-clamp: 3; 
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.expanded-area-text-md {
+    font-family: "pretendard";
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 14px;
+    margin: 0;
+    width: fit-content;
+    max-width: 120px;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    white-space: pre-wrap;
+    -webkit-line-clamp: 3; 
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.expanded-text {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 220px;
+    color: #222;
+    overflow: hidden;
+    display: -webkit-box;
+    margin: 0;
+    cursor: pointer;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.dimmed-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 10000000;
+    width: 100%;
+    height: 100%;
+}
+
+.iframe-container {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+    height: 99%;
+    background-color: #fff;
+    z-index: 10000002;
+    padding: 0px;
+    border-radius: 10px;
+
+    transition: all 0.5s ease;
+
+    @media screen and (min-width: 600px) {
+        width: 390px;
+        height: calc(100% - 100px);
+        bottom: 32px;
+        right: 24px;
+        box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
+}
+
+.iframe-container-shrink {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+    height: 449px;
+    background-color: #fff;
+    z-index: 10000002;
+    padding: 0px;
+    border: 1px solid #999;
+    border-radius: 10px;
+
+    transition: all 1s ease;
+    
+    @media screen and (min-width: 600px) {
+        width: 390px;
+        height: calc(100% - 100px);
+        bottom: 32px;
+        right: 24px;
+        box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
+}
+
+.iframe-container-hide {
+    transform: translateY(150%);
+}
+
+.chat-iframe-md {
+    width: 100%;
+    height: calc(100% - 44px);
+    border: none;
+
+    @media screen and (min-width: 600px) {
+        border-radius: 0 0 10px 10px;
+    }
+}
+
+.chat-iframe {
+    width: 100%;
+    height: calc(100% - 56px);
+    border: none;
+
+    @media screen and (min-width: 600px) {
+        border-radius: 0 0 10px 10px;
+    }
+}
+
+.chat-header {
+    width: 100%;
+    height: 56px;
+    background: #fff;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.chat-header-text {
+    width: fit-content;
+    text-wrap: nowrap;
+    font-family: "pretendard";
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    color: #C0C0C0;
+}
+
+.chat-handler {
+    width: 44px;
+    height: 4px;
+    background-image: url('public/img/units/sdk-bs-handler.png');
+}
+
+.chat-close-button-container {
+    width: 108px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.chat-close-button-container:hover {
+    background: #efefef;
+}
+
+.chat-close-button-container-md {
+    width: 46px;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.chat-close-button-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    background-size: contain;
+    background-image: url('https://d3qrvyizob9ouf.cloudfront.net/public/img/units/chat-shrink.png');
+}
+
+.chat-close-button-icon-md {
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-image: url('https://d3qrvyizob9ouf.cloudfront.net/public/img/units/chat-shrink-md.png');
+}
+
+.chat-close-button-text {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.chat-close-button-text-md {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.chat-header-md {
+    width: 100%;
+    height: 44px;
+    background: #fff;
+    padding: 8px 16px;
+    box-sizing: border-box;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.chat-handler-md {
+    width: 44px;
+    height: 4px;
+    background-image: url('public/img/units/sdk-bs-handler.png');
+}
+
+.chat-header-text-md {
+    width: fit-content;
+    text-wrap: nowrap;
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 17px;
+    margin: 0;
+    color: #C0C0C0;
+}
+
+.chat-close-action-area-md {
+    position: absolute;
+    width: 46px;
+    height: 40px;
+    min-width: 46px;
+    min-height: 40px;
+    top: 0;
+    right: 16px;
+}
+
+.chat-footer {
+    width: 100%;
+    height: 19px;
+    background: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.chat-footer-text {
+    width: fit-content;
+    text-wrap: nowrap;
+    font-family: "pretendard";
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 13px;
+    margin: 0;
+    color: #C0C0C0;
+}
+
+.footer-add-height {
+    height: calc(100% - 75px);
+}
+
+.footer-add-height-md {
+    height: calc(100% - 63px);
+}
+
+.hide {
+    display: none;
+}
+
+.hide-visibility {
+    visibility: hidden;
+}
+
+.event-disabled {
+    pointer-events: none;
+}
