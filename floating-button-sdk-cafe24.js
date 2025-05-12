@@ -34,6 +34,7 @@ class FloatingButton {
         this.itemId = this.getProductNo();
         this.iframeHeightState;
         this.viewportInjected = false;
+        this.originalViewport = null;
 
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -496,9 +497,9 @@ class FloatingButton {
         }
     }
 
-    async openChat() {
+    openChat() {
         // Inject viewport meta tag to block ios zoom in
-        await this.injectViewport();
+        this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
@@ -566,7 +567,7 @@ class FloatingButton {
         this.iframeContainer = null;
     }
 
-    async destroy() {
+    destroy() {
         if (window.__GentooInited !== 'created') {
             console.log('FloatingButton instance is not created');
             return;
@@ -576,7 +577,7 @@ class FloatingButton {
         console.log('Destroying FloatingButton instance');
 
         // Delete viewport meta tag
-        await this.deleteViewport();
+        this.deleteViewport();
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
@@ -737,38 +738,48 @@ class FloatingButton {
     }
 
     // Function to inject viewport meta tag
-    async injectViewport() {
-        if (this.viewportInjected) return; 
+    injectViewport() {
+        if (this.viewportInjected) return;
         
-        return new Promise((resolve, reject) => {
+        try {
+            // Check for existing viewport meta tag
+            const existingViewport = document.querySelector('meta[name="viewport"]');
+            if (existingViewport) {
+                this.originalViewport = existingViewport.cloneNode(true);
+                existingViewport.remove();
+            }
+
             const meta = document.createElement('meta');
             meta.name = 'viewport';
             meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
             meta.setAttribute('data-gentoo-injected', 'true');
-            meta.onload = () => {
-                this.viewportInjected = true;
-                resolve();
-            };
-            meta.onerror = () => reject(new Error("Viewport meta tag load failed"));
             document.head.appendChild(meta);
-        });
+            this.viewportInjected = true;
+        } catch (error) {
+            console.error('Failed to inject viewport meta tag:', error);
+        }
     }
 
     // Function to delete viewport meta tag
-    async deleteViewport() {
-        if (!this.viewportInjected) return; 
+    deleteViewport() {
+        if (!this.viewportInjected) return;
         
-        return new Promise((resolve, reject) => {
+        try {
             const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
             if (meta) {
                 meta.remove();
-                this.viewportInjected = false;
-                resolve();
-            } else {
-                this.viewportInjected = false; 
-                resolve(); 
             }
-        });
+
+            // Restore original viewport tag if it exists
+            if (this.originalViewport) {
+                document.head.appendChild(this.originalViewport);
+                this.originalViewport = null;
+            }
+        } catch (error) {
+            console.error('Failed to delete viewport meta tag:', error);
+        } finally {
+            this.viewportInjected = false;
+        }
     }
 
     handleTouchMove(e, iframeContainer) {
@@ -866,9 +877,9 @@ class FloatingButton {
         }
     }
 
-    async hideChat() {
+    hideChat() {
         // Delete viewport meta tag
-        await this.deleteViewport();
+        this.deleteViewport();
 
         if (this.button) {
             if (this.isSmallResolution) {
@@ -969,7 +980,7 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 

@@ -20,9 +20,9 @@
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/floating-button-sdk.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk.js'; // dev
-            // s.src = "./floating-button-sdk.js"; 
+            s.src = "./floating-button-sdk.js"; 
             // s.src = "https://dev-sdk.gentooai.com/dist/floating-button-sdk.js";
-            s.src = "dist/gentoo-sdk.js";
+            // s.src = "dist/gentoo-sdk.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
