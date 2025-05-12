@@ -40,6 +40,8 @@ class FloatingButton {
             formSubmitted: null,
         }
         this.iframeHeightState;
+        this.viewportInjected = false;
+        this.originalViewport = null;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -477,6 +479,8 @@ class FloatingButton {
     }
 
     openChat() {
+        // Inject viewport meta tag to block ios zoom in
+        this.injectViewport();
         // Chat being visible
         this.enableChat(this.iframeHeightState || 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
@@ -557,6 +561,7 @@ class FloatingButton {
     }
 
     destroy() {
+        console.log('isDestroyed', this.isDestroyed);
         if (window.__GentooInited !== 'created') {
             console.log('FloatingButton instance is not created');
             return;
@@ -564,6 +569,9 @@ class FloatingButton {
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
+
+        // Delete viewport meta tag
+        this.deleteViewport();
 
         // Remove all known DOM elements
         const elemsToRemove = [
@@ -729,6 +737,51 @@ class FloatingButton {
         });
     }
 
+    // Function to inject viewport meta tag
+    injectViewport() {
+        if (this.viewportInjected) return;
+        
+        try {
+            // Check for existing viewport meta tag
+            const existingViewport = document.querySelector('meta[name="viewport"]');
+            if (existingViewport) {
+                this.originalViewport = existingViewport.cloneNode(true);
+                existingViewport.remove();
+            }
+
+            const meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            meta.setAttribute('data-gentoo-injected', 'true');
+            document.head.appendChild(meta);
+            this.viewportInjected = true;
+        } catch (error) {
+            console.error('Failed to inject viewport meta tag:', error);
+        }
+    }
+
+    // Function to delete viewport meta tag
+    deleteViewport() {
+        if (!this.viewportInjected) return;
+        
+        try {
+            const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
+            if (meta) {
+                meta.remove();
+            }
+
+            // Restore original viewport tag if it exists
+            if (this.originalViewport) {
+                document.head.appendChild(this.originalViewport);
+                this.originalViewport = null;
+            }
+        } catch (error) {
+            console.error('Failed to delete viewport meta tag:', error);
+        } finally {
+            this.viewportInjected = false;
+        }
+    }
+
     handleTouchMove(e, iframeContainer) {
         e.preventDefault();
         const touch = e.touches[0];
@@ -824,6 +877,9 @@ class FloatingButton {
     }
 
     hideChat() {
+        // Delete viewport meta tag
+        this.deleteViewport();
+
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
@@ -898,24 +954,24 @@ window.FloatingButton = FloatingButton;
     var w = global;
 
     // Function to inject CSS
-    // function injectCSS(href) {
-    //     var existingLink = document.querySelector('link[href="' + href + '"]');
-    //     if (existingLink) return;
+    function injectCSS(href) {
+        var existingLink = document.querySelector('link[href="' + href + '"]');
+        if (existingLink) return;
 
-    //     var link = document.createElement("link");
-    //     link.rel = "stylesheet";
-    //     link.href = href;
-    //     link.type = "text/css";
-    //     link.onerror = function () {
-    //         console.error("Failed to load GentooIO CSS.");
-    //     };
-    //     document.head.appendChild(link);
-    // }
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        link.type = "text/css";
+        link.onerror = function () {
+            console.error("Failed to load GentooIO CSS.");
+        };
+        document.head.appendChild(link);
+    }
 
     // // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
     // // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
-    // // injectCSS("./floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
