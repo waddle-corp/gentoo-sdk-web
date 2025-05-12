@@ -283,13 +283,13 @@ class FloatingButton {
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
                         "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
@@ -970,7 +970,7 @@ window.FloatingButton = FloatingButton;
 
     // // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    // // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
