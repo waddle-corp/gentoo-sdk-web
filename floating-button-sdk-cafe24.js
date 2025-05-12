@@ -33,6 +33,7 @@ class FloatingButton {
         // this.floatingData;
         this.itemId = this.getProductNo();
         this.iframeHeightState;
+        this.viewportInjected = false;
 
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -495,7 +496,9 @@ class FloatingButton {
         }
     }
 
-    openChat() {
+    async openChat() {
+        // Inject viewport meta tag to block ios zoom in
+        await this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
@@ -563,7 +566,7 @@ class FloatingButton {
         this.iframeContainer = null;
     }
 
-    destroy() {
+    async destroy() {
         if (window.__GentooInited !== 'created') {
             console.log('FloatingButton instance is not created');
             return;
@@ -571,6 +574,9 @@ class FloatingButton {
         this.isDestroyed = true;
 
         console.log('Destroying FloatingButton instance');
+
+        // Delete viewport meta tag
+        await this.deleteViewport();
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
@@ -730,6 +736,41 @@ class FloatingButton {
         });
     }
 
+    // Function to inject viewport meta tag
+    async injectViewport() {
+        if (this.viewportInjected) return; 
+        
+        return new Promise((resolve, reject) => {
+            const meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            meta.setAttribute('data-gentoo-injected', 'true');
+            meta.onload = () => {
+                this.viewportInjected = true;
+                resolve();
+            };
+            meta.onerror = () => reject(new Error("Viewport meta tag load failed"));
+            document.head.appendChild(meta);
+        });
+    }
+
+    // Function to delete viewport meta tag
+    async deleteViewport() {
+        if (!this.viewportInjected) return; 
+        
+        return new Promise((resolve, reject) => {
+            const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
+            if (meta) {
+                meta.remove();
+                this.viewportInjected = false;
+                resolve();
+            } else {
+                this.viewportInjected = false; 
+                resolve(); 
+            }
+        });
+    }
+
     handleTouchMove(e, iframeContainer) {
         e.preventDefault();
         const touch = e.touches[0];
@@ -825,7 +866,10 @@ class FloatingButton {
         }
     }
 
-    hideChat() {
+    async hideChat() {
+        // Delete viewport meta tag
+        await this.deleteViewport();
+
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
