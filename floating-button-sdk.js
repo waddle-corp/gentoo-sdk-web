@@ -1,11 +1,5 @@
-// import ENV_CONFIG from './src/config/env';
-
-// const currentEnv = SDK_ENV; // Webpack으로 주입됨
-// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
-
 class FloatingButton {
     constructor(props) {
-        // console.log("API:", apiDomain, "HOST:", hostSrc);
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -46,6 +40,8 @@ class FloatingButton {
             formSubmitted: null,
         }
         this.iframeHeightState;
+        this.viewportInjected = false;
+        this.originalViewport = null;
 
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -84,6 +80,9 @@ class FloatingButton {
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            })
+            .catch(() => {
+                this.chatUserId = 'test';
             }),
             this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
@@ -284,13 +283,13 @@ class FloatingButton {
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
                         "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
@@ -480,6 +479,8 @@ class FloatingButton {
     }
 
     openChat() {
+        // Inject viewport meta tag to block ios zoom in
+        this.injectViewport();
         // Chat being visible
         this.enableChat(this.iframeHeightState || 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
@@ -567,6 +568,9 @@ class FloatingButton {
         this.isDestroyed = true;
 
         console.log("Destroying FloatingButton instance");
+
+        // Delete viewport meta tag
+        this.deleteViewport();
 
         // Remove all known DOM elements
         const elemsToRemove = [
@@ -684,7 +688,7 @@ class FloatingButton {
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`)
+            // console.error(`Error while calling fetchChatUserId API: ${error}`)
         }
     }
 
@@ -730,6 +734,51 @@ class FloatingButton {
             script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
             document.head.appendChild(script);
         });
+    }
+
+    // Function to inject viewport meta tag
+    injectViewport() {
+        if (this.viewportInjected) return;
+        
+        try {
+            // Check for existing viewport meta tag
+            const existingViewport = document.querySelector('meta[name="viewport"]');
+            if (existingViewport) {
+                this.originalViewport = existingViewport.cloneNode(true);
+                existingViewport.remove();
+            }
+
+            const meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            meta.setAttribute('data-gentoo-injected', 'true');
+            document.head.appendChild(meta);
+            this.viewportInjected = true;
+        } catch (error) {
+            console.error('Failed to inject viewport meta tag:', error);
+        }
+    }
+
+    // Function to delete viewport meta tag
+    deleteViewport() {
+        if (!this.viewportInjected) return;
+        
+        try {
+            const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
+            if (meta) {
+                meta.remove();
+            }
+
+            // Restore original viewport tag if it exists
+            if (this.originalViewport) {
+                document.head.appendChild(this.originalViewport);
+                this.originalViewport = null;
+            }
+        } catch (error) {
+            console.error('Failed to delete viewport meta tag:', error);
+        } finally {
+            this.viewportInjected = false;
+        }
     }
 
     handleTouchMove(e, iframeContainer) {
@@ -827,6 +876,9 @@ class FloatingButton {
     }
 
     hideChat() {
+        // Delete viewport meta tag
+        this.deleteViewport();
+
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
@@ -915,7 +967,7 @@ window.FloatingButton = FloatingButton;
         document.head.appendChild(link);
     }
 
-    // Inject the CSS automatically
+    // // Inject the CSS automatically
     injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");

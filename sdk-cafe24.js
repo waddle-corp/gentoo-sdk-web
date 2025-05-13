@@ -21,6 +21,7 @@
             s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./floating-button-sdk-cafe24.js"; 
+            // s.src = "https://dev-sdk.gentooai.com/dist/gentoo-sdk.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 

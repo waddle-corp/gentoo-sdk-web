@@ -1,198 +1,152 @@
-// import ENV_CONFIG from './src/config/env';
+import ENV_CONFIG from './src/config/env';
+import './gentoo-sdk.css';
 
-// const currentEnv = SDK_ENV; // Webpack으로 주입됨
-// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+const currentEnv = SDK_ENV; // Webpack으로 주입됨
+const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
 
 class FloatingButton {
     constructor(props) {
-        // console.log("API:", apiDomain, "HOST:", hostSrc);
+        console.log("API:", apiDomain, "HOST:", hostSrc);
+        // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
-        this.partnerType = props.partnerType || 'gentoo';
+        if (!props.partnerId || !props.authCode) {
+            throw new Error(
+                "Missing required parameters: partnerId, authCode are required"
+            );
+        }
+        this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
+        this.authCode = props.authCode;
+        this.itemId = props.itemId || null;
+        this.displayLocation = props.displayLocation || "HOME";
+        this.udid = props.udid || "";
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
-        this.displayLocation;
-        // this.chatbotData;
+        this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.hostSrc;
-        this.domains;
         this.isDestroyed = false;
-        this.isInitialized = false;  // Add flag to track initialization
+        this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.warningMessage;
         this.warningActivated;
+        this.floatingData;
         this.floatingAvatar;
-
-        // this.floatingData;
-        this.itemId = this.getProductNo();
-        this.iframeHeightState;
-        this.viewportInjected = false;
-        this.originalViewport = null;
-
-        if (window.location.hostname === 'localhost') {
-            this.hostSrc = 'http://localhost:3000';
-            this.domains = {
-                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
-                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
-                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
-                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
-                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-            }
-            this.keys = {
-                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
-            }
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
-            this.hostSrc = 'https://dev-demo.gentooai.com';
-            this.domains = {
-                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
-                log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
-                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
-                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
-                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-            }
-        } else if (window.location.hostname === "stage-demo.gentooai.com") {
-            this.hostSrc = "https://stage-demo.gentooai.com";
-            this.domains = {
-                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
-                partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
-            };
-        } else {
-            this.hostSrc = 'https://demo.gentooai.com';
-            this.domains = {
-                auth: 'https://api.gentooai.com/chat/api/v1/user',
-                log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
-                chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
-                floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
-                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
-            }
+        this.pageList = [];
+        this.eventCallback = {
+            show: null,
+            click: null,
+            formSubmitted: null,
         }
+        this.iframeHeightState;
 
-        // Modify the CAFE24API initialization to ensure promises are handled correctly
-        this.bootPromise = new Promise((resolve, reject) => {
-            ((CAFE24API) => {
-                // Wrap CAFE24API methods in Promises
-                const getCustomerIDInfoPromise = () => {
-                    return new Promise((innerResolve, innerReject) => {
-                        CAFE24API.getCustomerIDInfo((err, res) => {
-                            if (err) {
-                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                                innerReject(err);
-                            } else {
-                                innerResolve(res);
-                            }
-                        });
-                    });
-                };
-
-                // Fetch partner ID first
-                this.fetchPartnerId(CAFE24API.MALL_ID)
-                    .then(partnerId => {
-                        this.partnerId = partnerId;
-
-                        // Then get customer ID
-                        return getCustomerIDInfoPromise();
-                    })
-                    .then(res => {
-                        if (res.id.member_id) {
-                            this.cafe24UserId = res.id.member_id;
-                        } else {
-                            this.cafe24UserId = res.id['guest_id'];
-                        }
-
-                        // Fetch additional data
-                        return Promise.all([
-                            this.fetchChatUserId(this.cafe24UserId),
-                            this.fetchChatbotData(this.partnerId),
-                            this.fetchFloatingData(this.partnerId)
-                        ]);
-                    })
-                    .then(([chatUserId, chatbotData, floatingData]) => {
-                        this.chatUserId = chatUserId;
-                        this.gentooSessionData.cuid = chatUserId;
-                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                        this.chatbotData = chatbotData;
-                        this.floatingData = floatingData;
-                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                        this.warningMessage = warningMessageData?.extra?.message;
-                        this.warningActivated = warningMessageData?.activated;
-                        this.floatingAvatar = chatbotData?.avatar;
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Initialization error:', error);
-                        reject(error);
-                    });
-            })(CAFE24API.init({
-                client_id: 'ckUs4MK3KhZixizocrCmTA',
-                version: '2022-12-01'
-            }));
+        // Add a promise to track initialization status
+        this.bootPromise = Promise.all([
+            this.fetchChatUserId(this.authCode, this.udid).then((res) => {
+                if (!res) throw new Error("Failed to fetch chat user ID");
+                this.chatUserId = res;
+                this.gentooSessionData.cuid = res;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            })
+            .catch(() => {
+                this.chatUserId = 'test';
+            }),
+            this.fetchChatbotData(this.partnerId).then((res) => {
+                if (!res) throw new Error("Failed to fetch chatbot data");
+                this.chatbotData = res;
+                this.floatingAvatar = res?.avatar || null;
+                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                this.warningMessage = warningMessageData?.extra?.message;
+                this.warningActivated = warningMessageData?.activated;
+            }),
+        ]).catch((error) => {
+            console.error(`Error during initialization: ${error}`);
+            throw error;
         });
     }
-
 
     async init(params) {
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
+        if (document.getElementsByClassName('floating-container')[0]) {
+            return;
+        }
+        // this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
-
+        
         try {
             // Wait for boot process to complete
             await this.bootPromise;
 
             if (this.isInitialized) {
-                console.warn('FloatingButton is already initialized');
+                console.warn("FloatingButton is already initialized");
                 return;
             }
 
             if (!this.chatUserId || !this.chatbotData) {
-                throw new Error('Required data not yet loaded');
+                throw new Error("Required data not yet loaded");
             }
 
             this.isInitialized = true;
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // Fetch floating data before creating UI elements
+            this.floatingData = await this.fetchFloatingData(this.partnerId);
+            if (!this.floatingData) {
+                throw new Error("Failed to fetch floating data");
+            }
+
+            if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
+                this.chatUrl = `${hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } 
+            else if (this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } 
+            else {
+                this.chatUrl = `${hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
             else this.destroy();
 
         } catch (error) {
-            console.error('Failed to initialize:', error);
+            console.error("Failed to initialize:", error);
             throw error;
         }
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements( position, showGentooButton, isCustomButton = false ) {
+    createUIElements(position, showGentooButton, isCustomButton = false) {
         window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
+        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
             !this.chatbotData.position ||
             !this.chatbotData.mobilePosition
         ) {
-            console.error('Chatbot data is incomplete');
+            console.error("Chatbot data is incomplete");
             return;
         }
 
         if (!this.floatingData || !this.floatingData.imageUrl) {
-            console.error('Floating data is incomplete');
+            console.error("Floating data is incomplete");
             return;
+        }
+
+        if (this.eventCallback.show !== null) {
+            this.eventCallback.show();
         }
 
         // Create iframe elements
@@ -223,6 +177,7 @@ class FloatingButton {
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
+            
             this.dotLottiePlayer = player;
         }
 
@@ -265,7 +220,7 @@ class FloatingButton {
         }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
-
+        
         this.logEvent({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
@@ -292,8 +247,7 @@ class FloatingButton {
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
-
-             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -302,13 +256,13 @@ class FloatingButton {
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
                     this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                        !this.floatingAvatar || this.floatingAvatar?.type === 'CUSTOM' || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
                         "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
@@ -354,7 +308,7 @@ class FloatingButton {
             button: this.button,
             expandedButton: this.expandedButton,
             customButton: this.customButton,
-        }
+        };
 
         // Add event listeners
         this.setupEventListeners(position, isCustomButton);
@@ -401,9 +355,9 @@ class FloatingButton {
                     this.dotLottiePlayer.classList.add('hide');
                 }
                 this.openChat(e, this.elems);
-                // if (this.eventCallback?.click !== null) {
-                //     this.eventCallback?.click();
-                // }
+                if (this.eventCallback.click !== null) {
+                    this.eventCallback.click();
+                }
             } else {
                 this.hideChat(
                     this.elems.iframeContainer,
@@ -418,9 +372,9 @@ class FloatingButton {
                         this.button.className = "floating-button-common button-image";
                     }
                     this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-                }
-                if (this.dotLottiePlayer) {
-                    this.dotLottiePlayer.classList.remove('hide');
+                    if (this.dotLottiePlayer) {
+                        this.dotLottiePlayer.classList.remove('hide');
+                    }
                 }
             }
         };
@@ -460,7 +414,7 @@ class FloatingButton {
             // }
         });
 
-        this.floatingContainer?.addEventListener("click",buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
@@ -498,23 +452,21 @@ class FloatingButton {
     }
 
     openChat() {
-        // Inject viewport meta tag to block ios zoom in
-        this.injectViewport();
         // Chat being visible
-        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
+        this.enableChat(this.iframeHeightState || 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            this.dimmedBackground.className = 'dimmed-background hide';
+            this.dimmedBackground.className = "dimmed-background hide";
             this.hideChat();
             if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        })
+        });
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        }, {passive: true});
+        });
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -553,8 +505,14 @@ class FloatingButton {
     }
 
     remove() {
+        if (this.floatingContainer) {
+            document.body.removeChild(this.floatingContainer);
+        }
         if (this.button) {
             document.body.removeChild(this.button);
+        }
+        if (this.dotLottiePlayer) {
+            document.body.removeChild(this.dotLottiePlayer);
         }
         if (this.expandedButton) {
             document.body.removeChild(this.expandedButton);
@@ -562,9 +520,15 @@ class FloatingButton {
         if (this.iframeContainer) {
             document.body.removeChild(this.iframeContainer);
         }
+        if (this.dimmedBackground) {
+            document.body.removeChild(this.dimmedBackground);
+        }
+        this.floatingContainer = null;
         this.button = null;
+        this.dotLottiePlayer = null;
         this.expandedButton = null;
         this.iframeContainer = null;
+        this.dimmedBackground = null;
     }
 
     destroy() {
@@ -574,10 +538,22 @@ class FloatingButton {
         }
         this.isDestroyed = true;
 
-        console.log('Destroying FloatingButton instance');
+        console.log("Destroying FloatingButton instance");
 
-        // Delete viewport meta tag
-        this.deleteViewport();
+        // Remove all known DOM elements
+        const elemsToRemove = [
+            this.floatingContainer,
+            this.iframeContainer,
+            this.dimmedBackground,
+            this.button,
+            this.expandedButton,
+            this.dotLottiePlayer,
+        ];
+        elemsToRemove.forEach((el) => {
+            if (el && el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
@@ -615,17 +591,22 @@ class FloatingButton {
         this.closeButtonContainer = null;
         this.closeButtonIcon = null;
         this.closeButtonText = null;
+        this.dotLottiePlayer = null;
+    
         this.chatUserId = null;
         this.floatingData = null;
         this.chatbotData = null;
         this.chatUrl = null;
-
-        // Reset state flags
+    
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
 
         window.__GentooInited = null;
+    }
+
+    setPageList(pageList) {
+        this.pageList = pageList;
     }
 
     async logEvent(payload) {
@@ -638,7 +619,7 @@ class FloatingButton {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${apiDomain.log}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -663,7 +644,7 @@ class FloatingButton {
         }
 
         try {
-            const url = `${this.domains.auth}`;
+            const url = `${apiDomain.auth}`;
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -675,13 +656,13 @@ class FloatingButton {
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`)
+            // console.error(`Error while calling fetchChatUserId API: ${error}`)
         }
     }
 
     async fetchChatbotData(partnerId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}`, {
+            const response = await fetch(`${apiDomain.chatbot}/${partnerId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -695,7 +676,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
+                `${apiDomain.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -706,20 +687,6 @@ class FloatingButton {
             return res;
         } catch (error) {
             console.error(`Error while calling fetchFloatingData API: ${error}`);
-        }
-    }
-
-    async fetchPartnerId(mallId) {
-        try {
-            const url = `${this.domains.partnerId}/${mallId}`;
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {}
-            });
-            const res = await response.json();
-            return res.partnerId;
-        } catch (error) {
-            console.error(`Error while calling fetchPartnerId API: ${error}`)
         }
     }
 
@@ -737,51 +704,6 @@ class FloatingButton {
         });
     }
 
-    // Function to inject viewport meta tag
-    injectViewport() {
-        if (this.viewportInjected) return;
-        
-        try {
-            // Check for existing viewport meta tag
-            const existingViewport = document.querySelector('meta[name="viewport"]');
-            if (existingViewport) {
-                this.originalViewport = existingViewport.cloneNode(true);
-                existingViewport.remove();
-            }
-
-            const meta = document.createElement('meta');
-            meta.name = 'viewport';
-            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-            meta.setAttribute('data-gentoo-injected', 'true');
-            document.head.appendChild(meta);
-            this.viewportInjected = true;
-        } catch (error) {
-            console.error('Failed to inject viewport meta tag:', error);
-        }
-    }
-
-    // Function to delete viewport meta tag
-    deleteViewport() {
-        if (!this.viewportInjected) return;
-        
-        try {
-            const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
-            if (meta) {
-                meta.remove();
-            }
-
-            // Restore original viewport tag if it exists
-            if (this.originalViewport) {
-                document.head.appendChild(this.originalViewport);
-                this.originalViewport = null;
-            }
-        } catch (error) {
-            console.error('Failed to delete viewport meta tag:', error);
-        } finally {
-            this.viewportInjected = false;
-        }
-    }
-
     handleTouchMove(e, iframeContainer) {
         e.preventDefault();
         const touch = e.touches[0];
@@ -794,9 +716,9 @@ class FloatingButton {
         this.prevPosition = touch.clientY;
 
         const newHeight = iframeContainer.offsetHeight - diff;
-        iframeContainer.style.height = `${newHeight}px`
+        iframeContainer.style.height = `${newHeight}px`;
         if (Math.abs(diff) > 1) {
-            this.scrollDir = diff > 0 ? 'down' : 'up';
+            this.scrollDir = diff > 0 ? "down" : "up";
         }
     }
 
@@ -852,7 +774,7 @@ class FloatingButton {
 
     enableChat(mode) {
         this.logEvent({
-            eventCategory: 'SDKFloatingClicked',
+            eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
@@ -864,7 +786,6 @@ class FloatingButton {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
-            if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -878,9 +799,6 @@ class FloatingButton {
     }
 
     hideChat() {
-        // Delete viewport meta tag
-        this.deleteViewport();
-
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
@@ -888,7 +806,9 @@ class FloatingButton {
                 this.button.className = "floating-button-common button-image";
             }
         }
-        if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
+        if (this.dotLottiePlayer) {
+            this.dotLottiePlayer.classList.remove('hide');
+        }
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
@@ -904,56 +824,44 @@ class FloatingButton {
         return width;
     }
 
-    /**
-     * 현재 URL 또는 주어진 URL에서 product_no 값을 추출하는 함수
-     * 
-     * @param {string} [urlString=window.location.href] - 분석할 URL 문자열
-     * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
-     */
-    getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product') && !urlString.includes('/product/list') ) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else { this.displayLocation = 'HOME' }
+    async sendLog(input) {
         try {
-            // URL 객체 생성
-            const url = new URL(urlString);
+            await this.bootPromise;
+            // Wait for fetchChatUserId to complete before proceeding
+            this.chatUserId = await this.fetchChatUserId(input.authCode);
 
-            // 1. 쿼리 파라미터에서 product_no 추출 시도
-            const productNoFromQuery = url.searchParams.get('product_no');
-            if (productNoFromQuery) {
-                return productNoFromQuery;
-            }
+            const payload = {
+                eventCategory: input.eventCategory,
+                partnerId: String(input.partnerId),
+                chatUserId: String(this.chatUserId),
+                products: input.products,
+            };
 
-            // 2. 경로 기반 URL에서 product_no 추출 시도
-            const path = url.pathname;
-
-            /**
-             * 고려가 필요한 cafe24 경로 패턴
-                /product/{product_name}/{product_no}
-                /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
-                /{shop_no}/product/{product_name}/{product_no}
-             */
-
-            /**
-             * 정규 표현식 설명:
-                (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
-                \/product\/	/product/ 고정
-                [^\/]+	product_name
-                \/([^\/]+)	✅ 캡처할 product_no
-                (?:\/category/...)?	🔹 optional category/display path
-             */
-            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-
-            const match = path.match(regex);
-            if (match && match[1]) {
-                return match[1]; // product_no
-            }
-
-            // 3. 찾을 수 없는 경우 null 반환
-            return null;
+            return this.logEvent(payload);
         } catch (error) {
-            console.error('Invalid URL:', error);
-            return null;
+            console.error("Failed to send log:", error);
+            throw error;
+        }
+    }
+
+    getGentooShowEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.show = callback;
+        }
+    }
+
+    getGentooClickEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.click = callback;
+        }
+    }
+
+    getFormSubmittedEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.formSubmitted = callback;
         }
     }
 }
@@ -980,9 +888,9 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    // injectCSS("./floating-button-sdk-cafe24.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
