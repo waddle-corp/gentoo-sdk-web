@@ -2,6 +2,7 @@
 
 // const currentEnv = SDK_ENV; // Webpack으로 주입됨
 // const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+import CryptoJS from "crypto-js";
 
 class FloatingButton {
     constructor(props) {
@@ -133,8 +134,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: 'ckUs4MK3KhZixizocrCmTA',
-                version: '2022-12-01'
+                client_id: 'QfNlFJBPD6mXVWkE8MybWD',
+                version: '2024-09-01'
             }));
         });
     }
@@ -431,14 +432,10 @@ class FloatingButton {
         var testButtonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log('button clicked')
-            CAFE24API.addCurrentProductToCart(function(err, res) {
-                if (err) {
-                    console.log("err", err);
-                } else {
-                    console.log("res", res);
-                }
-           });
+            console.log("testButtonClickHandler", CAFE24API.MALL_ID, CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC);
+            CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), 'ckUs4MK3KhZixizocrCmTA', this.cafe24UserId, CAFE24API.HMAC, (res) => {
+                console.log("res", res);
+            });
         }
 
         window?.addEventListener("message", (e) => {

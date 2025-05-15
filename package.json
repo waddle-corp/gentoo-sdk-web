@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.42.0",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.7",
     "gh-pages": "^6.1.1"
   },
