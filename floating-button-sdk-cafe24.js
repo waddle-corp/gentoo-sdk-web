@@ -2,7 +2,7 @@
 
 // const currentEnv = SDK_ENV; // Webpack으로 주입됨
 // const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
-import CryptoJS from "crypto-js";
+// import CryptoJS from "crypto-js";
 
 class FloatingButton {
     constructor(props) {
