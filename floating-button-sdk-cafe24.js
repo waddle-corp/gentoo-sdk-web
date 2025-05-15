@@ -243,8 +243,8 @@ class FloatingButton {
             this.testButton.innerText = "테스트";
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.chatHandler);
-            this.chatHeader.appendChild(this.closeButtonContainer);
             this.chatHeader.appendChild(this.testButton);
+            this.chatHeader.appendChild(this.closeButtonContainer);
             this.iframeContainer.appendChild(this.closeActionArea);
         } else {
             this.chatHeader.className = "chat-header";
@@ -479,7 +479,7 @@ class FloatingButton {
         this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
-
+        this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
             this.browserWidth = this.logWindowWidth();
