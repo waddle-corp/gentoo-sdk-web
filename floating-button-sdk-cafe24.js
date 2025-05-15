@@ -243,9 +243,9 @@ class FloatingButton {
             this.testButton.innerText = "테스트";
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.chatHandler);
-            this.chatHeader.appendChild(this.testButton);
             this.chatHeader.appendChild(this.closeButtonContainer);
             this.iframeContainer.appendChild(this.closeActionArea);
+            this.iframeContainer.appendChild(this.testButton);
         } else {
             this.chatHeader.className = "chat-header";
             this.chatHeaderText.className = "chat-header-text";
