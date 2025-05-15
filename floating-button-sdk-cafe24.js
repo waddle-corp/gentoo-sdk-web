@@ -139,7 +139,6 @@ class FloatingButton {
         });
     }
 
-
     async init(params) {
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
@@ -239,9 +238,13 @@ class FloatingButton {
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.testButton = document.createElement("button");
+            this.testButton.className = "test-button";
+            this.testButton.innerText = "테스트";
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.chatHandler);
             this.chatHeader.appendChild(this.closeButtonContainer);
+            this.chatHeader.appendChild(this.testButton);
             this.iframeContainer.appendChild(this.closeActionArea);
         } else {
             this.chatHeader.className = "chat-header";
@@ -424,6 +427,13 @@ class FloatingButton {
                 }
             }
         };
+
+        var testButtonClickHandler = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            console.log("testButtonClickHandler", CAFE24API.MALL_ID);
+            this.openChat();
+        }
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
