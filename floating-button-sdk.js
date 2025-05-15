@@ -145,8 +145,7 @@ class FloatingButton {
                 // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                // this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                this.chatUrl = `https://accio-webclient-git-gent-3232-fix-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
@@ -953,6 +952,13 @@ class FloatingButton {
             this.eventCallback.formSubmitted = callback;
         }
     }
+
+    getUserSentMessageEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.userSentMessage = callback;
+        }
+    }
 }
 
 // Export as a global variable
@@ -1082,6 +1088,13 @@ window.FloatingButton = FloatingButton;
                 case "getFormSubmittedEvent":
                     if (typeof fb.getFormSubmittedEvent === "function") {
                         Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
+                        });
+                    }
+                    break;
+                case "getUserSentMessageEvent":
+                    if (typeof fb.getUserSentMessageEvent === "function") {
+                        Promise.resolve(fb.getUserSentMessageEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
                     }
