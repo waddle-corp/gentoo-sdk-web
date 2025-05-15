@@ -431,8 +431,10 @@ class FloatingButton {
         var testButtonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault();
-            console.log("testButtonClickHandler", CAFE24API.MALL_ID);
-            this.openChat();
+            console.log("testButtonClickHandler", CAFE24API.MALL_ID, CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC);
+            CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC, (res) => {
+                console.log("res", res);
+            });
         }
 
         window?.addEventListener("message", (e) => {
