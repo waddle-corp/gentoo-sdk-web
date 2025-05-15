@@ -63,13 +63,21 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
-        } else {
+        } else if (window.location.hostname === "demo.gentooai.com") {
             this.hostSrc = "https://demo.gentooai.com";
             this.domains = {
                 auth: "https://api.gentooai.com/chat/api/v1/user",
                 log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        } else {
+            this.hostSrc = "https://dev-demo.gentooai.com";
+            this.domains = {
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
