@@ -63,13 +63,21 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
-        } else {
+        } else if (window.location.hostname === "demo.gentooai.com") {
             this.hostSrc = "https://demo.gentooai.com";
             this.domains = {
                 auth: "https://api.gentooai.com/chat/api/v1/user",
                 log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        } else {
+            this.hostSrc = "https://dev-demo.gentooai.com";
+            this.domains = {
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -442,14 +450,14 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.pathname}));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -944,6 +952,13 @@ class FloatingButton {
             this.eventCallback.formSubmitted = callback;
         }
     }
+
+    getUserSentMessageEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.userSentMessage = callback;
+        }
+    }
 }
 
 // Export as a global variable
@@ -1073,6 +1088,13 @@ window.FloatingButton = FloatingButton;
                 case "getFormSubmittedEvent":
                     if (typeof fb.getFormSubmittedEvent === "function") {
                         Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
+                        });
+                    }
+                    break;
+                case "getUserSentMessageEvent":
+                    if (typeof fb.getUserSentMessageEvent === "function") {
+                        Promise.resolve(fb.getUserSentMessageEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
                     }

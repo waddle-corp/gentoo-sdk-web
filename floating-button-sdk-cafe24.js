@@ -2,6 +2,7 @@
 
 // const currentEnv = SDK_ENV; // Webpack으로 주입됨
 // const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+// import CryptoJS from "crypto-js";
 
 class FloatingButton {
     constructor(props) {
@@ -133,12 +134,11 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: 'ckUs4MK3KhZixizocrCmTA',
-                version: '2022-12-01'
+                client_id: 'QfNlFJBPD6mXVWkE8MybWD',
+                version: '2024-09-01'
             }));
         });
     }
-
 
     async init(params) {
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
@@ -239,10 +239,14 @@ class FloatingButton {
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
+            // this.testButton = document.createElement("button");
+            // this.testButton.className = "test-button";
+            // this.testButton.innerText = "테스트";
             this.chatHeader.appendChild(this.chatHeaderText);
             this.chatHeader.appendChild(this.chatHandler);
             this.chatHeader.appendChild(this.closeButtonContainer);
             this.iframeContainer.appendChild(this.closeActionArea);
+            // this.iframeContainer.appendChild(this.testButton);
         } else {
             this.chatHeader.className = "chat-header";
             this.chatHeaderText.className = "chat-header-text";
@@ -425,6 +429,15 @@ class FloatingButton {
             }
         };
 
+        // var testButtonClickHandler = (e) => {
+        //     e.stopPropagation();
+        //     e.preventDefault();
+        //     console.log("testButtonClickHandler", CAFE24API.MALL_ID, CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC);
+        //     CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), 'ckUs4MK3KhZixizocrCmTA', this.cafe24UserId, CAFE24API.HMAC, (res) => {
+        //         console.log("res", res);
+        //     });
+        // }
+
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 if (!this.isSmallResolution) {
@@ -461,15 +474,15 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click",buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.pathname}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.pathname}));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.pathname}));
-
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
             this.browserWidth = this.logWindowWidth();
