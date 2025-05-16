@@ -430,6 +430,7 @@ class FloatingButton {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
+            console.log('e.data.userSentMessageState, ', e.data.userSentMessageState);
             if (e.data.userSentMessageState) {
                 if (this.eventCallback.userSentMessage !== null) {
                     console.log('userSentMessage, ', this.eventCallback);
