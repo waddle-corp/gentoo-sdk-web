@@ -963,6 +963,7 @@ class FloatingButton {
 
     getUserSentMessageEvent(callback) {
         // Execute the callback function
+        console.log('getUserSentMessageEvent params, ', callback, typeof callback);
         if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.userSentMessage = callback;
         }
