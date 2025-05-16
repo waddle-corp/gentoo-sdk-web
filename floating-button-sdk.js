@@ -38,6 +38,7 @@ class FloatingButton {
             show: null,
             click: null,
             formSubmitted: null,
+            userSentMessage: null,
         }
         this.iframeHeightState;
         this.viewportInjected = false;
@@ -427,6 +428,11 @@ class FloatingButton {
                 const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
+                }
+            }
+            if (e.data.userSentMessageState) {
+                if (this.eventCallback.userSentMessage !== null) {
+                    this.eventCallback?.userSentMessage();
                 }
             }
             if (this.isSmallResolution && e.data.inputFocusState) {
