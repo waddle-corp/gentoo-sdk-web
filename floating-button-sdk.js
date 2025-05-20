@@ -38,6 +38,7 @@ class FloatingButton {
             show: null,
             click: null,
             formSubmitted: null,
+            userSentMessage: null,
         }
         this.iframeHeightState;
         this.viewportInjected = false;
@@ -421,6 +422,11 @@ class FloatingButton {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
+            if (e.data.userSentMessageState) {
+                if (this.eventCallback.userSentMessage !== null) {
+                    this.eventCallback?.userSentMessage();
+                }
+            }
             if (this.isSmallResolution && e.data.inputFocusState) {
                 this.enableChat("full");
             }
@@ -482,7 +488,7 @@ class FloatingButton {
         // Inject viewport meta tag to block ios zoom in
         this.injectViewport();
         // Chat being visible
-        this.enableChat(this.iframeHeightState || 'full');
+        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
