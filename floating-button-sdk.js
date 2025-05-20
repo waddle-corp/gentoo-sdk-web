@@ -430,10 +430,8 @@ class FloatingButton {
                     this.eventCallback?.formSubmitted(params);
                 }
             }
-            console.log('[debug] e.data.userSentMessageState, ', e.data.userSentMessageState, '; this.eventCallback', this.eventCallback);
             if (e.data.userSentMessageState) {
                 if (this.eventCallback.userSentMessage !== null) {
-                    console.log('[debug] userSentMessage, ', this.eventCallback);
                     this.eventCallback?.userSentMessage();
                 }
             }
@@ -963,7 +961,6 @@ class FloatingButton {
 
     getUserSentMessageEvent(callback) {
         // Execute the callback function
-        console.log('[debug] getUserSentMessageEvent params, ', callback, typeof callback);
         if (typeof callback === "function" && this.eventCallback) {
             this.eventCallback.userSentMessage = callback;
         }
@@ -1102,7 +1099,6 @@ window.FloatingButton = FloatingButton;
                     }
                     break;
                 case "getUserSentMessageEvent":
-                    console.log('[debug] getUserSentMessageEvent params, ', params);
                     if (typeof fb.getUserSentMessageEvent === "function") {
                         Promise.resolve(fb.getUserSentMessageEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
