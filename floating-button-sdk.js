@@ -498,7 +498,7 @@ class FloatingButton {
         // Inject viewport meta tag to block ios zoom in
         this.injectViewport();
         // Chat being visible
-        this.enableChat(this.iframeHeightState || 'full');
+        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
