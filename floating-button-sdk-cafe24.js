@@ -11,6 +11,12 @@ class FloatingButton {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
+        // Check for existing SDK elements 
+        if (this.checkSDKExists()) {
+            console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
+            window.__GentooInited = 'created'; // Mark as created to prevent further initialization
+            return;
+        }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
@@ -145,6 +151,12 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
+        
+        if (this.checkSDKExists()) {
+            console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
+            return;
+        }
+
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
@@ -178,6 +190,12 @@ class FloatingButton {
 
     // Separate UI creation into its own method for clarity
     createUIElements( position, showGentooButton, isCustomButton = false ) {
+        // Check if any SDK elements exist in document
+        if (this.checkSDKExists()) {
+            console.warn("GentooIO UI elements already exist in the document, skipping creation.");
+            return;
+        }
+        
         window.__GentooInited = 'creating';
         this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
@@ -198,8 +216,12 @@ class FloatingButton {
         // Create iframe elements
         this.dimmedBackground = document.createElement("div");
         this.dimmedBackground.className = "dimmed-background hide";
+        this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
+        this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
+        
         this.chatHeader = document.createElement("div");
         this.chatHandler = document.createElement("div");
         this.chatHeaderText = document.createElement("p");
@@ -281,6 +303,8 @@ class FloatingButton {
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
+            this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
+            
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
@@ -915,6 +939,15 @@ class FloatingButton {
     logWindowWidth() {
         const width = window.innerWidth;
         return width;
+    }
+
+    // SDK가 이미 존재하는지 확인
+    checkSDKExists() {
+        const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
+        const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
+        const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
+        
+        return hasDimmedBackground || hasIframeContainer || hasFloatingContainer;
     }
 
     /**
