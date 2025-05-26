@@ -5,10 +5,19 @@ class FloatingButton {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
-        // Check for existing SDK elements 
+        
+        // Check if in iframe: only allow instantiation in top window
+        const isInIframe = window !== window.top;
+        if (isInIframe) {
+            console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
+            window.__GentooInited = 'iframe_blocked';
+            return;
+        }
+        
+        // Check for existing SDK elements
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created'; // Mark as created to prevent further initialization
+            window.__GentooInited = 'created'; 
             return;
         }
         if (!props.partnerId || !props.authCode) {
@@ -110,11 +119,20 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        // if (document.getElementsByClassName('floating-container')[0]) {
-        if (this.checkSDKExists()) {
-            console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
+        
+        const isInIframe = window !== window.top;
+        if (isInIframe) {
+            console.warn("GentooIO initialization attempted in iframe. SDK should only be initialized in the top document.");
+            window.__GentooInited = 'iframe_blocked';
             return;
         }
+        
+        if (this.checkSDKExists()) {
+            console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
+            window.__GentooInited = 'created';
+            return;
+        }
+        
         // this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
@@ -146,8 +164,8 @@ class FloatingButton {
                 // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                // this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-                this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else {
                 this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
@@ -168,6 +186,7 @@ class FloatingButton {
         // Check if any SDK elements exist in document
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping creation.");
+            window.__GentooInited = 'created';
             return;
         }
 
@@ -980,11 +999,37 @@ class FloatingButton {
 
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
+        const isInIframe = window !== window.top;
+        
+        // 현재 document의 SDK set 
         const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
         
-        return hasDimmedBackground || hasIframeContainer || hasFloatingContainer;
+        if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
+            return true;
+        }
+        
+        if (isInIframe) {
+            try {
+                if (window.top.document) {
+                    if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
+                        return true;
+                    }
+                    
+                    // 부모 document의 SDK set 
+                    const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
+                    const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
+                    const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
+                    
+                    return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
+                }
+            } catch (e) {
+                console.warn("Cannot access parent document due to same-origin policy.");
+            }
+        }
+        
+        return false;
     }
 }
 
