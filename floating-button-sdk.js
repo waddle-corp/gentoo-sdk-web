@@ -1021,7 +1021,7 @@ class FloatingButton {
         if (isInIframe) {
             try {
                 if (window.top.document) {
-                    if (window.top.__GentooInited != null) {
+                    if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
                         return true;
                     }
                     
