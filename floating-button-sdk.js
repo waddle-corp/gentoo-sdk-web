@@ -262,7 +262,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container-md";
             this.closeButtonIcon.className = "chat-close-button-icon-md";
             this.closeButtonText.className = "chat-close-button-text-md";
-            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Close" : "접기";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
@@ -278,7 +278,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container";
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
-            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Close" : "채팅창 축소";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Minimize" : "채팅창 축소";
             this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
