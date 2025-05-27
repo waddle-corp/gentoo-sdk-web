@@ -176,7 +176,7 @@ class FloatingButton {
                 // this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
             }
 
             // Create UI elements after data is ready
@@ -262,7 +262,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container-md";
             this.closeButtonIcon.className = "chat-close-button-icon-md";
             this.closeButtonText.className = "chat-close-button-text-md";
-            this.closeButtonText.innerText = "접기";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Close" : "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
@@ -278,7 +278,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container";
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
-            this.closeButtonText.innerText = "채팅창 축소";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Close" : "채팅창 축소";
             this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
