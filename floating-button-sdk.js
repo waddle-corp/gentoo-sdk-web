@@ -397,6 +397,9 @@ class FloatingButton {
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
                 }
+                if (this.customButton) {
+                    this.customButton.classList.add('hide');
+                }
             }, 100);
             setTimeout(() => {
                 this.openChat();
@@ -429,6 +432,9 @@ class FloatingButton {
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
                 }
+                if (this.customButton) {
+                    this.customButton.classList.add('hide');
+                }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
                     this.eventCallback.click();
@@ -450,6 +456,9 @@ class FloatingButton {
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
+                }
+                if (this.customButton) {
+                    this.customButton.classList.remove('hide');
                 }
             }
         };
@@ -916,6 +925,8 @@ class FloatingButton {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
+            if (this.customButton) this.customButton.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -943,6 +954,7 @@ class FloatingButton {
             this.dotLottiePlayer.classList.remove('hide');
         }
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+        if (this.customButton) this.customButton.classList.remove('hide');
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
     }
