@@ -175,8 +175,9 @@ class FloatingButton {
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
                 this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
                 // this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } 
+            else {
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
             }
 
             // Create UI elements after data is ready
@@ -262,7 +263,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container-md";
             this.closeButtonIcon.className = "chat-close-button-icon-md";
             this.closeButtonText.className = "chat-close-button-text-md";
-            this.closeButtonText.innerText = "접기";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
@@ -278,7 +279,7 @@ class FloatingButton {
             this.closeButtonContainer.className = "chat-close-button-container";
             this.closeButtonIcon.className = "chat-close-button-icon";
             this.closeButtonText.className = "chat-close-button-text";
-            this.closeButtonText.innerText = "채팅창 축소";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Minimize" : "채팅창 축소";
             this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
@@ -397,6 +398,9 @@ class FloatingButton {
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
                 }
+                if (this.customButton) {
+                    this.customButton.classList.add('hide');
+                }
             }, 100);
             setTimeout(() => {
                 this.openChat();
@@ -429,6 +433,9 @@ class FloatingButton {
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.add('hide');
                 }
+                if (this.customButton) {
+                    this.customButton.classList.add('hide');
+                }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
                     this.eventCallback.click();
@@ -450,6 +457,9 @@ class FloatingButton {
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
+                }
+                if (this.customButton) {
+                    this.customButton.classList.remove('hide');
                 }
             }
         };
@@ -916,6 +926,8 @@ class FloatingButton {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
+            if (this.customButton) this.customButton.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -943,6 +955,7 @@ class FloatingButton {
             this.dotLottiePlayer.classList.remove('hide');
         }
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+        if (this.customButton) this.customButton.classList.remove('hide');
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
     }
