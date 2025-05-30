@@ -6,19 +6,23 @@
 
 class FloatingButton {
     constructor(props) {
+        // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
+        this.allowedDomainsForIframe = ['admin.shopify.com'];
+        
         // console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
 
-        // Check if in iframe: only allow instantiation in top window
         const isInIframe = window !== window.top;
-        if (isInIframe) {
+        const isAllowedDomain = this.isAllowedDomainForIframe();
+        if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
         }
+
         // Check for existing SDK elements 
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
@@ -161,7 +165,8 @@ class FloatingButton {
         }
         
         const isInIframe = window !== window.top;
-        if (isInIframe) {
+        const isAllowedDomain = this.isAllowedDomainForIframe();
+        if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO initialization attempted in iframe. SDK should only be initialized in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
@@ -987,6 +992,34 @@ class FloatingButton {
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");
+            }
+        }
+        
+        return false;
+    }
+
+    isAllowedDomainForIframe() {
+        if (this.allowedDomainsForIframe.includes(window.location.hostname)) {
+            return true;
+        }
+        
+        if (window !== window.top) {
+            try {
+                const parentDomain = window.top.location.hostname;
+                if (this.allowedDomainsForIframe.includes(parentDomain)) {
+                    return true;
+                }
+            } catch (e) {
+                if (document.referrer) {
+                    try {
+                        const referrerUrl = new URL(document.referrer);
+                        if (this.allowedDomainsForIframe.includes(referrerUrl.hostname)) {
+                            return true;
+                        }
+                    } catch (urlError) {
+                        console.warn('Could not parse referrer URL:', document.referrer);
+                    }
+                }
             }
         }
         
