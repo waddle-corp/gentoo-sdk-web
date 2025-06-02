@@ -6,19 +6,26 @@
 
 class FloatingButton {
     constructor(props) {
+        // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
+        this.allowedDomainsForIframe = [
+            'admin.shopify.com',
+            '*.myshopify.com',  
+        ];
+
         // console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
 
-        // Check if in iframe: only allow instantiation in top window
         const isInIframe = window !== window.top;
-        if (isInIframe) {
+        const isAllowedDomain = this.isAllowedDomainForIframe();
+        if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
         }
+
         // Check for existing SDK elements 
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
@@ -161,7 +168,8 @@ class FloatingButton {
         }
         
         const isInIframe = window !== window.top;
-        if (isInIframe) {
+        const isAllowedDomain = this.isAllowedDomainForIframe();
+        if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO initialization attempted in iframe. SDK should only be initialized in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
@@ -990,6 +998,51 @@ class FloatingButton {
             }
         }
         
+        return false;
+    }
+
+    isAllowedDomainPattern(hostname) {
+        if (this.allowedDomainsForIframe.includes(hostname)) {
+            return true;
+        }
+        
+        // Check wildcard patterns
+        for (const pattern of this.allowedDomainsForIframe) {
+            if (pattern.startsWith('*.')) {
+                const domain = pattern.substring(2); 
+                if (hostname.endsWith('.' + domain) || hostname === domain) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    isAllowedDomainForIframe() {
+        if (this.isAllowedDomainPattern(window.location.hostname)) {
+            return true;
+        }
+        
+        if (window !== window.top) {
+            try {
+                const parentDomain = window.top.location.hostname;
+                if (this.isAllowedDomainPattern(parentDomain)) {
+                    return true;
+                }
+            } catch (e) {
+                if (document.referrer) {
+                    try {
+                        const referrerUrl = new URL(document.referrer);
+                        if (this.isAllowedDomainPattern(referrerUrl.hostname)) {
+                            return true;
+                        }
+                    } catch (urlError) {
+                        console.warn('Could not parse referrer URL:', document.referrer);
+                    }
+                }
+            }
+        }
         return false;
     }
 
