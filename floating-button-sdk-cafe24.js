@@ -999,21 +999,33 @@ class FloatingButton {
     }
 
     isAllowedDomainForIframe() {
+        console.log('=== Domain Check Debug ===');
+        console.log('Current hostname:', window.location.hostname);
+        console.log('Allowed domains:', this.allowedDomainsForIframe);
+        
         if (this.allowedDomainsForIframe.includes(window.location.hostname)) {
+            console.log('✓ Current domain is allowed');
             return true;
         }
         
         if (window !== window.top) {
+            console.log('Inside iframe, checking parent...');
             try {
                 const parentDomain = window.top.location.hostname;
+                console.log('Parent hostname:', parentDomain);
                 if (this.allowedDomainsForIframe.includes(parentDomain)) {
+                    console.log('✓ Parent domain is allowed');
                     return true;
                 }
             } catch (e) {
+                console.log('Cannot access parent domain, trying referrer...');
+                console.log('Document referrer:', document.referrer);
                 if (document.referrer) {
                     try {
                         const referrerUrl = new URL(document.referrer);
+                        console.log('Referrer hostname:', referrerUrl.hostname);
                         if (this.allowedDomainsForIframe.includes(referrerUrl.hostname)) {
+                            console.log('✓ Referrer domain is allowed');
                             return true;
                         }
                     } catch (urlError) {
@@ -1022,7 +1034,7 @@ class FloatingButton {
                 }
             }
         }
-        
+        console.log('✗ No allowed domain found');
         return false;
     }
 
