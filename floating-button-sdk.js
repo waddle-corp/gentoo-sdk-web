@@ -72,7 +72,7 @@ class FloatingButton {
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
-        } else if (window.location.hostname === "stage-demo.gentooai.com") {
+        } else if (window.location.hostname === "stage-demo.gentooai.com" || this.partnerType === 'shopify') {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
                 auth: "https://stage-api.gentooai.com/chat/api/v1/user",
