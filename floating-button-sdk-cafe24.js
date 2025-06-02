@@ -7,8 +7,11 @@
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
-        this.allowedDomainsForIframe = ['admin.shopify.com'];
-        
+        this.allowedDomainsForIframe = [
+            'admin.shopify.com',
+            '*.myshopify.com',  
+        ];
+
         // console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -998,34 +1001,40 @@ class FloatingButton {
         return false;
     }
 
-    isAllowedDomainForIframe() {
-        console.log('=== Domain Check Debug ===');
-        console.log('Current hostname:', window.location.hostname);
-        console.log('Allowed domains:', this.allowedDomainsForIframe);
+    isAllowedDomainPattern(hostname) {
+        if (this.allowedDomainsForIframe.includes(hostname)) {
+            return true;
+        }
         
-        if (this.allowedDomainsForIframe.includes(window.location.hostname)) {
-            console.log('✓ Current domain is allowed');
+        // Check wildcard patterns
+        for (const pattern of this.allowedDomainsForIframe) {
+            if (pattern.startsWith('*.')) {
+                const domain = pattern.substring(2); 
+                if (hostname.endsWith('.' + domain) || hostname === domain) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    isAllowedDomainForIframe() {
+        if (this.isAllowedDomainPattern(window.location.hostname)) {
             return true;
         }
         
         if (window !== window.top) {
-            console.log('Inside iframe, checking parent...');
             try {
                 const parentDomain = window.top.location.hostname;
-                console.log('Parent hostname:', parentDomain);
-                if (this.allowedDomainsForIframe.includes(parentDomain)) {
-                    console.log('✓ Parent domain is allowed');
+                if (this.isAllowedDomainPattern(parentDomain)) {
                     return true;
                 }
             } catch (e) {
-                console.log('Cannot access parent domain, trying referrer...');
-                console.log('Document referrer:', document.referrer);
                 if (document.referrer) {
                     try {
                         const referrerUrl = new URL(document.referrer);
-                        console.log('Referrer hostname:', referrerUrl.hostname);
-                        if (this.allowedDomainsForIframe.includes(referrerUrl.hostname)) {
-                            console.log('✓ Referrer domain is allowed');
+                        if (this.isAllowedDomainPattern(referrerUrl.hostname)) {
                             return true;
                         }
                     } catch (urlError) {
@@ -1034,7 +1043,6 @@ class FloatingButton {
                 }
             }
         }
-        console.log('✗ No allowed domain found');
         return false;
     }
 
