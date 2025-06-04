@@ -513,6 +513,16 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
+            if (e.data.addProductToCart) {
+                CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), CAFE24API.APP_KEY, this.cafe24UserId, 'hmac', function(res, err) {
+                    if (err) {
+                        console.error('Failed to add product to cart:', err);
+                    } else {
+                        console.log('Product added to cart:', res);
+                    }
+                });
+            }
+
             // if (this.isMobileDevice) {
             //     if (e.data.messageExistence === 'exist') {
             //         this.iframeHeightState = 'full';
