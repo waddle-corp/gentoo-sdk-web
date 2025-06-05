@@ -58,6 +58,10 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        // cafe24 Gentoo App
+        this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+        this.cafe24Version = '2024-09-01';
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -159,8 +163,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: 'QfNlFJBPD6mXVWkE8MybWD',
-                version: '2024-09-01'
+                client_id: this.cafe24ClientId,
+                version: this.cafe24Version
             }));
         });
     }
@@ -808,9 +812,9 @@ class FloatingButton {
 
     async addProductToCart() {
         const newDate = new Date().getTime();
-        const message = CAFE24API.MALL_ID + newDate + CAFE24API.APP_KEY + this.cafe24UserId;
+        const message = CAFE24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
         const hmac = await this.fetchCafe24Hmac(message);
-        CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, newDate, CAFE24API.APP_KEY, this.cafe24UserId, hmac, function(res, err) {
+        CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(res, err) {
             if (err) {
                 console.error('Failed to add product to cart:', err);
             } else {
