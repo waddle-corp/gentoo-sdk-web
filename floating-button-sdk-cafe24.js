@@ -795,12 +795,9 @@ class FloatingButton {
 
     async fetchCafe24Hmac(text) {
         try {
-            const response = await fetch(`${this.domains.cafe24Utils}`, {
+            const response = await fetch(`${this.domains.cafe24Utils}/hmac?text=${text}`, {
                 method: "GET",
                 headers: {},
-                params: {
-                    text: text
-                }
             });
             const res = await response.json();
             return res.hmac;
