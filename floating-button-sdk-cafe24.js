@@ -110,6 +110,9 @@ class FloatingButton {
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
+                
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
                     return new Promise((innerResolve, innerReject) => {
@@ -811,10 +814,15 @@ class FloatingButton {
     }
 
     async addProductToCart() {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+
         const newDate = new Date().getTime();
-        const message = CAFE24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        const message = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
         const hmac = await this.fetchCafe24Hmac(message);
-        CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(res, err) {
+        this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(res, err) {
             if (err) {
                 console.error('Failed to add product to cart:', err);
             } else {
