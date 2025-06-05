@@ -66,6 +66,7 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
@@ -78,6 +79,7 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
         } else if (window.location.hostname === "stage-demo.gentooai.com") {
             this.hostSrc = "https://stage-demo.gentooai.com";
@@ -87,6 +89,7 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
                 partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
+                cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
             };
         } else {
             this.hostSrc = 'https://demo.gentooai.com';
@@ -96,6 +99,7 @@ class FloatingButton {
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
             }
         }
 
@@ -514,13 +518,7 @@ class FloatingButton {
                 this.hideChat();
             }
             if (e.data.addProductToCart) {
-                CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), CAFE24API.APP_KEY, this.cafe24UserId, 'hmac', function(res, err) {
-                    if (err) {
-                        console.error('Failed to add product to cart:', err);
-                    } else {
-                        console.log('Product added to cart:', res);
-                    }
-                });
+                this.addProductToCart(e.data.addProductToCart);
             }
 
             // if (this.isMobileDevice) {
@@ -793,6 +791,35 @@ class FloatingButton {
         } catch (error) {
             console.error(`Error while calling fetchPartnerId API: ${error}`)
         }
+    }
+
+    async fetchCafe24Hmac(text) {
+        try {
+            const response = await fetch(`${this.domains.cafe24Utils}`, {
+                method: "GET",
+                headers: {},
+                params: {
+                    text: text
+                }
+            });
+            const res = await response.json();
+            return res.hmac;
+        } catch (error) {
+            console.error(`Error while calling fetchCafe24Hmac API: ${error}`)
+        }
+    }
+
+    async addProductToCart() {
+        const newDate = new Date().getTime();
+        const message = CAFE24API.MALL_ID + newDate + CAFE24API.APP_KEY + this.cafe24UserId;
+        const hmac = await this.fetchCafe24Hmac(message);
+        CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, newDate, CAFE24API.APP_KEY, this.cafe24UserId, hmac, function(res, err) {
+            if (err) {
+                console.error('Failed to add product to cart:', err);
+            } else {
+                console.log('Product added to cart:', res);
+            }
+        });
     }
 
     // Function to inject Lottie
