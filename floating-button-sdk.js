@@ -110,7 +110,7 @@ class FloatingButton {
             this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
-                this.gentooSessionData.cuid = res;
+                this.gentooSessionData.cuid = this.authCode.includes('guest') ? '' : res;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             })
             .catch(() => {
