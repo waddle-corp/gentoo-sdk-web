@@ -58,6 +58,10 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        // cafe24 Gentoo App
+        this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+        this.cafe24Version = '2024-09-01';
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -66,6 +70,7 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
@@ -78,6 +83,7 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
         } else if (window.location.hostname === "stage-demo.gentooai.com") {
             this.hostSrc = "https://stage-demo.gentooai.com";
@@ -87,6 +93,7 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
                 partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
+                cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
             };
         } else {
             this.hostSrc = 'https://demo.gentooai.com';
@@ -96,12 +103,16 @@ class FloatingButton {
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
             }
         }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
+                
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
                     return new Promise((innerResolve, innerReject) => {
@@ -155,8 +166,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: 'QfNlFJBPD6mXVWkE8MybWD',
-                version: '2024-09-01'
+                client_id: this.cafe24ClientId,
+                version: this.cafe24Version
             }));
         });
     }
@@ -513,6 +524,10 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
+            if (e.data.addProductToCart) {
+                this.addProductToCart(e.data.addProductToCart);
+            }
+
             // if (this.isMobileDevice) {
             //     if (e.data.messageExistence === 'exist') {
             //         this.iframeHeightState = 'full';
@@ -783,6 +798,37 @@ class FloatingButton {
         } catch (error) {
             console.error(`Error while calling fetchPartnerId API: ${error}`)
         }
+    }
+
+    async fetchCafe24Hmac(text) {
+        try {
+            const response = await fetch(`${this.domains.cafe24Utils}/hmac?text=${text}`, {
+                method: "GET",
+                headers: {},
+            });
+            const res = await response.json();
+            return res.hmac;
+        } catch (error) {
+            console.error(`Error while calling fetchCafe24Hmac API: ${error}`)
+        }
+    }
+
+    async addProductToCart() {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+
+        const newDate = new Date().getTime();
+        const message = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        const hmac = await this.fetchCafe24Hmac(message);
+        this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(res, err) {
+            if (err) {
+                console.error('Failed to add product to cart:', err);
+            } else {
+                console.log('Product added to cart:', res);
+            }
+        });
     }
 
     // Function to inject Lottie
