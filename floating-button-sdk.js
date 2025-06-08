@@ -378,7 +378,7 @@ class FloatingButton {
                         ) {
                             this.floatingContainer.removeChild(this.expandedButton);
                         }
-                    }, 7000);
+                    }, 70000);
                 }
             }
         }
