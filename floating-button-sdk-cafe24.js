@@ -58,10 +58,6 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
-        // cafe24 Gentoo App
-        this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
-        this.cafe24Version = '2024-09-01';
-
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -75,6 +71,9 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
+            // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-10-16';
         } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
@@ -85,6 +84,9 @@ class FloatingButton {
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
                 cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
+            // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-10-16';
         } else if (window.location.hostname === "stage-demo.gentooai.com") {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
@@ -95,6 +97,9 @@ class FloatingButton {
                 partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
                 cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
             };
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else {
             this.hostSrc = 'https://demo.gentooai.com';
             this.domains = {
@@ -105,6 +110,9 @@ class FloatingButton {
                 partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
                 cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
             }
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
