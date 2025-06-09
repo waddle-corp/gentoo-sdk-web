@@ -738,12 +738,12 @@ class FloatingButton {
 
     async fetchChatUserId(userToken, udid = "") {
         const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        console.log('this.chatUserId', this.userToken, this.userToken.includes('guest'));
+        console.log('this.chatUserId', userToken, userToken.includes('guest'));
         const params = {
             externalKey: String(this.partnerId),
             userToken: convertedUserToken,
             udid: String(udid),
-            chatUserId: this.chatUserId && !this.userToken.includes('guest') ? String(this.chatUserId) : null
+            chatUserId: this.chatUserId && !userToken.includes('guest') ? String(this.chatUserId) : null
         }
 
         try {
