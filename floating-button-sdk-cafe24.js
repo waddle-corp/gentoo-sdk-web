@@ -840,7 +840,7 @@ class FloatingButton {
         
         // Alternative approaches to try if current doesn't work:
         // const message = `${this.cafe24API.MALL_ID}|${newDate}|${this.cafe24ClientId}|${this.cafe24UserId}`;
-        const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&member_id=${this.cafe24UserId}`;
+        const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
         const encodedMessage = encodeURIComponent(rawMessage);
         console.log('message', encodedMessage);
         const hmac = await this.fetchCafe24Hmac(encodedMessage);
