@@ -835,7 +835,7 @@ class FloatingButton {
         // Alternative approaches to try if current doesn't work:
         // const message = `${this.cafe24API.MALL_ID}|${newDate}|${this.cafe24ClientId}|${this.cafe24UserId}`;
         const message = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&member_id=${this.cafe24UserId}`;
-        
+        console.log('message', message);
         const hmac = await this.fetchCafe24Hmac(message);
         
         this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
