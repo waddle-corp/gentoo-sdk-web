@@ -829,12 +829,18 @@ class FloatingButton {
 
         const newDate =  Math.ceil(new Date().getTime() / 1000);
         
-        // Current approach - simple concatenation
-        //const message = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        // JSON stringify approach
+        const messageData = {
+            mall_id: this.cafe24API.MALL_ID,
+            request_time: newDate,
+            app_key: this.cafe24ClientId,
+            member_id: this.cafe24UserId
+        };
+        const message = JSON.stringify(messageData);
         
         // Alternative approaches to try if current doesn't work:
         // const message = `${this.cafe24API.MALL_ID}|${newDate}|${this.cafe24ClientId}|${this.cafe24UserId}`;
-        const message = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&member_id=${this.cafe24UserId}`;
+        // const message = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&member_id=${this.cafe24UserId}`;
         console.log('message', message);
         const hmac = await this.fetchCafe24Hmac(message);
         
