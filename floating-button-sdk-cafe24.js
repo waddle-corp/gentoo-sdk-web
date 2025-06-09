@@ -827,12 +827,21 @@ class FloatingButton {
             return;
         }
 
-        const newDate = new Date().getTime();
-        const message = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        const newDate =  Math.ceil(new Date().getTime() / 1000);
+        
+        // Current approach - simple concatenation
+        //const message = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        
+        // Alternative approaches to try if current doesn't work:
+        // const message = `${this.cafe24API.MALL_ID}|${newDate}|${this.cafe24ClientId}|${this.cafe24UserId}`;
+        const message = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&member_id=${this.cafe24UserId}`;
+        
         const hmac = await this.fetchCafe24Hmac(message);
-        this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(res, err) {
+        
+        this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
             if (err) {
                 console.error('Failed to add product to cart:', err);
+                console.error('Error details:', err.name, err.message);
             } else {
                 console.log('Product added to cart:', res);
             }
