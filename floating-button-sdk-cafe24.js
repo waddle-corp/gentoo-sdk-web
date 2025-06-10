@@ -816,9 +816,10 @@ class FloatingButton {
 
     async fetchCafe24Hmac(text) {
         try {
-            const response = await fetch(`${this.domains.cafe24Utils}/hmac?text=${text}`, {
-                method: "GET",
+            const response = await fetch(`${this.domains.cafe24Utils}/hmac`, {
+                method: "POST",
                 headers: {},
+                body: JSON.stringify({ text }),
             });
             const res = await response.json();
             return res.hmac;
@@ -840,15 +841,15 @@ class FloatingButton {
         console.log('📅 Timestamp generated:', newDate);
         
         // Try simple concatenation (most common Cafe24 pattern)
-        const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
-        console.log('📝 HMAC message (simple concat):', rawMessage);
+        /* const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        console.log('📝 HMAC message (simple concat):', rawMessage); */
         
         // Alternative patterns to try if above doesn't work:
         // Pattern 1: With separators
         // const rawMessage = this.cafe24API.MALL_ID + '|' + newDate + '|' + this.cafe24ClientId + '|' + this.cafe24UserId;
         
         // Pattern 2: Query string without encoding
-        // const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&request_member_id=${this.cafe24UserId}&request_time=${newDate}`;
+        const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&member_id=${this.cafe24UserId}&request_time=${newDate}`;
         
         // Pattern 3: Different parameter order
         // const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
@@ -857,6 +858,7 @@ class FloatingButton {
         // const rawMessage = 'addCurrentProductToCart' + this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
         
         const hmac = await this.fetchCafe24Hmac(rawMessage);
+        console.log('🔐 rawMessage:', rawMessage);
         console.log('🔐 HMAC generated:', hmac);
         
         console.log('🚀 Calling addCurrentProductToCart with params:', {
