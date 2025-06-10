@@ -851,13 +851,20 @@ class FloatingButton {
         console.log('message', encodedMessage);
         const hmac = await this.fetchCafe24Hmac(encodedMessage);
         
-        this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
-            if (err) {
-                console.error('Failed to add product to cart:', err);
-                console.error('Error details:', err.name, err.message);
-            } else {
-                console.log('Product added to cart:', res);
-            }
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
+                if (err) {
+                    console.error('Failed to add product to cart:', err);
+                    console.error('Error details:', err.name, err.message);
+                    console.error('Full error object:', err);
+                    reject(err);
+                } else {
+                    console.log('Product added to cart successfully:', res);
+                    console.log('Full response object:', res);
+                    resolve(res);
+                }
+            });
         });
     }
 
