@@ -73,7 +73,7 @@ class FloatingButton {
             }
             // cafe24 Gentoo-dev App
             this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
-            this.cafe24Version = '2024-10-16';
+            this.cafe24Version = '2024-09-01';
             /* // cafe24 Gentoo-prod App
             this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01'; */
@@ -89,7 +89,7 @@ class FloatingButton {
             }
             // cafe24 Gentoo-dev App
             this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
-            this.cafe24Version = '2024-10-16';
+            this.cafe24Version = '2024-09-01';
             /* // cafe24 Gentoo-prod App
             this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01'; */
