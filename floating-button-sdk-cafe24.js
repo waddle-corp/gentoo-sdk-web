@@ -839,23 +839,24 @@ class FloatingButton {
         const newDate = Math.floor(Date.now() / 1000);
         console.log('📅 Timestamp generated:', newDate);
         
-        // JSON stringify approach
-        /* const messageData = {
-            mall_id: this.cafe24API.MALL_ID,
-            request_time: newDate,
-            app_key: this.cafe24ClientId,
-            member_id: this.cafe24UserId
-        };
-        const message = JSON.stringify(messageData); */
+        // Try simple concatenation (most common Cafe24 pattern)
+        const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        console.log('📝 HMAC message (simple concat):', rawMessage);
         
-        // Alternative approaches to try if current doesn't work:
-        // const message = `${this.cafe24API.MALL_ID}|${newDate}|${this.cafe24ClientId}|${this.cafe24UserId}`;
+        // Alternative patterns to try if above doesn't work:
+        // Pattern 1: With separators
+        // const rawMessage = this.cafe24API.MALL_ID + '|' + newDate + '|' + this.cafe24ClientId + '|' + this.cafe24UserId;
+        
+        // Pattern 2: Query string without encoding
+        // const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&request_member_id=${this.cafe24UserId}&request_time=${newDate}`;
+        
+        // Pattern 3: Different parameter order
         // const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
-        const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&request_member_id=${this.cafe24UserId}&request_time=${newDate}`;
-        const encodedMessage = encodeURIComponent(rawMessage);
-        console.log('📝 HMAC message:', encodedMessage);
         
-        const hmac = await this.fetchCafe24Hmac(encodedMessage);
+        // Pattern 4: Method name included
+        // const rawMessage = 'addCurrentProductToCart' + this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        
+        const hmac = await this.fetchCafe24Hmac(rawMessage);
         console.log('🔐 HMAC generated:', hmac);
         
         console.log('🚀 Calling addCurrentProductToCart with params:', {
