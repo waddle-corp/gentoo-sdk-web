@@ -816,12 +816,23 @@ class FloatingButton {
 
     async fetchCafe24Hmac(text) {
         try {
+            console.log('🔐 fetchCafe24Hmac called with text:', text);
+            console.log('🔐 text type:', typeof text);
+            
+            const requestBody = { text };
+            console.log('🔐 Request body:', requestBody);
+            
             const response = await fetch(`${this.domains.cafe24Utils}/hmac`, {
                 method: "POST",
-                headers: {},
-                body: JSON.stringify({ text }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody),
             });
+            
+            console.log('🔐 Response status:', response.status);
             const res = await response.json();
+            console.log('🔐 Response data:', res);
             return res.hmac;
         } catch (error) {
             console.error(`Error while calling fetchCafe24Hmac API: ${error}`)
