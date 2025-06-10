@@ -71,12 +71,12 @@ class FloatingButton {
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
-            // cafe24 Gentoo-dev App
+            /* // cafe24 Gentoo-dev App
             this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
-            this.cafe24Version = '2024-09-01';
-            /* // cafe24 Gentoo-prod App
-            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
@@ -87,12 +87,12 @@ class FloatingButton {
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
                 cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
-            // cafe24 Gentoo-dev App
+            /* // cafe24 Gentoo-dev App
             this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
-            this.cafe24Version = '2024-09-01';
-            /* // cafe24 Gentoo-prod App
-            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else if (window.location.hostname === "stage-demo.gentooai.com") {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
