@@ -832,8 +832,7 @@ class FloatingButton {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-
-        const newDate =  Math.ceil(new Date().getTime() / 1000);
+        const newDate = Math.floor(Date.now() / 1000);
         
         // JSON stringify approach
         /* const messageData = {
