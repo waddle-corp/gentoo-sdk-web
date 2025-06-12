@@ -66,10 +66,17 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
             this.keys = {
                 log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
             }
+            /* // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
@@ -78,7 +85,14 @@ class FloatingButton {
                 chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
             }
+            /* // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else if (window.location.hostname === "stage-demo.gentooai.com") {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
@@ -87,7 +101,11 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
                 partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
+                cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
             };
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         } else {
             this.hostSrc = 'https://demo.gentooai.com';
             this.domains = {
@@ -96,12 +114,19 @@ class FloatingButton {
                 chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
                 floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
                 partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
             }
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
         }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
+                
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
                     return new Promise((innerResolve, innerReject) => {
@@ -155,8 +180,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: 'QfNlFJBPD6mXVWkE8MybWD',
-                version: '2024-09-01'
+                client_id: this.cafe24ClientId,
+                version: this.cafe24Version
             }));
         });
     }
@@ -514,13 +539,7 @@ class FloatingButton {
                 this.hideChat();
             }
             if (e.data.addProductToCart) {
-                CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), CAFE24API.APP_KEY, this.cafe24UserId, 'hmac', function(res, err) {
-                    if (err) {
-                        console.error('Failed to add product to cart:', err);
-                    } else {
-                        console.log('Product added to cart:', res);
-                    }
-                });
+                this.addProductToCart(e.data.addProductToCart);
             }
 
             // if (this.isMobileDevice) {
@@ -793,6 +812,94 @@ class FloatingButton {
         } catch (error) {
             console.error(`Error while calling fetchPartnerId API: ${error}`)
         }
+    }
+
+    async fetchCafe24Hmac(text) {
+        try {
+            console.log('🔐 fetchCafe24Hmac called with text:', text);
+            console.log('🔐 text type:', typeof text);
+            
+            const requestBody = { text };
+            console.log('🔐 Request body:', requestBody);
+            
+            const response = await fetch(`${this.domains.cafe24Utils}/hmac`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody),
+            });
+            
+            console.log('🔐 Response status:', response.status);
+            const res = await response.json();
+            console.log('🔐 Response data:', res);
+            return res.hmac;
+        } catch (error) {
+            console.error(`Error while calling fetchCafe24Hmac API: ${error}`)
+        }
+    }
+
+    async addProductToCart() {
+        console.log('🔍 addProductToCart called');
+        
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+        console.log('✅ CAFE24API is initialized');
+
+        const newDate = Math.floor(Date.now() / 1000);
+        console.log('📅 Timestamp generated:', newDate);
+        
+        // Try simple concatenation (most common Cafe24 pattern)
+        /* const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        console.log('📝 HMAC message (simple concat):', rawMessage); */
+        
+        // Alternative patterns to try if above doesn't work:
+        // Pattern 1: With separators
+        // const rawMessage = this.cafe24API.MALL_ID + '|' + newDate + '|' + this.cafe24ClientId + '|' + this.cafe24UserId;
+        
+        // Pattern 2: Query string without encoding
+        const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&member_id=${this.cafe24UserId}&request_time=${newDate}`;
+        
+        // Pattern 3: Different parameter order
+        // const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
+        
+        // Pattern 4: Method name included
+        // const rawMessage = 'addCurrentProductToCart' + this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
+        
+        const hmac = await this.fetchCafe24Hmac(rawMessage);
+        console.log('🔐 rawMessage:', rawMessage);
+        console.log('🔐 HMAC generated:', hmac);
+        
+        console.log('🚀 Calling addCurrentProductToCart with params:', {
+            mall_id: this.cafe24API.MALL_ID,
+            request_time: newDate,
+            app_key: this.cafe24ClientId,
+            member_id: this.cafe24UserId,
+            hmac: hmac
+        });
+        
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            console.log('🎯 Promise created, calling Cafe24 API...');
+            
+            this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
+                console.log('📞 Cafe24 API callback triggered!');
+                if (err) {
+                    console.error('❌ Failed to add product to cart:', err);
+                    console.error('Error details:', err.name, err.message);
+                    console.error('Full error object:', err);
+                    reject(err);
+                } else {
+                    console.log('✅ Product added to cart successfully:', res);
+                    console.log('Full response object:', res);
+                    resolve(res);
+                }
+            });
+            
+            console.log('⏳ API call initiated, waiting for callback...');
+        });
     }
 
     // Function to inject Lottie
