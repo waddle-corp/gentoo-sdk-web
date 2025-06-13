@@ -839,7 +839,7 @@ class FloatingButton {
         }
     }
 
-    async addProductToCart() {
+    async addProductToCart(product) {
         console.log('🔍 addProductToCart called');
         
         if (!this.cafe24API) {
@@ -848,8 +848,8 @@ class FloatingButton {
         }
         console.log('✅ CAFE24API is initialized');
 
-        const newDate = Math.floor(Date.now() / 1000);
-        console.log('📅 Timestamp generated:', newDate);
+        /* const newDate = Math.floor(Date.now() / 1000);
+        console.log('📅 Timestamp generated:', newDate); */
         
         // Try simple concatenation (most common Cafe24 pattern)
         /* const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
@@ -860,7 +860,7 @@ class FloatingButton {
         // const rawMessage = this.cafe24API.MALL_ID + '|' + newDate + '|' + this.cafe24ClientId + '|' + this.cafe24UserId;
         
         // Pattern 2: Query string without encoding
-        const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&member_id=${this.cafe24UserId}&request_time=${newDate}`;
+        // const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&member_id=${this.cafe24UserId}&request_time=${newDate}`;
         
         // Pattern 3: Different parameter order
         // const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
@@ -868,7 +868,7 @@ class FloatingButton {
         // Pattern 4: Method name included
         // const rawMessage = 'addCurrentProductToCart' + this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
         
-        const hmac = await this.fetchCafe24Hmac(rawMessage);
+        /* const hmac = await this.fetchCafe24Hmac(rawMessage);
         console.log('🔐 rawMessage:', rawMessage);
         console.log('🔐 HMAC generated:', hmac);
         
@@ -878,27 +878,26 @@ class FloatingButton {
             app_key: this.cafe24ClientId,
             member_id: this.cafe24UserId,
             hmac: hmac
-        });
+        }); */
         
         // Wrap the Cafe24 API call in a Promise for better error handling
         return new Promise((resolve, reject) => {
             console.log('🎯 Promise created, calling Cafe24 API...');
             
-            this.cafe24API.addCurrentProductToCart(this.cafe24API.MALL_ID, newDate, this.cafe24ClientId, this.cafe24UserId, hmac, function(err, res) {
-                console.log('📞 Cafe24 API callback triggered!');
-                if (err) {
-                    console.error('❌ Failed to add product to cart:', err);
-                    console.error('Error details:', err.name, err.message);
-                    console.error('Full error object:', err);
-                    reject(err);
-                } else {
-                    console.log('✅ Product added to cart successfully:', res);
-                    console.log('Full response object:', res);
-                    resolve(res);
+            this.cafe24API.addCart(
+                'A0000',
+                'C',
+                [product],
+                function(err, res) {
+                    if (err) {
+                        console.error('❌ Failed to add product to cart:', err);
+                        reject(err);
+                    } else {
+                        console.log('✅ Product added to cart successfully:', res);
+                        resolve(res);
+                    }
                 }
-            });
-            
-            console.log('⏳ API call initiated, waiting for callback...');
+            );
         });
     }
 
