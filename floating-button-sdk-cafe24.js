@@ -832,7 +832,7 @@ class FloatingButton {
                 'A0000',
                 product.prepaid_shipping_fee,
                 [productObject],
-                function(err, res) {
+                (err, res) => {
                     if (err) {
                         console.error('Failed to add product to cart:', err);
                         reject(err);
