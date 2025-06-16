@@ -814,71 +814,11 @@ class FloatingButton {
         }
     }
 
-    async fetchCafe24Hmac(text) {
-        try {
-            console.log('🔐 fetchCafe24Hmac called with text:', text);
-            console.log('🔐 text type:', typeof text);
-            
-            const requestBody = { text };
-            console.log('🔐 Request body:', requestBody);
-            
-            const response = await fetch(`${this.domains.cafe24Utils}/hmac`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(requestBody),
-            });
-            
-            console.log('🔐 Response status:', response.status);
-            const res = await response.json();
-            console.log('🔐 Response data:', res);
-            return res.hmac;
-        } catch (error) {
-            console.error(`Error while calling fetchCafe24Hmac API: ${error}`)
-        }
-    }
-
-    async addProductToCart(product) {
-        console.log('🔍 addProductToCart called');
-        
+    async addProductToCart(product) {        
         if (!this.cafe24API) {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-        console.log('✅ CAFE24API is initialized');
-
-        /* const newDate = Math.floor(Date.now() / 1000);
-        console.log('📅 Timestamp generated:', newDate); */
-        
-        // Try simple concatenation (most common Cafe24 pattern)
-        /* const rawMessage = this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
-        console.log('📝 HMAC message (simple concat):', rawMessage); */
-        
-        // Alternative patterns to try if above doesn't work:
-        // Pattern 1: With separators
-        // const rawMessage = this.cafe24API.MALL_ID + '|' + newDate + '|' + this.cafe24ClientId + '|' + this.cafe24UserId;
-        
-        // Pattern 2: Query string without encoding
-        // const rawMessage = `app_key=${this.cafe24ClientId}&mall_id=${this.cafe24API.MALL_ID}&member_id=${this.cafe24UserId}&request_time=${newDate}`;
-        
-        // Pattern 3: Different parameter order
-        // const rawMessage = `mall_id=${this.cafe24API.MALL_ID}&request_time=${newDate}&app_key=${this.cafe24ClientId}&request_member_id=${this.cafe24UserId}`;
-        
-        // Pattern 4: Method name included
-        // const rawMessage = 'addCurrentProductToCart' + this.cafe24API.MALL_ID + newDate + this.cafe24ClientId + this.cafe24UserId;
-        
-        /* const hmac = await this.fetchCafe24Hmac(rawMessage);
-        console.log('🔐 rawMessage:', rawMessage);
-        console.log('🔐 HMAC generated:', hmac);
-        
-        console.log('🚀 Calling addCurrentProductToCart with params:', {
-            mall_id: this.cafe24API.MALL_ID,
-            request_time: newDate,
-            app_key: this.cafe24ClientId,
-            member_id: this.cafe24UserId,
-            hmac: hmac
-        }); */
         
         const productObject = {
             product_no : product.product_no,
@@ -887,19 +827,18 @@ class FloatingButton {
         }
 
         // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
-            console.log('🎯 Promise created, calling Cafe24 API...');
-            
+        return new Promise((resolve, reject) => {            
             this.cafe24API.addCart(
                 'A0000',
                 product.prepaid_shipping_fee,
                 [productObject],
                 function(err, res) {
                     if (err) {
-                        console.error('❌ Failed to add product to cart:', err);
+                        console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
-                        console.log('✅ Product added to cart successfully:', res);
+                        console.log('Product added to cart successfully:', res);
+                        this.sendPostMessageHandler({addedProductToCart: true});
                         resolve(res);
                     }
                 }
