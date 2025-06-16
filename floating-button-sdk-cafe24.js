@@ -880,14 +880,20 @@ class FloatingButton {
             hmac: hmac
         }); */
         
+        const productObject = {
+            product_no : product.product_no,
+            variants_code : product.variants_code,
+            quantity : product.quantity,
+        }
+
         // Wrap the Cafe24 API call in a Promise for better error handling
         return new Promise((resolve, reject) => {
             console.log('🎯 Promise created, calling Cafe24 API...');
             
             this.cafe24API.addCart(
                 'A0000',
-                'C',
-                [product],
+                product.prepaid_shipping_fee,
+                [productObject],
                 function(err, res) {
                     if (err) {
                         console.error('❌ Failed to add product to cart:', err);
