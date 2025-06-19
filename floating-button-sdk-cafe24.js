@@ -156,17 +156,21 @@ class FloatingButton {
                             this.cafe24UserId = res.id['guest_id'];
                         }
 
-                        // Fetch additional data
-                        return Promise.all([
-                            this.fetchChatUserId(this.cafe24UserId),
-                            this.fetchChatbotData(this.partnerId),
-                            this.fetchFloatingData(this.partnerId)
-                        ]);
+                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
+                        return this.fetchChatUserId(this.cafe24UserId);
                     })
-                    .then(([chatUserId, chatbotData, floatingData]) => {
+                    .then(chatUserId => {
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+
+                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
+                        return Promise.all([
+                            this.fetchChatbotData(this.partnerId, chatUserId),
+                            this.fetchFloatingData(this.partnerId, chatUserId)
+                        ]);
+                    })
+                    .then(([chatbotData, floatingData]) => {
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
@@ -770,9 +774,10 @@ class FloatingButton {
         }
     }
 
-    async fetchChatbotData(partnerId) {
+    async fetchChatbotData(partnerId, chatUserId) {
+        console.log('fetchChatbotData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${this.chatUserId}`, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -783,10 +788,11 @@ class FloatingButton {
         }
     }
 
-    async fetchFloatingData(partnerId) {
+    async fetchFloatingData(partnerId, chatUserId) {
+        console.log('fetchFloatingData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${this.chatUserId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
