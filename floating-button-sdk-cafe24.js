@@ -166,8 +166,8 @@ class FloatingButton {
 
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
-                            this.fetchChatbotData(this.partnerId),
-                            this.fetchFloatingData(this.partnerId)
+                            this.fetchChatbotData(this.partnerId, chatUserId),
+                            this.fetchFloatingData(this.partnerId, chatUserId)
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
@@ -774,9 +774,9 @@ class FloatingButton {
         }
     }
 
-    async fetchChatbotData(partnerId) {
+    async fetchChatbotData(partnerId, chatUserId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${this.chatUserId}`, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -787,10 +787,10 @@ class FloatingButton {
         }
     }
 
-    async fetchFloatingData(partnerId) {
+    async fetchFloatingData(partnerId, chatUserId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${this.chatUserId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
