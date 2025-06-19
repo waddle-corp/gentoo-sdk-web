@@ -772,7 +772,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}`, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${this.chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -786,7 +786,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${this.chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
