@@ -34,6 +34,7 @@ class FloatingButton {
         }
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
+        if (this.partnerId === '67f487a8db6583cc1d270858') this.partnerId = '677c96df903d570bb95ace04';
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
@@ -86,21 +87,21 @@ class FloatingButton {
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
-        } else if (window.location.hostname === "demo.gentooai.com") {
-            this.hostSrc = "https://demo.gentooai.com";
-            this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else {
+        } else if (this.partnerId === '677c96df903d570bb95ace04') {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
                 log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        } else {
+            this.hostSrc = "https://demo.gentooai.com";
+            this.domains = {
+                auth: "https://api.gentooai.com/chat/api/v1/user",
+                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
             };
         }
 
@@ -378,7 +379,7 @@ class FloatingButton {
                         ) {
                             this.floatingContainer.removeChild(this.expandedButton);
                         }
-                    }, 70000);
+                    }, 7000);
                 }
             }
         }
@@ -738,11 +739,12 @@ class FloatingButton {
 
     async fetchChatUserId(userToken, udid = "") {
         const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        console.log('this.chatUserId', userToken, userToken.includes('guest'));
         const params = {
             externalKey: String(this.partnerId),
             userToken: convertedUserToken,
             udid: String(udid),
-            chatUserId: this.chatUserId ? String(this.chatUserId) : null
+            chatUserId: this.chatUserId && !userToken.includes('guest') ? String(this.chatUserId) : null
         }
 
         try {
@@ -1128,8 +1130,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope

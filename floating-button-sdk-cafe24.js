@@ -1183,8 +1183,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
