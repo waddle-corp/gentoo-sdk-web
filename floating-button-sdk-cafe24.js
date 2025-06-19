@@ -775,6 +775,7 @@ class FloatingButton {
     }
 
     async fetchChatbotData(partnerId, chatUserId) {
+        console.log('fetchChatbotData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${chatUserId}`, {
                 method: "GET",
@@ -788,6 +789,7 @@ class FloatingButton {
     }
 
     async fetchFloatingData(partnerId, chatUserId) {
+        console.log('fetchFloatingData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(
                 `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${chatUserId}`,
