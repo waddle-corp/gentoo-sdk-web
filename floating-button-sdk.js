@@ -70,7 +70,8 @@ class FloatingButton {
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1"
+            window.location.hostname === "127.0.0.1" ||
+            window.location.hostname === "localhost:3000"
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
@@ -1130,8 +1131,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
