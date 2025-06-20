@@ -67,10 +67,12 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1"
+            window.location.hostname === "127.0.0.1" ||
+            window.location.hostname === "localhost"
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
@@ -766,7 +768,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${this.chatUserId}`, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${this.chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -780,7 +782,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${this.chatUserId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${this.chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -1130,8 +1132,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope

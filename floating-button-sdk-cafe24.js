@@ -777,7 +777,7 @@ class FloatingButton {
     async fetchChatbotData(partnerId, chatUserId) {
         console.log('fetchChatbotData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}?userId=${chatUserId}`, {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -792,7 +792,7 @@ class FloatingButton {
         console.log('fetchFloatingData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&userId=${chatUserId}`,
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
@@ -1189,8 +1189,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
     // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
