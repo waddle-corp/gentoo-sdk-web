@@ -82,8 +82,8 @@ class FloatingButton {
             };
         } else if (
             window.location.hostname === "stage-demo.gentooai.com" ||
-            window.location.hostname === "localhost" ||
-            window.location.hostname === "gentoo-demo-shop-template.lovable.app"
+            window.location.hostname === "localhost"
+            // || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
         ) {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
