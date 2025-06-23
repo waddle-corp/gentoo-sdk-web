@@ -71,7 +71,8 @@ class FloatingButton {
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1"
+            window.location.hostname === "127.0.0.1" ||
+            window.location.hostname === "localhost"
             
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
@@ -82,8 +83,6 @@ class FloatingButton {
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else if (window.location.hostname === "stage-demo.gentooai.com"
-            || window.location.hostname === "localhost"
-            || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
         ) {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
