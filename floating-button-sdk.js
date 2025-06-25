@@ -81,8 +81,7 @@ class FloatingButton {
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else if (
-            window.location.hostname === "stage-demo.gentooai.com" ||
-            window.location.hostname === "localhost"
+            window.location.hostname === "stage-demo.gentooai.com"
             // || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
         ) {
             this.hostSrc = "https://stage-demo.gentooai.com";
