@@ -71,8 +71,7 @@ class FloatingButton {
         if (
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1" ||
-            window.location.hostname === "localhost"
+            window.location.hostname === "127.0.0.1" 
         ) {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
@@ -81,21 +80,17 @@ class FloatingButton {
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
-        } else if (window.location.hostname === "stage-demo.gentooai.com") {
+        } else if (
+            window.location.hostname === "stage-demo.gentooai.com" ||
+            window.location.hostname === "localhost"
+            // || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
+        ) {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
                 auth: "https://stage-api.gentooai.com/chat/api/v1/user",
                 log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else if (this.partnerId === '677c96df903d570bb95ace04') {
-            this.hostSrc = "https://dev-demo.gentooai.com";
-            this.domains = {
-                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
