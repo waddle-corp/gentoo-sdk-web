@@ -744,7 +744,6 @@ class FloatingButton {
 
     async fetchChatUserId(userToken, udid = "") {
         const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        console.log('this.chatUserId', userToken, userToken.includes('guest'));
         const params = {
             externalKey: String(this.partnerId),
             userToken: convertedUserToken,
@@ -1135,8 +1134,8 @@ window.FloatingButton = FloatingButton;
     }
 
     // // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
     // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
