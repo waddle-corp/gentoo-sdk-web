@@ -203,7 +203,7 @@ class FloatingButton {
         }
 
         window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
+        this.customButton = isCustomButton ? (document.getElementById('gentoo-custom-button') || document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
