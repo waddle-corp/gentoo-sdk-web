@@ -176,17 +176,23 @@ class FloatingButton {
                         this.partnerId = partnerId;
                         if (ref) {
                             console.log('ref', ref);
-                            const data = JSON.stringify({
-                                eventCategory: "ReferrerOrigin",
-                                partnerId: this.partnerId,
-                                chatUserId: 'selenTest',
-                                products: [],
-                                referrerOrigin: ref,
-                            });
-                            const blob = new Blob([data], { type: 'application/json' });
+                            // const data = JSON.stringify({
+                            //     eventCategory: "ReferrerOrigin",
+                            //     partnerId: this.partnerId,
+                            //     chatUserId: 'selenTest',
+                            //     products: [],
+                            //     referrerOrigin: ref,
+                            // });
+                            // const blob = new Blob([data], { type: 'application/json' });
                             navigator.sendBeacon(
-                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent/${partnerId}`,
-                                blob
+                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
+                                JSON.stringify({
+                                    eventCategory: "ReferrerOrigin",
+                                    partnerId: this.partnerId,
+                                    chatUserId: 'selenTest',
+                                    products: [],
+                                    referrerOrigin: ref,
+                                })
                             );
                         }
 
