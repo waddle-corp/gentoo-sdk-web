@@ -123,40 +123,34 @@ class FloatingButton {
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
-            (function getOrSetSessionSource() {
-                const ref = document.referrer;
-                if (ref) {
-                    console.log('ref', ref);
-                }
-              })();
-
+            const ref = document.referrer;
             (function attachScrollTracker() {
                 /** 간단한 throttle 유틸 – 1초당 한 번만 실행 */
                 function throttle(fn, wait = 1000) {
-                  let last = 0;
-                  return (...args) => {
-                    const now = Date.now();
-                    if (now - last >= wait) {
-                      last = now;
-                      fn(...args);
-                    }
-                  };
+                    let last = 0;
+                    return (...args) => {
+                        const now = Date.now();
+                        if (now - last >= wait) {
+                            last = now;
+                            fn(...args);
+                        }
+                    };
                 }
-              
+
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
-                  const y = window.scrollY || document.documentElement.scrollTop;
-                  console.log('y', y);
-                }, 500);
-              
+                    const y = window.scrollY || document.documentElement.scrollTop;
+                    console.log('y', y);
+                }, 100);
+
                 /** passive:true → 스크롤 성능 보호 */
                 window.addEventListener('scroll', onScroll, { passive: true });
-              
+
                 /** SDK가 언마운트될 때 정리(선택) */
                 window.GentooCleanup = () => {
-                  window.removeEventListener('scroll', onScroll);
+                    window.removeEventListener('scroll', onScroll);
                 };
-              })();
+            })();
 
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
@@ -170,6 +164,19 @@ class FloatingButton {
                                 console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
                                 innerReject(err);
                             } else {
+                                if (ref) {
+                                    console.log('ref', ref);
+                                    navigator.sendBeacon(
+                                        `https://dev-api.gentooai.com/chat/api/v1/event/userEvent/${res}`,
+                                        JSON.stringify({
+                                            eventCategory: "ReferrerOrigin",
+                                            partnerId: this.partnerId,
+                                            chatUserId: 'selenTest',
+                                            products: [],
+                                            referrerOrigin: ref,
+                                        })
+                                    );
+                                }
                                 innerResolve(res);
                             }
                         });
