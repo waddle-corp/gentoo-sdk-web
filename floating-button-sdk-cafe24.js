@@ -124,22 +124,12 @@ class FloatingButton {
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             function getOrSetSessionSource() {
-                // ① 이미 잡아 둔 값이 있으면 재사용
-                const cached = sessionStorage.getItem('sessionSource');
-                if (cached) return cached;
               
                 // ② 새로 계산
                 const ref = document.referrer;
-                let source = 'direct';
-                if (ref) {
-                  const host = new URL(ref).hostname.replace(/^www\./, '');
-                  if (/google\./.test(host))      source = 'google organic';
-                  else if (/bing\./.test(host))   source = 'bing organic';
-                  else                            source = host; // 기타 사이트
-                }
               
                 // ③ 세션 동안 유지
-                sessionStorage.setItem('sessionSource', source);
+                sessionStorage.setItem('sessionSource', ref);
                 return source;
               }
 
