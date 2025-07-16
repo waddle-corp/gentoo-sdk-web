@@ -123,6 +123,13 @@ class FloatingButton {
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
+            (function getOrSetSessionSource() {
+                const ref = document.referrer;
+                if (ref) {
+                    console.log('ref', ref);
+                }
+              })();
+
             (function attachScrollTracker() {
                 /** 간단한 throttle 유틸 – 1초당 한 번만 실행 */
                 function throttle(fn, wait = 1000) {
@@ -140,7 +147,7 @@ class FloatingButton {
                 const onScroll = throttle(() => {
                   const y = window.scrollY || document.documentElement.scrollTop;
                   console.log('y', y);
-                }, 1000);
+                }, 500);
               
                 /** passive:true → 스크롤 성능 보호 */
                 window.addEventListener('scroll', onScroll, { passive: true });
