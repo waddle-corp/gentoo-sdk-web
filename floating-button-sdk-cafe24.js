@@ -9,7 +9,7 @@ class FloatingButton {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
-            '*.myshopify.com',  
+            '*.myshopify.com',
         ];
 
         // console.log("API:", apiDomain, "HOST:", hostSrc);
@@ -29,8 +29,8 @@ class FloatingButton {
         // Check for existing SDK elements 
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created'; 
-            return; 
+            window.__GentooInited = 'created';
+            return;
         }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
@@ -124,22 +124,20 @@ class FloatingButton {
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             function getOrSetSessionSource() {
-              
-                // ② 새로 계산
                 const ref = document.referrer;
-              
-                // ③ 세션 동안 유지
-                sessionStorage.setItem('sessionSource', ref);
-                return source;
-              }
+                if (ref) {
+                    sessionStorage.setItem('sessionSource', ref);
+                }
+                return ref;
+            }
 
-              const sessionSource = getOrSetSessionSource();
-              console.log('sessionSource', sessionSource);
+            const sessionSource = getOrSetSessionSource();
+            console.log('sessionSource', sessionSource);
 
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
                 this.cafe24API = CAFE24API;
-                
+
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
                     return new Promise((innerResolve, innerReject) => {
@@ -208,7 +206,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        
+
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
         if (isInIframe && !isAllowedDomain) {
@@ -255,14 +253,14 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements( position, showGentooButton, isCustomButton = false ) {
+    createUIElements(position, showGentooButton, isCustomButton = false) {
         // Check if any SDK elements exist in document
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping creation.");
             window.__GentooInited = 'created';
             return;
         }
-        
+
         window.__GentooInited = 'creating';
         this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
@@ -288,7 +286,7 @@ class FloatingButton {
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
-        
+
         this.chatHeader = document.createElement("div");
         this.chatHandler = document.createElement("div");
         this.chatHeaderText = document.createElement("p");
@@ -371,7 +369,7 @@ class FloatingButton {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
-            
+
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
@@ -388,7 +386,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -396,16 +394,16 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    this.expandedButton.className = 
+                    this.expandedButton.className =
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area-md" :
-                        "expanded-area-md expanded-area-neutral-md";
+                            "expanded-area-md" :
+                            "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
-                    this.expandedButton.className = 
+                    this.expandedButton.className =
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area" :
-                        "expanded-area expanded-area-neutral";
+                            "expanded-area" :
+                            "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
                 }
                 this.expandedButton.appendChild(this.expandedText);
@@ -479,7 +477,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            
+
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.classList.add('hide');
@@ -535,7 +533,7 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl });
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -568,15 +566,15 @@ class FloatingButton {
             // }
         });
 
-        this.floatingContainer?.addEventListener("click",buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -610,7 +608,7 @@ class FloatingButton {
         this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
-        if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
+        if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -622,7 +620,7 @@ class FloatingButton {
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        }, {passive: true});
+        }, { passive: true });
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -833,20 +831,20 @@ class FloatingButton {
         }
     }
 
-    async addProductToCart(product) {        
+    async addProductToCart(product) {
         if (!this.cafe24API) {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-        
+
         const productObject = {
-            product_no : product.product_no,
-            variants_code : product.variants_code,
-            quantity : product.quantity,
+            product_no: product.product_no,
+            variants_code: product.variants_code,
+            quantity: product.quantity,
         }
 
         // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {            
+        return new Promise((resolve, reject) => {
             this.cafe24API.addCart(
                 'A0000',
                 product.prepaid_shipping_fee,
@@ -857,7 +855,7 @@ class FloatingButton {
                         reject(err);
                     } else {
                         console.log('Product added to cart successfully:', res);
-                        this.sendPostMessageHandler({addedProductToCart: true});
+                        this.sendPostMessageHandler({ addedProductToCart: true });
                         resolve(res);
                     }
                 }
@@ -882,7 +880,7 @@ class FloatingButton {
     // Function to inject viewport meta tag
     injectViewport() {
         if (this.viewportInjected) return;
-        
+
         try {
             // Check for existing viewport meta tag
             const existingViewport = document.querySelector('meta[name="viewport"]');
@@ -905,7 +903,7 @@ class FloatingButton {
     // Function to delete viewport meta tag
     deleteViewport() {
         if (!this.viewportInjected) return;
-        
+
         try {
             const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
             if (meta) {
@@ -1000,7 +998,7 @@ class FloatingButton {
             products: [],
         });
 
-        this.sendPostMessageHandler({enableMode: mode});
+        this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
@@ -1049,35 +1047,35 @@ class FloatingButton {
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
         const isInIframe = window !== window.top;
-        
+
         // 현재 document의 SDK set 
         const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-        
+
         if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
             return true;
         }
-        
+
         if (isInIframe) {
             try {
                 if (window.top.document) {
                     if (window.top.__GentooInited !== null && window.top.__GentooInited !== undefined) {
                         return true;
                     }
-                    
+
                     // 부모 document의 SDK set 
                     const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
                     const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
                     const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-                    
+
                     return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");
             }
         }
-        
+
         return false;
     }
 
@@ -1085,17 +1083,17 @@ class FloatingButton {
         if (this.allowedDomainsForIframe.includes(hostname)) {
             return true;
         }
-        
+
         // Check wildcard patterns
         for (const pattern of this.allowedDomainsForIframe) {
             if (pattern.startsWith('*.')) {
-                const domain = pattern.substring(2); 
+                const domain = pattern.substring(2);
                 if (hostname.endsWith('.' + domain) || hostname === domain) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -1103,7 +1101,7 @@ class FloatingButton {
         if (this.isAllowedDomainPattern(window.location.hostname)) {
             return true;
         }
-        
+
         if (window !== window.top) {
             try {
                 const parentDomain = window.top.location.hostname;
@@ -1133,7 +1131,7 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product') && !urlString.includes('/product/list') ) { this.displayLocation = 'PRODUCT_DETAIL' }
+        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
         try {
