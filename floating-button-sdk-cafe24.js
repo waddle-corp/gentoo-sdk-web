@@ -164,19 +164,6 @@ class FloatingButton {
                                 console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
                                 innerReject(err);
                             } else {
-                                if (ref) {
-                                    console.log('ref', ref);
-                                    navigator.sendBeacon(
-                                        `https://dev-api.gentooai.com/chat/api/v1/event/userEvent/${res}`,
-                                        JSON.stringify({
-                                            eventCategory: "ReferrerOrigin",
-                                            partnerId: this.partnerId,
-                                            chatUserId: 'selenTest',
-                                            products: [],
-                                            referrerOrigin: ref,
-                                        })
-                                    );
-                                }
                                 innerResolve(res);
                             }
                         });
@@ -187,6 +174,19 @@ class FloatingButton {
                 this.fetchPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
+                        if (ref) {
+                            console.log('ref', ref);
+                            navigator.sendBeacon(
+                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent/${partnerId}`,
+                                JSON.stringify({
+                                    eventCategory: "ReferrerOrigin",
+                                    partnerId: this.partnerId,
+                                    chatUserId: 'selenTest',
+                                    products: [],
+                                    referrerOrigin: ref,
+                                })
+                            );
+                        }
 
                         // Then get customer ID
                         return getCustomerIDInfoPromise();
