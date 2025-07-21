@@ -11,8 +11,6 @@ class Logger {
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.displayLocation;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.hostSrc;
-        this.domains;
         this.isInitialized = false;  // Add flag to track initialization
         this.itemId = this.getProductNo();
         this.cafe24UserId = null;
@@ -25,40 +23,6 @@ class Logger {
         // cafe24 Gentoo-prod App
         this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
         this.cafe24Version = '2024-09-01';
-
-        if (window.location.hostname === 'localhost') {
-            this.hostSrc = 'http://localhost:3000';
-            this.domains = {
-                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
-                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent2',
-                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
-            }
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
-            this.hostSrc = 'https://dev-demo.gentooai.com';
-            this.domains = {
-                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
-                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent2',
-                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
-                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
-            }
-        } else if (window.location.hostname === "stage-demo.gentooai.com") {
-            this.hostSrc = "https://stage-demo.gentooai.com";
-            this.domains = {
-                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent2",
-                partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
-                cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
-            };
-        } else {
-            this.hostSrc = 'https://demo.gentooai.com';
-            this.domains = {
-                auth: 'https://api.gentooai.com/chat/api/v1/user',
-                log: 'https://api.gentooai.com/chat/api/v1/event/userEvent2',
-                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
-                cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
-            }
-        }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -259,7 +223,7 @@ class Logger {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -284,7 +248,7 @@ class Logger {
         }
 
         try {
-            const url = `${this.domains.auth}`;
+            const url = `${process.env.API_CHAT_BASE_URL}${process.env.API_AUTH_CAFE24_ENDPOINT}`;
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -302,7 +266,7 @@ class Logger {
 
     async fetchPartnerId(mallId) {
         try {
-            const url = `${this.domains.partnerId}/${mallId}`;
+            const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_PARTNERID_ENDPOINT}/${mallId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {}

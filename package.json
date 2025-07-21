@@ -5,9 +5,9 @@
     "build:floating:dev": "cross-env SDK_ENV=dev webpack --config webpack.floating.config.js",
     "build:floating:stage": "cross-env SDK_ENV=stage webpack --config webpack.floating.config.js",
     "build:floating:prod": "cross-env SDK_ENV=prod webpack --config webpack.floating.config.js",
-    "build:logger:dev": "cross-env SDK_ENV=dev webpack --config webpack.logger.config.js",
-    "build:logger:stage": "cross-env SDK_ENV=stage webpack --config webpack.logger.config.js",
-    "build:logger:prod": "cross-env SDK_ENV=prod webpack --config webpack.logger.config.js"
+    "build:logger:dev": "cross-env SDK_ENV=dev webpack --config webpack.logger.config.js --mode development",
+    "build:logger:stage": "cross-env SDK_ENV=stage webpack --config webpack.logger.config.js --mode development",
+    "build:logger:prod": "cross-env SDK_ENV=prod webpack --config webpack.logger.config.js --mode production"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.42.0",
