@@ -137,7 +137,7 @@ class Logger {
                             pageLocation: window.location.href,
                         };
 
-                        if (window.location.host !== ref) {
+                        if (ref && !ref.includes(window.location.host)) {
                             console.log('ref', ref, 'window.location.host', window.location.host);
                             payload.referrerOrigin = ref;
                         }
