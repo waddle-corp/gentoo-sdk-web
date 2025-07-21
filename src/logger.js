@@ -32,7 +32,7 @@ class Logger {
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             const ref = document.referrer;
-            (function attachScrollTracker() {
+            const attachScrollTracker = () => {
                 /** 간단한 throttle 유틸 – 1초당 한 번만 실행 */
                 function throttle(fn, wait = 1000) {
                     let last = 0;
@@ -77,7 +77,8 @@ class Logger {
                 window.GentooCleanup = () => {
                     window.removeEventListener('scroll', onScroll);
                 };
-            })();
+            };
+            attachScrollTracker();
 
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
