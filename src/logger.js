@@ -326,32 +326,72 @@ class Logger {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        const url = new URL(urlString);
-        const path = url.pathname;
+        // const url = new URL(urlString);
+        // const path = url.pathname;
 
-        // displayLocation parsing
-        if (
-          path === '/' ||
-          path === '/index.html' ||
-          path.replace(/\/$/, '') === '' // (빈 path)
-        ) {
-          this.displayLocation = 'HOME';
-        }
-        else if (path.includes('/product') && !path.includes('/product/list')) {
-          this.displayLocation = 'PRODUCT_DETAIL';
-        }
-        else if (path.includes('/category') || path.includes('/product/list')) {
-          this.displayLocation = 'PRODUCT_LIST';
-        }
-        else if (path.includes('/search')) {
-          this.displayLocation = 'SEARCH';
-        }
-        else {
-          this.displayLocation = 'UNDEFINED_LOCATION';
-        }
+        // // displayLocation parsing
+        // if (
+        //   path === '/' ||
+        //   path === '/index.html' ||
+        //   path.replace(/\/$/, '') === '' // (빈 path)
+        // ) {
+        //   this.displayLocation = 'HOME';
+        // }
+        // else if (path.includes('/product') && !path.includes('/product/list')) {
+        //   this.displayLocation = 'PRODUCT_DETAIL';
+        // }
+        // else if (path.includes('/category') || path.includes('/product/list')) {
+        //   this.displayLocation = 'PRODUCT_LIST';
+        // }
+        // else if (path.includes('/search')) {
+        //   this.displayLocation = 'PRODUCT_SEARCH';
+        // }
+        // else {
+        //   this.displayLocation = 'UNDEFINED_LOCATION';
+        // }
+        // try {
+        //     // URL 객체 생성
+        //     // const url = new URL(urlString);
+
+        //     // 1. 쿼리 파라미터에서 product_no 추출 시도
+        //     const productNoFromQuery = url.searchParams.get('product_no');
+        //     if (productNoFromQuery) {
+        //         return productNoFromQuery;
+        //     }
+
+        //     // 2. 경로 기반 URL에서 product_no 추출 시도
+        //     // const path = url.pathname;
+
+        //     /**
+        //      * 고려가 필요한 cafe24 경로 패턴
+        //         /product/{product_name}/{product_no}
+        //         /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
+        //         /{shop_no}/product/{product_name}/{product_no}
+        //      */
+
+        //     /**
+        //      * 정규 표현식 설명:
+        //         (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
+        //         \/product\/	/product/ 고정
+        //         [^\/]+	product_name
+        //         \/([^\/]+)	✅ 캡처할 product_no
+        //         (?:\/category/...)?	🔹 optional category/display path
+        //      */
+        //     const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
+
+        //     const match = path.match(regex);
+        //     if (match && match[1]) {
+        //         return match[1]; // product_no
+        //     }
+
+        //     // 3. 찾을 수 없는 경우 null 반환
+        //     return null;
+        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
+        else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
-            // const url = new URL(urlString);
+            const url = new URL(urlString);
 
             // 1. 쿼리 파라미터에서 product_no 추출 시도
             const productNoFromQuery = url.searchParams.get('product_no');
@@ -360,7 +400,7 @@ class Logger {
             }
 
             // 2. 경로 기반 URL에서 product_no 추출 시도
-            // const path = url.pathname;
+            const path = url.pathname;
 
             /**
              * 고려가 필요한 cafe24 경로 패턴
