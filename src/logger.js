@@ -337,7 +337,7 @@ class Logger {
         ) {
           this.displayLocation = 'HOME';
         }
-        else if (path.includes('/product') && !path.includes('/product/list')) {
+        else if (path.includes('/product') && !path.includes('/product/list') && !path.includes('/search')) {
           this.displayLocation = 'PRODUCT_DETAIL';
         }
         else if (path.includes('/category') || path.includes('/product/list')) {
