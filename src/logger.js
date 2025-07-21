@@ -48,7 +48,24 @@ class Logger {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                    console.log('y', y);
+                    console.log('scrollTop', y);
+                    navigator.sendBeacon(
+                        `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
+                        JSON.stringify({
+                            eventCategory: "Scroll",
+                            sessionId: this.sessionId,
+                            partnerId: this.partnerId,
+                            chatUserId: this.chatUserId,
+                            userId: this.cafe24MemberId,
+                            guestId: this.cafe24GuestId,
+                            displayLocation: this.displayLocation,
+                            pageLocation: window.location.href,
+                            scrollTop: y,
+                            documentHeight: document.documentElement.scrollHeight,
+                            viewportHeight: window.innerHeight,
+                            scrollPercentage: y / (document.documentElement.scrollHeight - window.innerHeight),
+                        })
+                    );
                 }, 100);
 
                 /** passive:true → 스크롤 성능 보호 */
