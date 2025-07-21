@@ -5,10 +5,10 @@ const dotenv = require('dotenv');
 module.exports = (env, argv) => {
   const mode = argv.mode || 'development';
   const envFile = mode === 'development' ? '.env.development' : '.env.production';
-  const envVars = dotenv.config({ path: envFile });
+  const envVars = dotenv.config({ path: envFile }).parsed || {};
 
   const envKeys = Object.keys(envVars).reduce((prev, next) => {
-    prev[`process.env.${next}`] = JSON.stringify(envVars[next]);
+    prev[`process.env.${next}`] = JSON.stringify(envVars[next] || '');
     return prev;
   }, {});
 
