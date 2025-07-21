@@ -16,6 +16,11 @@ class Logger {
         this.cafe24UserId = null;
         this.cafe24MemberId = null;
         this.cafe24GuestId = null;
+        this.sessionId = `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        if (!this.gentooSessionData?.sessionId) {
+            this.gentooSessionData.sessionId = this.sessionId;
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        }
 
         /* // cafe24 Gentoo-dev App
         this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
@@ -101,7 +106,7 @@ class Logger {
                         if (ref) {
                             console.log('ref', ref);
                             navigator.sendBeacon(
-                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
+                                `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
                                 JSON.stringify({
                                     eventCategory: "ReferrerOrigin",
                                     partnerId: this.partnerId,
