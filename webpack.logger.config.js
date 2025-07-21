@@ -7,8 +7,8 @@ module.exports = (env, argv) => {
   const envFile = mode === 'development' ? '.env.development' : '.env.production';
   const envVars = dotenv.config({ path: envFile });
 
-  const envKeys = Object.keys(env).reduce((prev, next) => {
-    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  const envKeys = Object.keys(envVars).reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(envVars[next]);
     return prev;
   }, {});
 
