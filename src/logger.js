@@ -16,7 +16,7 @@ class Logger {
         this.cafe24UserId = null;
         this.cafe24MemberId = null;
         this.cafe24GuestId = null;
-        this.sessionId = `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
         if (!this.gentooSessionData?.sessionId) {
             this.gentooSessionData.sessionId = this.sessionId;
             sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -104,16 +104,17 @@ class Logger {
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
 
                         if (ref) {
-                            console.log('ref', ref);
                             navigator.sendBeacon(
                                 `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
                                 JSON.stringify({
                                     eventCategory: "ReferrerOrigin",
+                                    sessionId: this.sessionId,
                                     partnerId: this.partnerId,
                                     chatUserId: this.chatUserId,
                                     userId: this.cafe24MemberId,
                                     guestId: this.cafe24GuestId,
-                                    products: [],
+                                    displayLocation: this.displayLocation,
+                                    pageLocation: window.location.href,
                                     referrerOrigin: ref,
                                 })
                             );
@@ -325,12 +326,32 @@ class Logger {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else { this.displayLocation = 'HOME' }
+        const url = new URL(urlString);
+        const path = url.pathname;
+
+        // displayLocation parsing
+        if (
+          path === '/' ||
+          path === '/index.html' ||
+          path.replace(/\/$/, '') === '' // (빈 path)
+        ) {
+          this.displayLocation = 'HOME';
+        }
+        else if (path.includes('/product') && !path.includes('/product/list')) {
+          this.displayLocation = 'PRODUCT_DETAIL';
+        }
+        else if (path.includes('/category') || path.includes('/product/list')) {
+          this.displayLocation = 'PRODUCT_LIST';
+        }
+        else if (path.includes('/search')) {
+          this.displayLocation = 'SEARCH';
+        }
+        else {
+          this.displayLocation = 'UNDEFINED_LOCATION';
+        }
         try {
             // URL 객체 생성
-            const url = new URL(urlString);
+            // const url = new URL(urlString);
 
             // 1. 쿼리 파라미터에서 product_no 추출 시도
             const productNoFromQuery = url.searchParams.get('product_no');
@@ -339,7 +360,7 @@ class Logger {
             }
 
             // 2. 경로 기반 URL에서 product_no 추출 시도
-            const path = url.pathname;
+            // const path = url.pathname;
 
             /**
              * 고려가 필요한 cafe24 경로 패턴
