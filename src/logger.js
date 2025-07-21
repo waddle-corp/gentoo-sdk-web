@@ -13,6 +13,7 @@ class Logger {
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         this.isInitialized = false;  // Add flag to track initialization
         this.itemId = this.getProductNo();
+        this.searchKeyword = this.getSearchKeyword();
         this.cafe24UserId = null;
         this.cafe24MemberId = null;
         this.cafe24GuestId = null;
@@ -80,6 +81,8 @@ class Logger {
             };
             attachScrollTracker();
 
+            
+
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
                 this.cafe24API = CAFE24API;
@@ -122,21 +125,31 @@ class Logger {
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                        
+                        var payload = {
+                            eventCategory: "PageTransition",
+                            sessionId: this.sessionId,
+                            partnerId: this.partnerId,
+                            chatUserId: this.chatUserId,
+                            userId: this.cafe24MemberId,
+                            guestId: this.cafe24GuestId,
+                            displayLocation: this.displayLocation,
+                            pageLocation: window.location.href,
+                        };
+
+                        if (window.location.host !== ref) {
+                            console.log('ref', ref, 'window.location.host', window.location.host);
+                            payload.referrerOrigin = ref;
+                        }
+
+                        if (this.searchKeyword) {
+                            payload.searchKeyword = this.searchKeyword;
+                        }
 
                         if (ref) {
                             navigator.sendBeacon(
                                 `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
-                                JSON.stringify({
-                                    eventCategory: "ReferrerOrigin",
-                                    sessionId: this.sessionId,
-                                    partnerId: this.partnerId,
-                                    chatUserId: this.chatUserId,
-                                    userId: this.cafe24MemberId,
-                                    guestId: this.cafe24GuestId,
-                                    displayLocation: this.displayLocation,
-                                    pageLocation: window.location.href,
-                                    referrerOrigin: ref,
-                                })
+                                JSON.stringify(payload)
                             );
                         }
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
@@ -410,6 +423,12 @@ class Logger {
             console.error('Invalid URL:', error);
             return null;
         }
+    }
+
+    getSearchKeyword() {
+        const url = new URL(window.location.href);
+        const searchParams = url.searchParams;
+        return searchParams.get('keyword') || null;
     }
 }
 
