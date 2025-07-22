@@ -24,6 +24,93 @@ class Logger {
             this.gentooSessionData.sessionId = this.sessionId;
             sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
         }
+
+        /* // cafe24 Gentoo-dev App
+        this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+        this.cafe24Version = '2024-09-01'; */
+        // cafe24 Gentoo-prod App
+        this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+        this.cafe24Version = '2024-09-01';
+
+        // cafe24 API init & fetch partnerId, chatUserId
+        ((CAFE24API) => {
+            // Store the CAFE24API instance for use in other methods
+            this.cafe24API = CAFE24API;
+
+            // Wrap CAFE24API methods in Promises
+            const getCustomerIDInfoPromise = () => {
+                return new Promise((innerResolve, innerReject) => {
+                    CAFE24API.getCustomerIDInfo((err, res) => {
+                        if (err) {
+                            console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                            innerReject(err);
+                        } else {
+                            innerResolve(res);
+                        }
+                    });
+                });
+            };
+
+            // Fetch partner ID first
+            this.fetchPartnerId(CAFE24API.MALL_ID)
+                .then(partnerId => {
+                    this.partnerId = partnerId;
+
+                    // Then get customer ID
+                    return getCustomerIDInfoPromise();
+                })
+                .then(res => {
+                    if (res.id.member_id) {
+                        this.cafe24UserId = res.id.member_id;
+                        this.cafe24MemberId = res.id.member_id;
+                    } else {
+                        this.cafe24UserId = res.id['guest_id'];
+                        this.cafe24GuestId = res.id['guest_id'];
+                    }
+
+                    // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
+                    return fetchChatUserId(this.cafe24UserId, "", this.partnerId, this.chatUserId)
+                })
+                .then(chatUserId => {
+                    this.chatUserId = chatUserId;
+                    this.gentooSessionData.cuid = chatUserId;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                    
+                    // var payload = {
+                    //     eventCategory: "PageTransition",
+                    //     sessionId: this.sessionId,
+                    //     partnerId: this.partnerId,
+                    //     chatUserId: this.chatUserId,
+                    //     userId: this.cafe24MemberId,
+                    //     guestId: this.cafe24GuestId,
+                    //     displayLocation: this.displayLocation,
+                    //     pageLocation: window.location.href,
+                    //     itemId: this.itemId,
+                    // };
+
+                    // if (ref) {
+                    //     navigator.sendBeacon(
+                    //         `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
+                    //         JSON.stringify(payload)
+                    //     );
+                    // }
+
+                    // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
+                    return Promise.all([
+                        // this.fetchChatbotData(this.partnerId, chatUserId),
+                        // this.fetchFloatingData(this.partnerId, chatUserId)
+                    ]);
+                })
+                .catch(error => {
+                    console.error('Initialization error:', error);
+                    reject(error);
+                });
+        })(CAFE24API.init({
+            client_id: this.cafe24ClientId,
+            version: this.cafe24Version
+        }));
+
+        // declare basic payload
         this.basicPayload = {
             sessionId: this.sessionId,
             partnerId: this.partnerId,
@@ -35,12 +122,17 @@ class Logger {
             itemId: this.itemId,
         }
 
-        /* // cafe24 Gentoo-dev App
-        this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
-        this.cafe24Version = '2024-09-01'; */
-        // cafe24 Gentoo-prod App
-        this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
-        this.cafe24Version = '2024-09-01';
+        // send event log
+        const ref = document.referrer;
+        if (ref && !ref.includes(window.location.host)) {
+            console.log('ref', ref, 'window.location.host', window.location.host);
+            // payload.referrerOrigin = ref;
+            sendEventLog("PageTransition", this.basicPayload, { referrerOrigin: ref });
+        } else if (this.searchKeyword) {
+            sendEventLog("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
+        } else {
+            sendEventLog("PageTransition", this.basicPayload);
+        }
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -98,95 +190,6 @@ class Logger {
                 };
             };
             attachScrollTracker();
-
-            
-
-            ((CAFE24API) => {
-                // Store the CAFE24API instance for use in other methods
-                this.cafe24API = CAFE24API;
-
-                // Wrap CAFE24API methods in Promises
-                const getCustomerIDInfoPromise = () => {
-                    return new Promise((innerResolve, innerReject) => {
-                        CAFE24API.getCustomerIDInfo((err, res) => {
-                            if (err) {
-                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                                innerReject(err);
-                            } else {
-                                innerResolve(res);
-                            }
-                        });
-                    });
-                };
-
-                // Fetch partner ID first
-                this.fetchPartnerId(CAFE24API.MALL_ID)
-                    .then(partnerId => {
-                        this.partnerId = partnerId;
-
-                        // Then get customer ID
-                        return getCustomerIDInfoPromise();
-                    })
-                    .then(res => {
-                        if (res.id.member_id) {
-                            this.cafe24UserId = res.id.member_id;
-                            this.cafe24MemberId = res.id.member_id;
-                        } else {
-                            this.cafe24UserId = res.id['guest_id'];
-                            this.cafe24GuestId = res.id['guest_id'];
-                        }
-
-                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return fetchChatUserId(this.cafe24UserId, "", this.partnerId, this.chatUserId)
-                    })
-                    .then(chatUserId => {
-                        this.chatUserId = chatUserId;
-                        this.gentooSessionData.cuid = chatUserId;
-                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                        
-                        // var payload = {
-                        //     eventCategory: "PageTransition",
-                        //     sessionId: this.sessionId,
-                        //     partnerId: this.partnerId,
-                        //     chatUserId: this.chatUserId,
-                        //     userId: this.cafe24MemberId,
-                        //     guestId: this.cafe24GuestId,
-                        //     displayLocation: this.displayLocation,
-                        //     pageLocation: window.location.href,
-                        //     itemId: this.itemId,
-                        // };
-
-                        if (ref && !ref.includes(window.location.host)) {
-                            console.log('ref', ref, 'window.location.host', window.location.host);
-                            // payload.referrerOrigin = ref;
-                            sendEventLog("PageTransition", this.basicPayload, { referrerOrigin: ref });
-                        } else if (this.searchKeyword) {
-                            sendEventLog("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
-                        } else {
-                            sendEventLog("PageTransition", this.basicPayload);
-                        }
-
-                        // if (ref) {
-                        //     navigator.sendBeacon(
-                        //         `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
-                        //         JSON.stringify(payload)
-                        //     );
-                        // }
-
-                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
-                        return Promise.all([
-                            // this.fetchChatbotData(this.partnerId, chatUserId),
-                            // this.fetchFloatingData(this.partnerId, chatUserId)
-                        ]);
-                    })
-                    .catch(error => {
-                        console.error('Initialization error:', error);
-                        reject(error);
-                    });
-            })(CAFE24API.init({
-                client_id: this.cafe24ClientId,
-                version: this.cafe24Version
-            }));
         });
     }
 
