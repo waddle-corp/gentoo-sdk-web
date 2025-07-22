@@ -19,8 +19,8 @@ module.exports = (env, argv) => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'gentooLogger.js',
-      library: 'gentooLogger',
+      filename: 'gentoo-logger.js',
+      library: 'gentoo-logger',
       libraryTarget: 'umd',
       clean: true,
     },

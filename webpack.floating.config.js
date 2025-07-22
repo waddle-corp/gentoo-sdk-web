@@ -4,12 +4,12 @@ const webpack = require('webpack');
 module.exports = {
   mode: 'development', // or 'development'
   entry: {
-    'gentooFloating': './src/gentoo-sdk.js',
+    'gentoo-floating-sdk': './src/gentoo-sdk.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'gentooFloating.js',
-    library: 'gentooFloating',
+    filename: 'floating-button-sdk.js',
+    library: 'gentoo-floating-sdk',
     libraryTarget: 'umd',
     clean: true,
   },

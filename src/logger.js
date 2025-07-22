@@ -1,3 +1,5 @@
+import { fetchChatUserId } from './apis/chatConfig';
+
 class Logger {
     constructor(props) {
         // Check for existing SDK elements 
@@ -21,6 +23,16 @@ class Logger {
         if (!this.gentooSessionData?.sessionId) {
             this.gentooSessionData.sessionId = this.sessionId;
             sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        }
+        this.basicPayload = {
+            sessionId: this.sessionId,
+            partnerId: this.partnerId,
+            chatUserId: this.chatUserId,
+            userId: this.cafe24MemberId,
+            guestId: this.cafe24GuestId,
+            displayLocation: this.displayLocation,
+            pageLocation: window.location.href,
+            itemId: this.itemId,
         }
 
         /* // cafe24 Gentoo-dev App
@@ -50,25 +62,31 @@ class Logger {
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
                     console.log('scrollTop', y);
-                    if (ref) {
-                        navigator.sendBeacon(
-                            `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
-                            JSON.stringify({
-                                eventCategory: "Scroll",
-                                sessionId: this.sessionId,
-                                partnerId: this.partnerId,
-                                chatUserId: this.chatUserId,
-                                userId: this.cafe24MemberId,
-                                guestId: this.cafe24GuestId,
-                                displayLocation: this.displayLocation,
-                                pageLocation: window.location.href,
-                                scrollTop: y,
-                                documentHeight: document.documentElement.scrollHeight,
-                                viewportHeight: window.innerHeight,
-                                scrollPercentage: y / (document.documentElement.scrollHeight - window.innerHeight),
-                            })
-                        );
-                    }
+                    // if (ref) {
+                    //     navigator.sendBeacon(
+                    //         `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
+                    //         JSON.stringify({
+                    //             eventCategory: "Scroll",
+                    //             sessionId: this.sessionId,
+                    //             partnerId: this.partnerId,
+                    //             chatUserId: this.chatUserId,
+                    //             userId: this.cafe24MemberId,
+                    //             guestId: this.cafe24GuestId,
+                    //             displayLocation: this.displayLocation,
+                    //             pageLocation: window.location.href,
+                    //             scrollTop: y,
+                    //             documentHeight: document.documentElement.scrollHeight,
+                    //             viewportHeight: window.innerHeight,
+                    //             scrollPercentage: y / (document.documentElement.scrollHeight - window.innerHeight),
+                    //         })
+                    //     );
+                    // }
+                    sendEventLog("Scroll", this.basicPayload, { 
+                        scrollTop: y, 
+                        documentHeight: document.documentElement.scrollHeight, 
+                        viewportHeight: window.innerHeight, 
+                        scrollPercentage: y / (document.documentElement.scrollHeight - window.innerHeight) * 100 
+                    });
                 }, 100);
 
                 /** passive:true → 스크롤 성능 보호 */
@@ -119,39 +137,42 @@ class Logger {
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return this.fetchChatUserId(this.cafe24UserId)
+                        return fetchChatUserId(this.cafe24UserId, "", this.partnerId, this.chatUserId)
                     })
                     .then(chatUserId => {
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                         
-                        var payload = {
-                            eventCategory: "PageTransition",
-                            sessionId: this.sessionId,
-                            partnerId: this.partnerId,
-                            chatUserId: this.chatUserId,
-                            userId: this.cafe24MemberId,
-                            guestId: this.cafe24GuestId,
-                            displayLocation: this.displayLocation,
-                            pageLocation: window.location.href,
-                        };
+                        // var payload = {
+                        //     eventCategory: "PageTransition",
+                        //     sessionId: this.sessionId,
+                        //     partnerId: this.partnerId,
+                        //     chatUserId: this.chatUserId,
+                        //     userId: this.cafe24MemberId,
+                        //     guestId: this.cafe24GuestId,
+                        //     displayLocation: this.displayLocation,
+                        //     pageLocation: window.location.href,
+                        //     itemId: this.itemId,
+                        // };
 
                         if (ref && !ref.includes(window.location.host)) {
                             console.log('ref', ref, 'window.location.host', window.location.host);
-                            payload.referrerOrigin = ref;
+                            // payload.referrerOrigin = ref;
+                            sendEventLog("PageTransition", this.basicPayload, { referrerOrigin: ref });
+                        } else if (this.searchKeyword) {
+                            sendEventLog("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
+                        } else {
+                            sendEventLog("PageTransition", this.basicPayload);
                         }
 
-                        if (this.searchKeyword) {
-                            payload.searchKeyword = this.searchKeyword;
-                        }
+                        // if (ref) {
+                        //     navigator.sendBeacon(
+                        //         `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
+                        //         JSON.stringify(payload)
+                        //     );
+                        // }
 
-                        if (ref) {
-                            navigator.sendBeacon(
-                                `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`,
-                                JSON.stringify(payload)
-                            );
-                        }
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
                             // this.fetchChatbotData(this.partnerId, chatUserId),
@@ -277,31 +298,31 @@ class Logger {
         }
     }
 
-    async fetchChatUserId(userToken, udid = "") {
-        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        const params = {
-            externalKey: String(this.partnerId),
-            userToken: convertedUserToken,
-            udid: String(udid),
-            chatUserId: this.chatUserId ? String(this.chatUserId) : null
-        }
+    // async fetchChatUserId(userToken, udid = "") {
+    //     const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    //     const params = {
+    //         externalKey: String(this.partnerId),
+    //         userToken: convertedUserToken,
+    //         udid: String(udid),
+    //         chatUserId: this.chatUserId ? String(this.chatUserId) : null
+    //     }
 
-        try {
-            const url = `${process.env.API_CHAT_BASE_URL}${process.env.API_AUTH_CAFE24_ENDPOINT}`;
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(params)
-            });
+    //     try {
+    //         const url = `${process.env.API_CHAT_BASE_URL}${process.env.API_AUTH_CAFE24_ENDPOINT}`;
+    //         const response = await fetch(url, {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(params)
+    //         });
 
-            const res = await response.json();
-            return res.chatUserId;
-        } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`)
-        }
-    }
+    //         const res = await response.json();
+    //         return res.chatUserId;
+    //     } catch (error) {
+    //         console.error(`Error while calling fetchChatUserId API: ${error}`)
+    //     }
+    // }
 
     async fetchPartnerId(mallId) {
         try {
