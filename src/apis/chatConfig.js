@@ -24,11 +24,11 @@ export async function fetchChatUserId(userToken, udid = "", partnerId, chatUserI
     }
 }
 
-export async function sendEventLog(eventCategory, basicPayload = {}, customPayload = {}) {
+export async function sendEventLog(event, basicPayload = {}, customPayload = {}) {
     // if (!customPayload.referrerOrigin) return;
     
     const payload = {
-        eventCategory,
+        event,
         ...basicPayload,
         ...customPayload,
     }
