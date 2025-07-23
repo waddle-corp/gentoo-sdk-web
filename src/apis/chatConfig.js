@@ -33,7 +33,7 @@ export async function sendEventLog(eventCategory, basicPayload = {}, customPaylo
         ...customPayload,
     }
 
-    const url = `${process.env.API_CHAT_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`;
+    const url = `${process.env.API_TRACKER_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`;
     navigator.sendBeacon(
         url,
         JSON.stringify(payload)
