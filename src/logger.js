@@ -3,11 +3,11 @@ import { fetchChatUserId, sendEventLog } from './apis/chatConfig';
 class Logger {
     constructor(props) {
         // Check for existing SDK elements 
-        if (this.checkSDKExists()) {
-            console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created';
+        if (window.__GentooLoggerInited !== null && window.__GentooLoggerInited !== undefined) {
+            console.warn("GentooLogger already exists in the document, skipping initialization.");
             return;
         }
+
         this.partnerType = props.partnerType || 'gentoo';
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
@@ -146,15 +146,14 @@ class Logger {
             };
             attachScrollTracker();
         });
+        window.__GentooLoggerInited = 'created';
     }
 
     async init() {
-        if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
+        if (window.__GentooLoggerInited !== null && window.__GentooLoggerInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-
-        window.__GentooInited = 'init';
 
         try {
             // Wait for boot process to complete
@@ -175,6 +174,8 @@ class Logger {
             console.error('Failed to initialize:', error);
             throw error;
         }
+
+        window.__GentooLoggerInited = 'init';
     }
 
     setupEventListeners(position) {
@@ -207,27 +208,21 @@ class Logger {
             }
         });
 
-        this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
-        this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
-        this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
-        this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        // this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        // this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        // this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
+        // this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
+        // this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
+        // this.closeActionArea?.addEventListener("click", buttonClickHandler);
+        // this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
+        // this.customButton?.addEventListener("click", buttonClickHandler);
+        // this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
             this.browserWidth = this.logWindowWidth();
             this.isSmallResolution = this.browserWidth < 601;
             this.updateFloatingContainerPosition(position); // Update position on resize
-        });
-
-        window?.addEventListener('popstate', () => {
-            if (this.isMobileDevice) {
-                this.hideChat();
-            }
         });
     }
 
@@ -268,41 +263,6 @@ class Logger {
         } catch (error) {
             console.error(`Error while calling fetchPartnerId API: ${error}`)
         }
-    }
-
-    // SDK가 이미 존재하는지 확인
-    checkSDKExists() {
-        const isInIframe = window !== window.top;
-
-        // 현재 document의 SDK set 
-        const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
-        const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
-        const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-
-        if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
-            return true;
-        }
-
-        if (isInIframe) {
-            try {
-                if (window.top.document) {
-                    if (window.top.__GentooInited !== null && window.top.__GentooInited !== undefined) {
-                        return true;
-                    }
-
-                    // 부모 document의 SDK set 
-                    const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
-                    const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
-                    const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-
-                    return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
-                }
-            } catch (e) {
-                console.warn("Cannot access parent document due to same-origin policy.");
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -432,20 +392,6 @@ window.GentooLogger = Logger;
                         });
                     }
                     break;
-                case "unmount":
-                    if (typeof logger.destroy === "function") {
-                        Promise.resolve(logger.destroy()).catch((error) => {
-                            console.error("Failed to unmount GentooLogger:", error);
-                        });
-                    }
-                    break;
-                case "sendLog":
-                    if (typeof logger.sendLog === "function") {
-                        Promise.resolve(logger.sendLog(params)).catch((error) => {
-                            console.error("Failed to send GentooLogger log:", error);
-                        });
-                    }
-                    break;
                 default:
                     console.error("GentooLogger: Unknown method", method);
             }
@@ -461,7 +407,7 @@ window.GentooLogger = Logger;
         }
     }
 
-    // Initialize or get existing GentooIO
+    // Initialize or get existing GentooLogger
     var existingGentooLogger = w.GentooLogger;
     w.GentooLogger = createQueueProcessor();
 
