@@ -2,7 +2,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 300;
-    src: url("/public/fonts/Pretendard-Light.woff") format("woff");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Light.woff") format("woff");
     /* light */
 }
 
@@ -10,7 +10,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 400;
-    src: url("/public/fonts/Pretendard-Regular.woff") format("woff");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Regular.woff") format("woff");
     /* regular */
 }
 
@@ -18,7 +18,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 600;
-    src: url("/public/fonts/Pretendard-SemiBold.woff") format("woff");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-SemiBold.woff") format("woff");
     /* semi bold */
 }
 
@@ -26,7 +26,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 700;
-    src: url("/public/fonts/Pretendard-Bold.woff") format("woff");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Bold.woff") format("woff");
     /* regular */
 }
 
