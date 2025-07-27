@@ -176,14 +176,6 @@ class FloatingButton {
                         this.partnerId = partnerId;
                         if (ref) {
                             console.log('ref', ref);
-                            // const data = JSON.stringify({
-                            //     eventCategory: "ReferrerOrigin",
-                            //     partnerId: this.partnerId,
-                            //     chatUserId: 'selenTest',
-                            //     products: [],
-                            //     referrerOrigin: ref,
-                            // });
-                            // const blob = new Blob([data], { type: 'application/json' });
                             navigator.sendBeacon(
                                 `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
                                 JSON.stringify({
@@ -200,6 +192,7 @@ class FloatingButton {
                         return getCustomerIDInfoPromise();
                     })
                     .then(res => {
+                        console.log('res from getCustomerIDInfoPromise', res);
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
                         } else {
@@ -210,6 +203,7 @@ class FloatingButton {
                         return this.fetchChatUserId(this.cafe24UserId);
                     })
                     .then(chatUserId => {
+                        console.log('chatUserId', chatUserId);
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -221,6 +215,8 @@ class FloatingButton {
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
+                        console.log('chatbotData', chatbotData);
+                        console.log('floatingData', floatingData);
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
