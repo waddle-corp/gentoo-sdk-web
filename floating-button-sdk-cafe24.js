@@ -279,7 +279,8 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -452,17 +453,17 @@ class FloatingButton {
                     this.floatingContainer.appendChild(this.expandedButton);
 
                     // Add text animation
-                    let i = 0;
-                    const addLetter = () => {
-                        if (!this.floatingData) return;
-                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                            this.expandedText.innerText += this.floatingData.comment[i];
-                            i++;
-                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                        }
-                    };
-                    addLetter();
-                    this.floatingCount += 1;
+                    // let i = 0;
+                    // const addLetter = () => {
+                    //     if (!this.floatingData) return;
+                    //     if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                    //         this.expandedText.innerText += this.floatingData.comment[i];
+                    //         i++;
+                    //         setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                    //     }
+                    // };
+                    // addLetter();
+                    // this.floatingCount += 1;
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -594,6 +595,11 @@ class FloatingButton {
             }
             if (e.data.addProductToCart) {
                 this.addProductToCart(e.data.addProductToCart);
+            }
+
+            if (e.data.floatingMessage) {
+                console.log('e.data.floatingMessage', e.data.floatingMessage);
+                this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
             }
 
             // if (this.isMobileDevice) {
@@ -771,6 +777,14 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = null;
+    }
+
+    addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
+        if (!floatingMessage) return;
+        if (i < floatingMessage.length && !isDestroyed()) {
+            expandedText.innerText += floatingMessage[i];
+            setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
+        }
     }
 
     async logEvent(payload) {

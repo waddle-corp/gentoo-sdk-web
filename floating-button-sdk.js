@@ -354,18 +354,19 @@ class FloatingButton {
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
 
-                    // Add text animation
-                    let i = 0;
-                    const addLetter = () => {
-                        if (!this.floatingData) return;
-                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                            this.expandedText.innerText += this.floatingData.comment[i];
-                            i++;
-                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                        }
-                    };
-                    addLetter();
-                    this.floatingCount += 1;
+                    // // Add text animation
+                    // let i = 0;
+                    // const addLetter = () => {
+                    //     if (!this.floatingData) return;
+                    //     if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                    //         this.expandedText.innerText += this.floatingData.comment[i];
+                    //         i++;
+                    //         setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                    //     }
+                    // };
+                    // addLetter();
+                    // this.floatingCount += 1;
+                    this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -414,6 +415,14 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+    }
+
+    addLetter(floatingData, expandedText, isDestroyed, i = 0) {
+        if (!floatingData) return;
+        if (i < floatingData.comment.length && !isDestroyed()) {
+            expandedText.innerText += floatingData.comment[i];
+            setTimeout(() => this.addLetter(floatingData, expandedText, isDestroyed, i + 1), 1000 / floatingData.comment.length);
+        }
     }
 
     setupEventListeners(position) {
