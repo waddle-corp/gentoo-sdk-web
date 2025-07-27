@@ -159,8 +159,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: this.cafe24ClientId,
-                version: this.cafe24Version
+                client_id: process.env.CAFE24_CLIENTID,
+                version: process.env.CAFE24_VERSION
             }));
         });
     }
