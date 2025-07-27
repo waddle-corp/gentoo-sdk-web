@@ -22,7 +22,7 @@ module.exports = (env, argv) => {
       filename: 'gentoo-logger.js',
       library: 'gentoo-logger',
       libraryTarget: 'umd',
-      clean: true,
+      clean: false,
     },
     plugins: [
       new webpack.DefinePlugin({

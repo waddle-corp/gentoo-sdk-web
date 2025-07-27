@@ -19,9 +19,9 @@
             s.type = "text/javascript"; 
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
-            s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
+            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./floating-button-sdk-cafe24.js"; 
-            // s.src = "https://dev-sdk.gentooai.com/dist/gentoo-sdk.js";
+            s.src = "https://dev-sdk.gentooai.com/dist/cafe24/floating-button-sdk-cafe24.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
