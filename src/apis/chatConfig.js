@@ -74,7 +74,7 @@ export async function fetchFloatingData(partnerId, displayLocation, itemId, chat
 
 export async function fetchPartnerId(mallId) {
     try {
-        const url = `${process.env.API_CHAT_BASE_URL}${process.env.API_PARTNERID_ENDPOINT}/${mallId}`;
+        const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_PARTNERID_ENDPOINT}/${mallId}`;
         const response = await fetch(url, {
             method: "GET",
             headers: {}
