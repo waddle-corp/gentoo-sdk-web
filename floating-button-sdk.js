@@ -1,3 +1,9 @@
+import ENV_CONFIG from './src/config/env';
+import './floating-button-sdk.css';
+
+const currentEnv = SDK_ENV; // Webpack으로 주입됨
+const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
@@ -46,8 +52,6 @@ class FloatingButton {
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.hostSrc;
-        this.domains;
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
@@ -67,40 +71,6 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
-        
-        if (
-            window.location.hostname === "dailyshot.co" ||
-            window.location.hostname === "dev-demo.gentooai.com" ||
-            window.location.hostname === "127.0.0.1" 
-        ) {
-            this.hostSrc = "https://dev-demo.gentooai.com";
-            this.domains = {
-                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else if (
-            window.location.hostname === "stage-demo.gentooai.com" ||
-            window.location.hostname === "localhost"
-            // || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
-        ) {
-            this.hostSrc = "https://stage-demo.gentooai.com";
-            this.domains = {
-                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        } else {
-            this.hostSrc = "https://demo.gentooai.com";
-            this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
-            };
-        }
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
@@ -174,15 +144,15 @@ class FloatingButton {
             }
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
                 // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                this.chatUrl = `${hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
                 // this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             } 
             else {
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
+                this.chatUrl = `${hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
             }
 
             // Create UI elements after data is ready
@@ -353,19 +323,6 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
-
-                    // // Add text animation
-                    // let i = 0;
-                    // const addLetter = () => {
-                    //     if (!this.floatingData) return;
-                    //     if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                    //         this.expandedText.innerText += this.floatingData.comment[i];
-                    //         i++;
-                    //         setTimeout(addLetter, 1000 / this.floatingData.comment.length);
-                    //     }
-                    // };
-                    // addLetter();
-                    // this.floatingCount += 1;
                     this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
 
                     // Remove expanded button after delay
@@ -728,7 +685,7 @@ class FloatingButton {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${apiDomain.log}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -753,7 +710,7 @@ class FloatingButton {
         }
 
         try {
-            const url = `${this.domains.auth}`;
+            const url = `${apiDomain.auth}`;
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -771,7 +728,7 @@ class FloatingButton {
 
     async fetchChatbotData(partnerId) {
         try {
-            const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${this.chatUserId}`, {
+            const response = await fetch(`${apiDomain.chatbot}/${partnerId}?chatUserId=${this.chatUserId}`, {
                 method: "GET",
                 headers: {},
             });
@@ -785,7 +742,7 @@ class FloatingButton {
     async fetchFloatingData(partnerId) {
         try {
             const response = await fetch(
-                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${this.chatUserId}`,
+                `${apiDomain.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${this.chatUserId}`,
                 {
                     method: "GET",
                     headers: {},
