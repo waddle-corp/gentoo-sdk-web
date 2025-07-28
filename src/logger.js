@@ -79,7 +79,7 @@ class Logger {
                         // declare basic payload
                         this.basicPayload = {
                             sessionId: this.sessionId,
-                            partnerId: this.partnerId,
+                            externalKey: this.partnerId,
                             timestamp: Date.now(),
                             chatUserId: this.chatUserId,
                             userId: this.cafe24MemberId,
@@ -99,6 +99,15 @@ class Logger {
                             sendEventLog("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
                         } else {
                             sendEventLog("PageTransition", this.basicPayload); 
+                        }
+
+                        window.GentooLogListener = {
+                            log: function(payload) {
+                                console.log('payload', payload);
+                                if (payload.event === 'floatingButtonClick') {
+                                    sendEventLog("FloatingButtonClick", this.basicPayload);
+                                }
+                            }
                         }
                     })
                     .catch(error => {
@@ -155,11 +164,6 @@ class Logger {
                 });
             }
         });
-        window.GentooLogListener = {
-            log: function(payload) {
-                console.log('payload', payload);
-            }
-        }
         window.__GentooLoggerInited = 'created';
     }
 
