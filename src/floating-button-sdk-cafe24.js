@@ -694,7 +694,7 @@ class FloatingButton {
     }
 
     addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
-        if (!floatingMessage) return;
+        if (!floatingMessage || floatingMessage.length === 0) return;
         if (i < floatingMessage.length && !isDestroyed()) {
             expandedText.innerText += floatingMessage[i];
             setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
