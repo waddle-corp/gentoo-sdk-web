@@ -41,6 +41,7 @@ class FloatingButton {
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.floatingMessage = '';
         this.warningMessage;
         this.warningActivated;
         this.floatingAvatar;
@@ -351,7 +352,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingMessage?.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -695,6 +696,7 @@ class FloatingButton {
 
     addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
         if (!floatingMessage || floatingMessage.length === 0) return;
+        this.floatingMessage = floatingMessage;
         if (i < floatingMessage.length && !isDestroyed()) {
             expandedText.innerText += floatingMessage[i];
             setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
