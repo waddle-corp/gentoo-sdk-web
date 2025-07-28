@@ -145,6 +145,15 @@ class Logger {
                 };
             };
             attachScrollTracker();
+
+            // floating button click event
+            const floatingButton = document.getElementsByClassName('floating-container')[0];
+            console.log('floatingButton', floatingButton);
+            if (floatingButton) {
+                floatingButton.addEventListener('click', () => {
+                    console.log('floating button clicked');
+                });
+            }
         });
         window.__GentooLoggerInited = 'created';
     }
