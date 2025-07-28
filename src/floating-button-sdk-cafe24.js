@@ -70,7 +70,6 @@ class FloatingButton {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                    console.log('y', y);
                 }, 100);
 
                 /** passive:true → 스크롤 성능 보호 */
@@ -105,7 +104,6 @@ class FloatingButton {
                     .then(partnerId => {
                         this.partnerId = partnerId;
                         if (ref) {
-                            console.log('ref', ref);
                             navigator.sendBeacon(
                                 `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
                                 JSON.stringify({
@@ -122,7 +120,6 @@ class FloatingButton {
                         return getCustomerIDInfoPromise();
                     })
                     .then(res => {
-                        console.log('res from getCustomerIDInfoPromise', res);
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
                         } else {
@@ -133,7 +130,6 @@ class FloatingButton {
                         return fetchChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
                     })
                     .then(chatUserId => {
-                        console.log('chatUserId', chatUserId);
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -145,8 +141,6 @@ class FloatingButton {
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
-                        console.log('chatbotData', chatbotData);
-                        console.log('floatingData', floatingData);
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
@@ -432,15 +426,6 @@ class FloatingButton {
             }
         };
 
-        // var testButtonClickHandler = (e) => {
-        //     e.stopPropagation();
-        //     e.preventDefault();
-        //     console.log("testButtonClickHandler", CAFE24API.MALL_ID, CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC);
-        //     CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), 'ckUs4MK3KhZixizocrCmTA', this.cafe24UserId, CAFE24API.HMAC, (res) => {
-        //         console.log("res", res);
-        //     });
-        // }
-
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 if (!this.isSmallResolution) {
@@ -472,7 +457,6 @@ class FloatingButton {
             }
 
             if (e.data.floatingMessage) {
-                console.log('e.data.floatingMessage', e.data.floatingMessage);
                 if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
@@ -727,7 +711,6 @@ class FloatingButton {
                         console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
-                        console.log('Product added to cart successfully:', res);
                         this.sendPostMessageHandler({ addedProductToCart: true });
                         resolve(res);
                     }

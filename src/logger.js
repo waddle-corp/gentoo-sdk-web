@@ -92,8 +92,6 @@ class Logger {
                         // send event log
                         const ref = document.referrer;
                         if (ref && !ref.includes(window.location.host)) {
-                            console.log('ref', ref, 'window.location.host', window.location.host);
-                            // payload.referrerOrigin = ref;
                             sendEventLog("PageTransition", this.basicPayload, { referrerOrigin: ref });
                         } else if (this.searchKeyword) {
                             sendEventLog("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
@@ -153,15 +151,6 @@ class Logger {
                 };
             };
             attachScrollTracker();
-
-            // floating button click event
-            const floatingButton = document.getElementsByClassName('floating-container')[0];
-            console.log('floatingButton', floatingButton);
-            if (floatingButton) {
-                floatingButton.addEventListener('click', () => {
-                    console.log('floating button clicked');
-                });
-            }
         });
         window.__GentooLoggerInited = 'created';
     }
@@ -193,45 +182,6 @@ class Logger {
         }
 
         window.__GentooLoggerInited = 'init';
-    }
-
-    setupEventListeners(position) {
-        // Button click event
-        var buttonClickHandler = (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            this.floatingClicked = true;
-
-            this.logEvent({
-                eventCategory: "FloatingButtonClick",
-                chatUserId: this.chatUserId,
-                partnerId: this.partnerId,
-                products: [],
-            });
-        };
-
-        window?.addEventListener("message", (e) => {
-            if (e.data.floatingButtonClick) {
-                console.log('floating button clicked');
-            }
-        });
-
-        // this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        // this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
-        // this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        // this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
-        // this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
-        // this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        // this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
-        // this.customButton?.addEventListener("click", buttonClickHandler);
-        // this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
-        // this.testButton?.addEventListener("click", testButtonClickHandler);
-        // Add event listener for the resize event
-        window?.addEventListener("resize", () => {
-            this.browserWidth = this.logWindowWidth();
-            this.isSmallResolution = this.browserWidth < 601;
-            this.updateFloatingContainerPosition(position); // Update position on resize
-        });
     }
 
     async logEvent(payload) {
