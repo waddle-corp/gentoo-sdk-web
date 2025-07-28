@@ -473,7 +473,7 @@ class FloatingButton {
 
             if (e.data.floatingMessage) {
                 console.log('e.data.floatingMessage', e.data.floatingMessage);
-                if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingMessage?.length > 0) {
+                if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                         return;
