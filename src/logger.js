@@ -155,6 +155,11 @@ class Logger {
                 });
             }
         });
+        window.GentooLogListener = {
+            log: function(payload) {
+                console.log('payload', payload);
+            }
+        }
         window.__GentooLoggerInited = 'created';
     }
 
@@ -203,17 +208,8 @@ class Logger {
         };
 
         window?.addEventListener("message", (e) => {
-            if (e.data.redirectState) {
-                if (!this.isSmallResolution) {
-                    this.gentooSessionData.redirectState = true;
-                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                }
-                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl });
-                window.location.href = e.data.redirectUrl;
-            }
-
-            if (e.data.addProductToCart) {
-                this.addProductToCart(e.data.addProductToCart);
+            if (e.data.floatingButtonClick) {
+                console.log('floating button clicked');
             }
         });
 
