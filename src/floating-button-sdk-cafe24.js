@@ -351,44 +351,6 @@ class FloatingButton {
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
-
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingMessage?.length > 0) {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
-
-                this.expandedButton = document.createElement("div");
-                this.expandedText = document.createElement("p");
-                if (this.isSmallResolution) {
-                    this.expandedButton.className =
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area-md" :
-                            "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
-                } else {
-                    this.expandedButton.className =
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area" :
-                            "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
-                }
-                this.expandedButton.appendChild(this.expandedText);
-
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
-
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
-                        }
-                    }, 7000);
-                }
-            }
         }
 
         this.elems = {
@@ -511,7 +473,46 @@ class FloatingButton {
 
             if (e.data.floatingMessage) {
                 console.log('e.data.floatingMessage', e.data.floatingMessage);
-                this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
+                if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingMessage?.length > 0) {
+                    // Check if component is destroyed or clicked
+                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                        return;
+    
+                    this.expandedButton = document.createElement("div");
+                    this.expandedText = document.createElement("p");
+                    if (this.isSmallResolution) {
+                        this.expandedButton.className =
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area-md" :
+                                "expanded-area-md expanded-area-neutral-md";
+                        this.expandedText.className = "expanded-area-text-md";
+                    } else {
+                        this.expandedButton.className =
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area" :
+                                "expanded-area expanded-area-neutral";
+                        this.expandedText.className = "expanded-area-text";
+                    }
+                    this.expandedButton.appendChild(this.expandedText);
+    
+                    // Double check if floatingContainer still exists before appending
+                    if (this.floatingContainer && this.floatingContainer.parentNode) {
+                        this.floatingContainer.appendChild(this.expandedButton);
+
+                        this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
+                        this.floatingCount += 1;
+    
+                        setTimeout(() => {
+                            if (
+                                this.floatingContainer &&
+                                this.expandedButton &&
+                                this.expandedButton.parentNode === this.floatingContainer
+                            ) {
+                                this.floatingContainer.removeChild(this.expandedButton);
+                            }
+                        }, 7000);
+                    }
+                }
             }
 
             // if (this.isMobileDevice) {
