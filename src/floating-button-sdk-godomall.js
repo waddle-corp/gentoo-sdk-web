@@ -111,7 +111,8 @@ class FloatingButton {
                     console.log('godomallMallInfo', mallInfo);
                     console.log('godomallMemberProfile', memberProfile);
 
-                    const partnerIdPromise = fetchPartnerId(mallInfo.mallDomain)
+                    const godomallMallId = mallInfo.mallDomain.split('.')[0];
+                    const partnerIdPromise = fetchPartnerId(godomallMallId)
                         .then(partnerId => {
                             this.partnerId = partnerId;
                             
