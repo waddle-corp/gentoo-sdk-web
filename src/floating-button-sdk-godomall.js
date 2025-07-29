@@ -68,7 +68,7 @@ class FloatingButton {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                    console.log('y', y);
+                    //console.log('y', y);
                 }, 100);
 
                 /** passive:true → 스크롤 성능 보호 */
@@ -97,7 +97,9 @@ class FloatingButton {
             const getMemberProfilePromise = new Promise((resolve, reject) => {
                 this.godomallAPI.getMemberProfile((err, res) => {
                     if (err) {
-                        reject(new Error(`Error while calling godomall getMemberProfile api: ${err}`));
+                        // Handle guest users who get 403 error - they're not logged in
+                        console.log('User is guest (not logged in):', err);
+                        resolve(null); // Resolve with null for guest users
                     } else {
                         resolve(res);
                     }
@@ -129,7 +131,8 @@ class FloatingButton {
                             return partnerId;
                         });
 
-                    this.godomallUserId = memberProfile.id || null;
+                    // Handle both member and guest users
+                    this.godomallUserId = memberProfile?.id || null;
 
                     // Wait for partner ID before fetching chat user ID
                     return partnerIdPromise.then(partnerId => {
