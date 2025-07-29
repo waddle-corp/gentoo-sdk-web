@@ -380,6 +380,7 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
+                    this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
 
                     setTimeout(() => {
                         if (
@@ -498,49 +499,6 @@ class FloatingButton {
             }
             if (e.data.closeRequestState) {
                 this.hideChat();
-            }
-
-            if (e.data.floatingMessage) {
-                if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
-                    // Check if component is destroyed or clicked
-                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                        return;
-    
-                    this.expandedButton = document.createElement("div");
-                    this.expandedText = document.createElement("p");
-                    if (this.isSmallResolution) {
-                        this.expandedButton.className =
-                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                                "expanded-area-md" :
-                                "expanded-area-md expanded-area-neutral-md";
-                        this.expandedText.className = "expanded-area-text-md";
-                    } else {
-                        this.expandedButton.className =
-                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                                "expanded-area" :
-                                "expanded-area expanded-area-neutral";
-                        this.expandedText.className = "expanded-area-text";
-                    }
-                    this.expandedButton.appendChild(this.expandedText);
-    
-                    // Double check if floatingContainer still exists before appending
-                    if (this.floatingContainer && this.floatingContainer.parentNode) {
-                        this.floatingContainer.appendChild(this.expandedButton);
-
-                        this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
-                        this.floatingCount += 1;
-    
-                        setTimeout(() => {
-                            if (
-                                this.floatingContainer &&
-                                this.expandedButton &&
-                                this.expandedButton.parentNode === this.floatingContainer
-                            ) {
-                                this.floatingContainer.removeChild(this.expandedButton);
-                            }
-                        }, 7000);
-                    }
-                }
             }
 
             // if (this.isMobileDevice) {
@@ -720,11 +678,11 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
-        if (!floatingMessage) return;
-        if (i < floatingMessage.length && !isDestroyed()) {
-            expandedText.innerText += floatingMessage[i];
-            setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
+    addLetter(floatingData, expandedText, isDestroyed, i = 0) {
+        if (!floatingData) return;
+        if (i < floatingData.comment.length && !isDestroyed()) {
+            expandedText.innerText += floatingData.comment[i];
+            setTimeout(() => this.addLetter(floatingData, expandedText, isDestroyed, i + 1), 1000 / floatingData.comment.length);
         }
     }
 
@@ -1064,8 +1022,8 @@ window.FloatingButton = FloatingButton;
 
     // Inject the CSS automatically
     // injectCSS("https://sdk.gentooai.com/floating-button-sdk-godomall.css");
-    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-godomall.css");
-    injectCSS("./floating-button-sdk-godomall.css");
+    injectCSS("https://dev-sdk.gentooai.com/src/floating-button-sdk-godomall.css");
+    // injectCSS("./floating-button-sdk-godomall.css");
 
     var fb; // Keep fb in closure scope
 
