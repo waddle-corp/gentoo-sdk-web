@@ -140,7 +140,7 @@ class Logger {
                         viewportHeight: window.innerHeight,
                         scrollPercentage: (y / (document.documentElement.scrollHeight - window.innerHeight) * 100).toFixed(1),
                     });
-                }, 100);
+                });
 
                 /** passive:true → 스크롤 성능 보호 */
                 window.addEventListener('scroll', onScroll, { passive: true });
