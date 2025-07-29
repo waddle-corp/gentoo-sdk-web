@@ -87,6 +87,20 @@ export async function fetchPartnerId(mallId) {
     }
 }
 
+export async function fetchGodomallPartnerId(mallId) {
+    try {
+        const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_GODOMALL_PARTNERID_ENDPOINT}/${mallId}`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {}
+        });
+        const res = await response.json();
+        return res.partnerId;
+    } catch (error) {
+        console.error(`Error while calling fetchGodomallPartnerId API: ${error}`)
+    }
+}
+
 export async function sendChatEventLog(payload, isMobileDevice) {
     try {
         const params = {

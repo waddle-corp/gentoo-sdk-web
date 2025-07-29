@@ -1,5 +1,5 @@
 import './floating-button-sdk-godomall.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchPartnerId, sendChatEventLog } from './apis/chatConfig';
+import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchGodomallPartnerId, sendChatEventLog } from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {
@@ -112,7 +112,7 @@ class FloatingButton {
                     console.log('godomallMemberProfile', memberProfile);
 
                     const godomallMallId = mallInfo.mallDomain.split('.')[0];
-                    const partnerIdPromise = fetchPartnerId(godomallMallId)
+                    const partnerIdPromise = fetchGodomallPartnerId(godomallMallId)
                         .then(partnerId => {
                             this.partnerId = partnerId;
                             
