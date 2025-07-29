@@ -70,7 +70,7 @@ class FloatingButton {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                }, 100);
+                });
 
                 /** passive:true → 스크롤 성능 보호 */
                 window.addEventListener('scroll', onScroll, { passive: true });

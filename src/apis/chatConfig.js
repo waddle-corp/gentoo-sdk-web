@@ -30,6 +30,7 @@ export async function sendEventLog(event, basicPayload = {}, customPayload = {})
     
     const payload = {
         event,
+        timestamp: Date.now(),
         ...basicPayload,
         ...customPayload,
     }
