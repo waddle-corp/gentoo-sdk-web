@@ -8,6 +8,9 @@
     "build:floatingCafe24:dev": "cross-env SDK_ENV=dev webpack --config webpack.floatingCafe24.config.js --mode development",
     "build:floatingCafe24:stage": "cross-env SDK_ENV=stage webpack --config webpack.floatingCafe24.config.js --mode development",
     "build:floatingCafe24:prod": "cross-env SDK_ENV=prod webpack --config webpack.floatingCafe24.config.js --mode production",
+    "build:floatingGodomall:dev": "cross-env SDK_ENV=dev webpack --config webpack.floatingGodomall.config.js --mode development",
+    "build:floatingGodomall:stage": "cross-env SDK_ENV=stage webpack --config webpack.floatingGodomall.config.js --mode development",
+    "build:floatingGodomall:prod": "cross-env SDK_ENV=prod webpack --config webpack.floatingGodomall.config.js --mode production",
     "build:logger:dev": "cross-env SDK_ENV=dev webpack --config webpack.logger.config.js --mode development",
     "build:logger:stage": "cross-env SDK_ENV=stage webpack --config webpack.logger.config.js --mode development",
     "build:logger:prod": "cross-env SDK_ENV=prod webpack --config webpack.logger.config.js --mode production"
