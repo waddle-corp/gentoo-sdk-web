@@ -80,7 +80,6 @@ class Logger {
                         this.basicPayload = {
                             sessionId: this.sessionId,
                             externalKey: this.partnerId,
-                            timestamp: Date.now(),
                             chatUserId: this.chatUserId,
                             userId: this.cafe24MemberId,
                             anonymousId: this.cafe24GuestId,
