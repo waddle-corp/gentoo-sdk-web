@@ -103,20 +103,6 @@ class FloatingButton {
                 fetchPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
-                        if (ref) {
-                            navigator.sendBeacon(
-                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
-                                JSON.stringify({
-                                    eventCategory: "ReferrerOrigin",
-                                    partnerId: this.partnerId,
-                                    chatUserId: 'selenTest',
-                                    products: [],
-                                    referrerOrigin: ref,
-                                })
-                            );
-                        }
-
-                        // Then get customer ID
                         return getCustomerIDInfoPromise();
                     })
                     .then(res => {
@@ -1039,26 +1025,6 @@ window.FloatingButton = FloatingButton;
 
 (function (global, document) {
     var w = global;
-
-    // Function to inject CSS
-    function injectCSS(href) {
-        var existingLink = document.querySelector('link[href="' + href + '"]');
-        if (existingLink) return;
-
-        var link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = href;
-        link.type = "text/css";
-        link.onerror = function () {
-            console.error("Failed to load GentooIO CSS.");
-        };
-        document.head.appendChild(link);
-    }
-
-    // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
-    // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
 
