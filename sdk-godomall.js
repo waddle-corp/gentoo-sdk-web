@@ -18,9 +18,10 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
-            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
-            // s.src = "./floating-button-sdk-cafe24.js"; 
+            // s.src = "https://sdk.gentooai.com/floating-button-sdk-godomall.js"; 
+            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-godomall.js'; // dev
+            // s.src = "./floating-button-sdk-godomall.js"; 
+            s.src = "https://dev-sdk.gentooai.com/dist/godomall/floating-sdk-godomall.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
@@ -39,7 +40,7 @@
 )(window, document);
 
 GentooIO('boot', {
-    partnerType: 'cafe24',
+    partnerType: 'godomall',
 })
 
 GentooIO('init', {});

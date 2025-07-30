@@ -2,7 +2,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 300;
-    src: url("/public/fonts/Pretendard-Light.woff") format("woff");
+    src: url("../public/fonts/Pretendard-Light.woff") format("woff");
     /* light */
 }
 
@@ -10,7 +10,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 400;
-    src: url("/public/fonts/Pretendard-Regular.woff") format("woff");
+    src: url("../public/fonts/Pretendard-Regular.woff") format("woff");
     /* regular */
 }
 
@@ -18,7 +18,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 600;
-    src: url("/public/fonts/Pretendard-SemiBold.woff") format("woff");
+    src: url("../public/fonts/Pretendard-SemiBold.woff") format("woff");
     /* semi bold */
 }
 
@@ -26,7 +26,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 700;
-    src: url("/public/fonts/Pretendard-Bold.woff") format("woff");
+    src: url("../public/fonts/Pretendard-Bold.woff") format("woff");
     /* regular */
 }
 
@@ -92,7 +92,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('public/img/units/sdk-floating-close.png');
+    background-image: url('../public/img/units/sdk-floating-close.png');
 }
 
 .button-image-close-mr {
@@ -100,7 +100,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('public/img/units/sdk-floating-close.png');
+    background-image: url('../public/img/units/sdk-floating-close.png');
     margin-right: 24px;
 }
 
@@ -108,7 +108,7 @@
     width: 40px;
     height: 40px;
     margin: 5px;
-    background-image: url('public/img/units/floating-gentoo-shrink.png');
+    background-image: url('../public/img/units/floating-gentoo-shrink.png');
 }
 
 .expanded-button {
@@ -157,7 +157,7 @@
     width: fit-content;
     height: fit-content;
     padding: 8px 10px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     background-color: #222;
     border-radius: 8px 0 8px 8px;
     z-index: 9999999;
@@ -171,11 +171,13 @@
 .expanded-area-neutral {
     background-color: #444;
     border-radius: 12px;
+    margin-bottom: 18px;
 }
 
 .expanded-area-neutral-md {
     background-color: #444;
     border-radius: 8px;
+    margin-bottom: 4px;
 }
 
 .expanded-area-text {
@@ -334,7 +336,7 @@
 .chat-handler {
     width: 44px;
     height: 4px;
-    background-image: url('public/img/units/sdk-bs-handler.png');
+    background-image: url('../public/img/units/sdk-bs-handler.png');
 }
 
 .chat-close-button-container {
@@ -407,7 +409,7 @@
 .chat-handler-md {
     width: 44px;
     height: 4px;
-    background-image: url('public/img/units/sdk-bs-handler.png');
+    background-image: url('../public/img/units/sdk-bs-handler.png');
 }
 
 .chat-header-text-md {

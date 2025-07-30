@@ -507,15 +507,6 @@ class FloatingButton {
             }
         };
 
-        // var testButtonClickHandler = (e) => {
-        //     e.stopPropagation();
-        //     e.preventDefault();
-        //     console.log("testButtonClickHandler", CAFE24API.MALL_ID, CAFE24API.APP_KEY, this.cafe24UserId, CAFE24API.HMAC);
-        //     CAFE24API.addCurrentProductToCart(CAFE24API.MALL_ID, new Date().getTime(), 'ckUs4MK3KhZixizocrCmTA', this.cafe24UserId, CAFE24API.HMAC, (res) => {
-        //         console.log("res", res);
-        //     });
-        // }
-
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
                 if (!this.isSmallResolution) {
@@ -775,7 +766,6 @@ class FloatingButton {
     }
 
     async fetchChatbotData(partnerId, chatUserId) {
-        console.log('fetchChatbotData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${chatUserId}`, {
                 method: "GET",
@@ -789,7 +779,6 @@ class FloatingButton {
     }
 
     async fetchFloatingData(partnerId, chatUserId) {
-        console.log('fetchFloatingData partnerId', partnerId, 'chatUserId', chatUserId);
         try {
             const response = await fetch(
                 `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${chatUserId}`,
@@ -843,7 +832,6 @@ class FloatingButton {
                         console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
-                        console.log('Product added to cart successfully:', res);
                         this.sendPostMessageHandler({addedProductToCart: true});
                         resolve(res);
                     }

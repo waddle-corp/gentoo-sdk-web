@@ -93,7 +93,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('public/img/units/sdk-floating-close.png');
+    background-image: url('../public/img/units/sdk-floating-close.png');
 }
 
 .button-image-close-mr {
@@ -101,7 +101,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('public/img/units/sdk-floating-close.png');
+    background-image: url('../public/img/units/sdk-floating-close.png');
     margin-right: 24px;
 }
 
@@ -109,7 +109,7 @@
     width: 40px;
     height: 40px;
     margin: 5px;
-    background-image: url('public/img/units/floating-gentoo-shrink.png');
+    background-image: url('../public/img/units/floating-gentoo-shrink.png');
 }
 
 .expanded-button {
@@ -337,7 +337,7 @@
 .chat-handler {
     width: 44px;
     height: 4px;
-    background-image: url('public/img/units/sdk-bs-handler.png');
+    background-image: url('../public/img/units/sdk-bs-handler.png');
 }
 
 .chat-close-button-container {
@@ -410,7 +410,7 @@
 .chat-handler-md {
     width: 44px;
     height: 4px;
-    background-image: url('public/img/units/sdk-bs-handler.png');
+    background-image: url('../public/img/units/sdk-bs-handler.png');
 }
 
 .chat-header-text-md {
