@@ -77,7 +77,7 @@ class FloatingButton {
             // cafe24 Gentoo-prod App
             this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01';
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
+        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company') || window.location.hostname.includes('jintaebaek')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
