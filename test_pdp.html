@@ -80,6 +80,53 @@
             }
         });
         GentooIO('unmount', {});
+
+        // (function() {
+        //     let count = 0;
+        //     const maxCount = 1500;
+        //     const duration = 60000;
+        //     const intervalMs = duration / maxCount;
+        //     const interval = setInterval(() => {
+        //         const basicPayload = {
+        //             sessionId: 'sess-1753856485296-xkwyo612',
+        //             externalKey: '6889b848aac23b0c81675a12',
+        //             chatUserId: '8EJqkU2m6HDzui65PP3wEc0SgTEJpvst',
+        //             userId: 'jintaebaek',
+        //             anonymousId: null,
+        //             displayLocation: 'HOME',
+        //             pageLocation: window.location.href,
+        //             itemId: null,
+        //         }
+    
+        //         const customPayload = {
+        //             referrerOrigin: 'https://www.google.com',
+        //         }
+                
+        //         const sendEventLog = (event, basicPayload = {}, customPayload = {}) => {
+        //             // if (!customPayload.referrerOrigin) return;
+                    
+        //             const payload = {
+        //                 event,
+        //                 timestamp: Date.now(),
+        //                 ...basicPayload,
+        //                 ...customPayload,
+        //             }
+    
+        //             const url = `https://dev-tracking.gentooai.com/api/v1/beacon/track`;
+        //             navigator.sendBeacon(
+        //                 url,
+        //                 JSON.stringify(payload)
+        //             );
+        //         }
+
+        //         sendEventLog('PageTransitionTest', basicPayload, customPayload);
+        //         count++;
+        //         if (count >= maxCount) {
+        //             clearInterval(interval);
+        //         }
+        //     }, intervalMs);
+        // })();
+
     </script>
     <div>
         <div>
