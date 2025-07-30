@@ -1,6 +1,3 @@
-import './floating-button-sdk.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, sendChatEventLog } from './src/apis/chatConfig';
-
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
@@ -37,7 +34,6 @@ class FloatingButton {
         }
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
-        if (this.partnerId === '67f487a8db6583cc1d270858') this.partnerId = '677c96df903d570bb95ace04';
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
@@ -49,6 +45,8 @@ class FloatingButton {
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.hostSrc;
+        this.domains;
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
@@ -68,10 +66,43 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        
+        if (
+            window.location.hostname === "dailyshot.co" ||
+            window.location.hostname === "dev-demo.gentooai.com" ||
+            window.location.hostname === "127.0.0.1" 
+        ) {
+            this.hostSrc = "https://dev-demo.gentooai.com";
+            this.domains = {
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        } else if (
+            window.location.hostname === "stage-demo.gentooai.com"
+            // || window.location.hostname === "gentoo-demo-shop-template.lovable.app"
+        ) {
+            this.hostSrc = "https://stage-demo.gentooai.com";
+            this.domains = {
+                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
+                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        } else {
+            this.hostSrc = "https://demo.gentooai.com";
+            this.domains = {
+                auth: "https://api.gentooai.com/chat/api/v1/user",
+                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+            };
+        }
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
-            fetchChatUserId(this.authCode, this.udid, this.partnerId, this.chatUserId).then((res) => {
+            this.fetchChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
@@ -80,7 +111,7 @@ class FloatingButton {
             .catch(() => {
                 this.chatUserId = 'test';
             }),
-            fetchChatbotData(this.partnerId, this.chatUserId).then((res) => {
+            this.fetchChatbotData(this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
                 this.floatingAvatar = res?.avatar || null;
@@ -135,11 +166,22 @@ class FloatingButton {
             this.isInitialized = true;
 
             // Fetch floating data before creating UI elements
-            this.floatingData = await fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId);
+            this.floatingData = await this.fetchFloatingData(this.partnerId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
             }
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
+
+            if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://stage-demo.gentooai.com/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } 
+            else if (this.partnerId === '676a4b3cac97386117d1838d') {
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+                // this.chatUrl = `https://accio-webclient-git-hotfix-pdpmalfunction-waddle.vercel.app/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            } 
+            else {
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
+            }
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -161,7 +203,7 @@ class FloatingButton {
         }
 
         window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
+        this.customButton = isCustomButton ? (document.getElementById('gentoo-custom-button') || document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
         if (
             !this.chatbotData ||
@@ -257,12 +299,12 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
         
-        sendChatEventLog({
+        this.logEvent({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
-        }, this.isMobileDevice);
+        });
 
         // Create floating button
         if (showGentooButton) {
@@ -309,7 +351,19 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
-                    this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
+
+                    // Add text animation
+                    let i = 0;
+                    const addLetter = () => {
+                        if (!this.floatingData) return;
+                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                            this.expandedText.innerText += this.floatingData.comment[i];
+                            i++;
+                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                        }
+                    };
+                    addLetter();
+                    this.floatingCount += 1;
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -358,14 +412,6 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
-    }
-
-    addLetter(floatingData, expandedText, isDestroyed, i = 0) {
-        if (!floatingData) return;
-        if (i < floatingData.comment.length && !isDestroyed()) {
-            expandedText.innerText += floatingData.comment[i];
-            setTimeout(() => this.addLetter(floatingData, expandedText, isDestroyed, i + 1), 1000 / floatingData.comment.length);
-        }
     }
 
     setupEventListeners(position) {
@@ -452,6 +498,13 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
+            // if (this.isMobileDevice) {
+            //     if (e.data.messageExistence === 'exist') {
+            //         this.iframeHeightState = 'full';
+            //     } else if (e.data.messageExistence === 'none') {
+            //         this.iframeHeightState = 'shrink';
+            //     }
+            // }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
@@ -650,6 +703,91 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
+    setPageList(pageList) {
+        this.pageList = pageList;
+    }
+
+    async logEvent(payload) {
+        try {
+            const params = {
+                eventCategory: String(payload.eventCategory),
+                chatUserId: String(payload.chatUserId),
+                partnerId: String(payload.partnerId),
+                channelId: this.isMobileDevice ? "mobile" : "web",
+                products: payload?.products,
+            };
+
+            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+            });
+
+            const res = await response.json(); // JSON 형태의 응답 데이터 파싱
+            return res;
+        } catch (error) {
+            console.error(`Error while calling logEvent API: ${error}`);
+        }
+    }
+
+    async fetchChatUserId(userToken, udid = "") {
+        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const params = {
+            externalKey: String(this.partnerId),
+            userToken: convertedUserToken,
+            udid: String(udid),
+            chatUserId: this.chatUserId && !userToken.includes('guest') ? String(this.chatUserId) : null
+        }
+
+        try {
+            const url = `${this.domains.auth}`;
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params)
+            });
+
+            const res = await response.json();
+            return res.chatUserId;
+        } catch (error) {
+            // console.error(`Error while calling fetchChatUserId API: ${error}`)
+        }
+    }
+
+    async fetchChatbotData(partnerId) {
+        try {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${this.chatUserId}`, {
+                method: "GET",
+                headers: {},
+            });
+            const res = await response.json();
+            return res;
+        } catch (error) {
+            console.error(`Error while calling fetchChatbotId API: ${error}`);
+        }
+    }
+
+    async fetchFloatingData(partnerId) {
+        try {
+            const response = await fetch(
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${this.chatUserId}`,
+                {
+                    method: "GET",
+                    headers: {},
+                }
+            );
+
+            const res = await response.json();
+            return res;
+        } catch (error) {
+            console.error(`Error while calling fetchFloatingData API: ${error}`);
+        }
+    }
+
     // Function to inject Lottie
     async injectLottie() {
         return new Promise((resolve, reject) => {
@@ -778,12 +916,12 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        sendChatEventLog({
+        this.logEvent({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
-        }, this.isMobileDevice);
+        });
 
         this.sendPostMessageHandler({enableMode: mode});
 
@@ -839,16 +977,16 @@ class FloatingButton {
         try {
             await this.bootPromise;
             // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await fetchChatUserId(input?.authCode, input?.udid, input?.partnerId, '');
+            this.chatUserId = await this.fetchChatUserId(input.authCode);
 
             const payload = {
                 eventCategory: input.eventCategory,
-                partnerId: String(input?.partnerId),
+                partnerId: String(input.partnerId),
                 chatUserId: String(this.chatUserId),
                 products: input.products,
             };
 
-            return sendChatEventLog(payload, this.isMobileDevice);
+            return this.logEvent(payload);
         } catch (error) {
             console.error("Failed to send log:", error);
             throw error;
@@ -967,8 +1105,28 @@ class FloatingButton {
 // Export as a global variable
 window.FloatingButton = FloatingButton;
 
-(function (global) {
+(function (global, document) {
     var w = global;
+
+    // Function to inject CSS
+    function injectCSS(href) {
+        var existingLink = document.querySelector('link[href="' + href + '"]');
+        if (existingLink) return;
+
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        link.type = "text/css";
+        link.onerror = function () {
+            console.error("Failed to load GentooIO CSS.");
+        };
+        document.head.appendChild(link);
+    }
+
+    // // Inject the CSS automatically
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk.css");
+    // injectCSS("./floating-button-sdk.css");
 
     var fb; // Keep fb in closure scope
 
@@ -1044,6 +1202,13 @@ window.FloatingButton = FloatingButton;
                     if (typeof fb.sendLog === "function") {
                         Promise.resolve(fb.sendLog(params)).catch((error) => {
                             console.error("Failed to send GentooIO log:", error);
+                        });
+                    }
+                    break;
+                case "setPageList":
+                    if (typeof fb.setPageList === "function") {
+                        Promise.resolve(fb.setPageList(params)).catch((error) => {
+                            console.error("Failed to set GentooIO page list:", error);
                         });
                     }
                     break;

@@ -1,14 +1,18 @@
-import './floating-button-sdk-cafe24.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchPartnerId, sendChatEventLog } from './src/apis/chatConfig';
+// import ENV_CONFIG from './src/config/env';
+
+// const currentEnv = SDK_ENV; // Webpack으로 주입됨
+// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
+// import CryptoJS from "crypto-js";
 
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
-            '*.myshopify.com',
+            '*.myshopify.com',  
         ];
 
+        // console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
@@ -25,8 +29,8 @@ class FloatingButton {
         // Check for existing SDK elements 
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created';
-            return;
+            window.__GentooInited = 'created'; 
+            return; 
         }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
@@ -34,9 +38,12 @@ class FloatingButton {
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.displayLocation;
+        // this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.hostSrc;
+        this.domains;
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
@@ -45,46 +52,81 @@ class FloatingButton {
         this.warningActivated;
         this.floatingAvatar;
 
+        // this.floatingData;
         this.itemId = this.getProductNo();
         this.iframeHeightState;
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        if (window.location.hostname === 'localhost') {
+            this.hostSrc = 'http://localhost:3000';
+            this.domains = {
+                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
+                log: 'https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
+            }
+            this.keys = {
+                log: 'G4J2wPnd643wRoQiK52PO9ZAtaD6YNCAhGlfm1Oc',
+            }
+            /* // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
+        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company')) {
+            this.hostSrc = 'https://dev-demo.gentooai.com';
+            this.domains = {
+                auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
+                log: '  https://dev-api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://dev-api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://dev-api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://dev-api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://dev-api.gentooai.com/chat/api/cafe24/utils',
+            }
+            /* // cafe24 Gentoo-dev App
+            this.cafe24ClientId = 'ckUs4MK3KhZixizocrCmTA';
+            this.cafe24Version = '2024-09-01'; */
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
+        } else if (window.location.hostname === "stage-demo.gentooai.com") {
+            this.hostSrc = "https://stage-demo.gentooai.com";
+            this.domains = {
+                auth: "https://stage-api.gentooai.com/chat/api/v1/user",
+                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
+                partnerId: "https://stage-api.gentooai.com/app/api/partner/v1/cafe24/mall",
+                cafe24Utils: "https://stage-api.gentooai.com/chat/api/cafe24/utils",
+            };
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
+        } else {
+            this.hostSrc = 'https://demo.gentooai.com';
+            this.domains = {
+                auth: 'https://api.gentooai.com/chat/api/v1/user',
+                log: 'https://api.gentooai.com/chat/api/v1/event/userEvent',
+                chatbot: 'https://api.gentooai.com/chat/api/v1/chat/chatbot',
+                floating: 'https://api.gentooai.com/chat/api/v1/chat/floating',
+                partnerId: 'https://api.gentooai.com/app/api/partner/v1/cafe24/mall',
+                cafe24Utils: 'https://api.gentooai.com/chat/api/cafe24/utils',
+            }
+            // cafe24 Gentoo-prod App
+            this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
+            this.cafe24Version = '2024-09-01';
+        }
+
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
-            const ref = document.referrer;
-            (function attachScrollTracker() {
-                /** 간단한 throttle 유틸 – 1초당 한 번만 실행 */
-                function throttle(fn, wait = 1000) {
-                    let last = 0;
-                    return (...args) => {
-                        const now = Date.now();
-                        if (now - last >= wait) {
-                            last = now;
-                            fn(...args);
-                        }
-                    };
-                }
-
-                /** 실제 스크롤 핸들러 */
-                const onScroll = throttle(() => {
-                    const y = window.scrollY || document.documentElement.scrollTop;
-                    console.log('y', y);
-                }, 100);
-
-                /** passive:true → 스크롤 성능 보호 */
-                window.addEventListener('scroll', onScroll, { passive: true });
-
-                /** SDK가 언마운트될 때 정리(선택) */
-                window.GentooCleanup = () => {
-                    window.removeEventListener('scroll', onScroll);
-                };
-            })();
-
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
                 this.cafe24API = CAFE24API;
-
+                
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
                     return new Promise((innerResolve, innerReject) => {
@@ -100,28 +142,14 @@ class FloatingButton {
                 };
 
                 // Fetch partner ID first
-                fetchPartnerId(CAFE24API.MALL_ID)
+                this.fetchPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
-                        if (ref) {
-                            console.log('ref', ref);
-                            navigator.sendBeacon(
-                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
-                                JSON.stringify({
-                                    eventCategory: "ReferrerOrigin",
-                                    partnerId: this.partnerId,
-                                    chatUserId: 'selenTest',
-                                    products: [],
-                                    referrerOrigin: ref,
-                                })
-                            );
-                        }
 
                         // Then get customer ID
                         return getCustomerIDInfoPromise();
                     })
                     .then(res => {
-                        console.log('res from getCustomerIDInfoPromise', res);
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
                         } else {
@@ -129,23 +157,20 @@ class FloatingButton {
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return fetchChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                        return this.fetchChatUserId(this.cafe24UserId);
                     })
                     .then(chatUserId => {
-                        console.log('chatUserId', chatUserId);
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
 
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
-                            fetchChatbotData(this.partnerId, chatUserId),
-                            fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                            this.fetchChatbotData(this.partnerId, chatUserId),
+                            this.fetchFloatingData(this.partnerId, chatUserId)
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
-                        console.log('chatbotData', chatbotData);
-                        console.log('floatingData', floatingData);
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
@@ -159,8 +184,8 @@ class FloatingButton {
                         reject(error);
                     });
             })(CAFE24API.init({
-                client_id: process.env.CAFE24_CLIENTID,
-                version: process.env.CAFE24_VERSION
+                client_id: this.cafe24ClientId,
+                version: this.cafe24Version
             }));
         });
     }
@@ -170,7 +195,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-
+        
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
         if (isInIframe && !isAllowedDomain) {
@@ -204,8 +229,7 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -218,14 +242,14 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements(position, showGentooButton, isCustomButton = false) {
+    createUIElements( position, showGentooButton, isCustomButton = false ) {
         // Check if any SDK elements exist in document
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping creation.");
             window.__GentooInited = 'created';
             return;
         }
-
+        
         window.__GentooInited = 'creating';
         this.customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
         // Add null checks before accessing properties
@@ -251,7 +275,7 @@ class FloatingButton {
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
-
+        
         this.chatHeader = document.createElement("div");
         this.chatHandler = document.createElement("div");
         this.chatHeaderText = document.createElement("p");
@@ -322,19 +346,19 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        sendChatEventLog({
+        this.logEvent({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
-        }, this.isMobileDevice);
+        });
 
         // Create floating button
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
-
+            
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
@@ -351,7 +375,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+             if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -359,16 +383,16 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    this.expandedButton.className =
+                    this.expandedButton.className = 
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area-md" :
-                            "expanded-area-md expanded-area-neutral-md";
+                        "expanded-area-md" :
+                        "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
-                    this.expandedButton.className =
+                    this.expandedButton.className = 
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area" :
-                            "expanded-area expanded-area-neutral";
+                        "expanded-area" :
+                        "expanded-area expanded-area-neutral";
                     this.expandedText.className = "expanded-area-text";
                 }
                 this.expandedButton.appendChild(this.expandedText);
@@ -377,6 +401,20 @@ class FloatingButton {
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
 
+                    // Add text animation
+                    let i = 0;
+                    const addLetter = () => {
+                        if (!this.floatingData) return;
+                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
+                            this.expandedText.innerText += this.floatingData.comment[i];
+                            i++;
+                            setTimeout(addLetter, 1000 / this.floatingData.comment.length);
+                        }
+                    };
+                    addLetter();
+                    this.floatingCount += 1;
+
+                    // Remove expanded button after delay
                     setTimeout(() => {
                         if (
                             this.floatingContainer &&
@@ -428,7 +466,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-
+            
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
                     this.expandedButton.classList.add('hide');
@@ -484,7 +522,7 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl });
+                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -508,11 +546,6 @@ class FloatingButton {
                 this.addProductToCart(e.data.addProductToCart);
             }
 
-            if (e.data.floatingMessage) {
-                console.log('e.data.floatingMessage', e.data.floatingMessage);
-                this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
-            }
-
             // if (this.isMobileDevice) {
             //     if (e.data.messageExistence === 'exist') {
             //         this.iframeHeightState = 'full';
@@ -522,15 +555,15 @@ class FloatingButton {
             // }
         });
 
-        this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.floatingContainer?.addEventListener("click",buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
         // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -564,7 +597,7 @@ class FloatingButton {
         this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
-        if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
+        if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -576,7 +609,7 @@ class FloatingButton {
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        }, { passive: true });
+        }, {passive: true});
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -690,28 +723,117 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
-        if (!floatingMessage) return;
-        if (i < floatingMessage.length && !isDestroyed()) {
-            expandedText.innerText += floatingMessage[i];
-            setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
+    async logEvent(payload) {
+        try {
+            const params = {
+                eventCategory: String(payload.eventCategory),
+                chatUserId: String(payload.chatUserId),
+                partnerId: String(payload.partnerId),
+                channelId: this.isMobileDevice ? "mobile" : "web",
+                products: payload?.products,
+            };
+
+            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+            });
+
+            const res = await response.json(); // JSON 형태의 응답 데이터 파싱
+            return res;
+        } catch (error) {
+            console.error(`Error while calling logEvent API: ${error}`);
         }
     }
 
-    async addProductToCart(product) {
+    async fetchChatUserId(userToken, udid = "") {
+        const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const params = {
+            externalKey: String(this.partnerId),
+            userToken: convertedUserToken,
+            udid: String(udid),
+            chatUserId: this.chatUserId ? String(this.chatUserId) : null
+        }
+
+        try {
+            const url = `${this.domains.auth}`;
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params)
+            });
+
+            const res = await response.json();
+            return res.chatUserId;
+        } catch (error) {
+            console.error(`Error while calling fetchChatUserId API: ${error}`)
+        }
+    }
+
+    async fetchChatbotData(partnerId, chatUserId) {
+        console.log('fetchChatbotData partnerId', partnerId, 'chatUserId', chatUserId);
+        try {
+            const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${chatUserId}`, {
+                method: "GET",
+                headers: {},
+            });
+            const res = await response.json();
+            return res;
+        } catch (error) {
+            console.error(`Error while calling fetchChatbotId API: ${error}`);
+        }
+    }
+
+    async fetchFloatingData(partnerId, chatUserId) {
+        console.log('fetchFloatingData partnerId', partnerId, 'chatUserId', chatUserId);
+        try {
+            const response = await fetch(
+                `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${chatUserId}`,
+                {
+                    method: "GET",
+                    headers: {},
+                }
+            );
+
+            const res = await response.json();
+            return res;
+        } catch (error) {
+            console.error(`Error while calling fetchFloatingData API: ${error}`);
+        }
+    }
+
+    async fetchPartnerId(mallId) {
+        try {
+            const url = `${this.domains.partnerId}/${mallId}`;
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {}
+            });
+            const res = await response.json();
+            return res.partnerId;
+        } catch (error) {
+            console.error(`Error while calling fetchPartnerId API: ${error}`)
+        }
+    }
+
+    async addProductToCart(product) {        
         if (!this.cafe24API) {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-
+        
         const productObject = {
-            product_no: product.product_no,
-            variants_code: product.variants_code,
-            quantity: product.quantity,
+            product_no : product.product_no,
+            variants_code : product.variants_code,
+            quantity : product.quantity,
         }
 
         // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {            
             this.cafe24API.addCart(
                 'A0000',
                 product.prepaid_shipping_fee,
@@ -722,7 +844,7 @@ class FloatingButton {
                         reject(err);
                     } else {
                         console.log('Product added to cart successfully:', res);
-                        this.sendPostMessageHandler({ addedProductToCart: true });
+                        this.sendPostMessageHandler({addedProductToCart: true});
                         resolve(res);
                     }
                 }
@@ -747,7 +869,7 @@ class FloatingButton {
     // Function to inject viewport meta tag
     injectViewport() {
         if (this.viewportInjected) return;
-
+        
         try {
             // Check for existing viewport meta tag
             const existingViewport = document.querySelector('meta[name="viewport"]');
@@ -770,7 +892,7 @@ class FloatingButton {
     // Function to delete viewport meta tag
     deleteViewport() {
         if (!this.viewportInjected) return;
-
+        
         try {
             const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
             if (meta) {
@@ -858,14 +980,14 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        sendChatEventLog({
+        this.logEvent({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
-        }, this.isMobileDevice);
+        });
 
-        this.sendPostMessageHandler({ enableMode: mode });
+        this.sendPostMessageHandler({enableMode: mode});
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
@@ -914,35 +1036,35 @@ class FloatingButton {
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
         const isInIframe = window !== window.top;
-
+        
         // 현재 document의 SDK set 
         const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-
+        
         if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
             return true;
         }
-
+        
         if (isInIframe) {
             try {
                 if (window.top.document) {
                     if (window.top.__GentooInited !== null && window.top.__GentooInited !== undefined) {
                         return true;
                     }
-
+                    
                     // 부모 document의 SDK set 
                     const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
                     const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
                     const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-
+                    
                     return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");
             }
         }
-
+        
         return false;
     }
 
@@ -950,17 +1072,17 @@ class FloatingButton {
         if (this.allowedDomainsForIframe.includes(hostname)) {
             return true;
         }
-
+        
         // Check wildcard patterns
         for (const pattern of this.allowedDomainsForIframe) {
             if (pattern.startsWith('*.')) {
-                const domain = pattern.substring(2);
+                const domain = pattern.substring(2); 
                 if (hostname.endsWith('.' + domain) || hostname === domain) {
                     return true;
                 }
             }
         }
-
+        
         return false;
     }
 
@@ -968,7 +1090,7 @@ class FloatingButton {
         if (this.isAllowedDomainPattern(window.location.hostname)) {
             return true;
         }
-
+        
         if (window !== window.top) {
             try {
                 const parentDomain = window.top.location.hostname;
@@ -998,7 +1120,7 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        if (urlString.includes('/product') && !urlString.includes('/product/list') ) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
         try {
@@ -1050,6 +1172,26 @@ window.FloatingButton = FloatingButton;
 
 (function (global, document) {
     var w = global;
+
+    // Function to inject CSS
+    function injectCSS(href) {
+        var existingLink = document.querySelector('link[href="' + href + '"]');
+        if (existingLink) return;
+
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = href;
+        link.type = "text/css";
+        link.onerror = function () {
+            console.error("Failed to load GentooIO CSS.");
+        };
+        document.head.appendChild(link);
+    }
+
+    // Inject the CSS automatically
+    injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
 

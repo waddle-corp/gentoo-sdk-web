@@ -15,12 +15,12 @@ module.exports = (env, argv) => {
   return {
     mode: mode,
     entry: {
-      floatingButton: './src/floating-button-sdk.js',
+      floating: './src/floating-sdk.js',
     },
     output: {
       path: path.resolve(__dirname, 'dist/gentoo'),
-      filename: 'floating-button-sdk.js',
-      library: 'floating-button-sdk',
+      filename: 'floating-sdk.js',
+      library: 'floating-sdk',
       libraryTarget: 'umd',
       clean: true,
     },

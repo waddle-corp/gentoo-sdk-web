@@ -15,12 +15,12 @@ module.exports = (env, argv) => {
   return {
     mode: mode,
     entry: {
-      floatingButtonCafe24: './src/floating-button-sdk-cafe24.js',
+      floatingCafe24: './src/floating-sdk-cafe24-glacier.js',
     },
     output: {
       path: path.resolve(__dirname, 'dist/cafe24'),
-      filename: 'floating-button-sdk-cafe24.js',
-      library: 'floating-button-sdk-cafe24',
+      filename: 'floating-sdk-cafe24-glacier.js',
+      library: 'floating-sdk-cafe24-glacier',
       libraryTarget: 'umd',
       clean: true,
     },

@@ -1,5 +1,5 @@
-import './floating-button-sdk-godomall.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchGodomallPartnerId, sendChatEventLog } from './apis/chatConfig';
+import './floating-sdk-cafe24-glacier.css';
+import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchPartnerId, sendChatEventLog } from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {
@@ -41,6 +41,7 @@ class FloatingButton {
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.floatingMessage = '';
         this.warningMessage;
         this.warningActivated;
         this.floatingAvatar;
@@ -50,6 +51,7 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             const ref = document.referrer;
             (function attachScrollTracker() {
@@ -68,8 +70,7 @@ class FloatingButton {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                    //console.log('y', y);
-                }, 100);
+                });
 
                 /** passive:true → 스크롤 성능 보호 */
                 window.addEventListener('scroll', onScroll, { passive: true });
@@ -79,93 +80,83 @@ class FloatingButton {
                     window.removeEventListener('scroll', onScroll);
                 };
             })();
-            
-            /* 고도몰 init process */
 
-            this.godomallAPI = window.GodomallSDK.init('b1hLbVFoS1lUeUVSYTc4UUZVK3dFdz09');
+            ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
 
-            const getMallInfoPromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMallInfo((err, res) => {
-                    if (err) {
-                        reject(new Error(`Error while calling godomall getMallInfo api: ${err}`));
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
-
-            const getMemberProfilePromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMemberProfile((err, res) => {
-                    if (err) {
-                        // Handle guest users who get 403 error - they're not logged in
-                        console.log('User is guest (not logged in):', err);
-                        resolve(null); // Resolve with null for guest users
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
-
-            Promise.all([getMallInfoPromise, getMemberProfilePromise])
-                .then(([mallInfo, memberProfile]) => {
-                    console.log('godomallMallInfo', mallInfo);
-                    console.log('godomallMemberProfile', memberProfile);
-
-                    const godomallMallId = mallInfo.mallDomain.split('.')[0];
-                    const partnerIdPromise = fetchGodomallPartnerId(godomallMallId)
-                        .then(partnerId => {
-                            this.partnerId = partnerId;
-                            
-                            if (ref) {
-                                console.log('ref', ref);
-                                navigator.sendBeacon(
-                                    `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
-                                    JSON.stringify({
-                                        eventCategory: "ReferrerOrigin",
-                                        partnerId: this.partnerId,
-                                        chatUserId: 'selenTest',
-                                        products: [],
-                                        referrerOrigin: ref,
-                                    })
-                                );
+                // Wrap CAFE24API methods in Promises
+                const getCustomerIDInfoPromise = () => {
+                    return new Promise((innerResolve, innerReject) => {
+                        CAFE24API.getCustomerIDInfo((err, res) => {
+                            if (err) {
+                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                                innerReject(err);
+                            } else {
+                                innerResolve(res);
                             }
-                            return partnerId;
                         });
-
-                    // Handle both member and guest users
-                    this.godomallUserId = memberProfile?.id || null;
-
-                    // Wait for partner ID before fetching chat user ID
-                    return partnerIdPromise.then(partnerId => {
-                        return fetchChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
                     });
-                })
-                .then(chatUserId => {
-                    console.log('chatUserId', chatUserId);
-                    this.chatUserId = chatUserId;
-                    this.gentooSessionData.cuid = chatUserId;
-                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                };
 
-                    return Promise.all([
-                        fetchChatbotData(this.partnerId, chatUserId),
-                        fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
-                    ]);
-                })
-                .then(([chatbotData, floatingData]) => {
-                    console.log('chatbotData', chatbotData);
-                    console.log('floatingData', floatingData);
-                    this.chatbotData = chatbotData;
-                    this.floatingData = floatingData;
-                    const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                    this.warningMessage = warningMessageData?.extra?.message;
-                    this.warningActivated = warningMessageData?.activated;
-                    this.floatingAvatar = chatbotData?.avatar;
-                    resolve();
-                })
-                .catch(error => {
-                    console.error('Initialization error:', error);
-                    reject(error);
-                });
+                // Fetch partner ID first
+                fetchPartnerId(CAFE24API.MALL_ID)
+                    .then(partnerId => {
+                        this.partnerId = partnerId;
+                        if (ref) {
+                            navigator.sendBeacon(
+                                `https://dev-api.gentooai.com/chat/api/v1/event/userEvent2`,
+                                JSON.stringify({
+                                    eventCategory: "ReferrerOrigin",
+                                    partnerId: this.partnerId,
+                                    chatUserId: 'selenTest',
+                                    products: [],
+                                    referrerOrigin: ref,
+                                })
+                            );
+                        }
+
+                        // Then get customer ID
+                        return getCustomerIDInfoPromise();
+                    })
+                    .then(res => {
+                        if (res.id.member_id) {
+                            this.cafe24UserId = res.id.member_id;
+                        } else {
+                            this.cafe24UserId = res.id['guest_id'];
+                        }
+
+                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
+                        return fetchChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                    })
+                    .then(chatUserId => {
+                        this.chatUserId = chatUserId;
+                        this.gentooSessionData.cuid = chatUserId;
+                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+
+                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
+                        return Promise.all([
+                            fetchChatbotData(this.partnerId, chatUserId),
+                            fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                        ]);
+                    })
+                    .then(([chatbotData, floatingData]) => {
+                        this.chatbotData = chatbotData;
+                        this.floatingData = floatingData;
+                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                        this.warningMessage = warningMessageData?.extra?.message;
+                        this.warningActivated = warningMessageData?.activated;
+                        this.floatingAvatar = chatbotData?.avatar;
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Initialization error:', error);
+                        reject(error);
+                    });
+            })(CAFE24API.init({
+                client_id: process.env.CAFE24_CLIENTID,
+                version: process.env.CAFE24_VERSION
+            }));
         });
     }
 
@@ -208,8 +199,8 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            // this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -354,45 +345,6 @@ class FloatingButton {
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
-
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
-
-                this.expandedButton = document.createElement("div");
-                this.expandedText = document.createElement("p");
-                if (this.isSmallResolution) {
-                    this.expandedButton.className =
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area-md" :
-                            "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
-                } else {
-                    this.expandedButton.className =
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area" :
-                            "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
-                }
-                this.expandedButton.appendChild(this.expandedText);
-
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
-                    this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
-
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
-                        }
-                    }, 7000);
-                }
-            }
         }
 
         this.elems = {
@@ -500,6 +452,52 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
+            if (e.data.addProductToCart) {
+                this.addProductToCart(e.data.addProductToCart);
+            }
+
+            if (e.data.floatingMessage) {
+                if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
+                    // Check if component is destroyed or clicked
+                    if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                        return;
+    
+                    this.expandedButton = document.createElement("div");
+                    this.expandedText = document.createElement("p");
+                    if (this.isSmallResolution) {
+                        this.expandedButton.className =
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area-md" :
+                                "expanded-area-md expanded-area-neutral-md";
+                        this.expandedText.className = "expanded-area-text-md";
+                    } else {
+                        this.expandedButton.className =
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area" :
+                                "expanded-area expanded-area-neutral";
+                        this.expandedText.className = "expanded-area-text";
+                    }
+                    this.expandedButton.appendChild(this.expandedText);
+    
+                    // Double check if floatingContainer still exists before appending
+                    if (this.floatingContainer && this.floatingContainer.parentNode) {
+                        this.floatingContainer.appendChild(this.expandedButton);
+
+                        this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
+                        this.floatingCount += 1;
+    
+                        setTimeout(() => {
+                            if (
+                                this.floatingContainer &&
+                                this.expandedButton &&
+                                this.expandedButton.parentNode === this.floatingContainer
+                            ) {
+                                this.floatingContainer.removeChild(this.expandedButton);
+                            }
+                        }, 7000);
+                    }
+                }
+            }
 
             // if (this.isMobileDevice) {
             //     if (e.data.messageExistence === 'exist') {
@@ -511,7 +509,10 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.floatingContainer?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
+            window?.GentooLogListener?.log({ event: 'floatingButtonClick' });
+        });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
@@ -678,12 +679,44 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    addLetter(floatingData, expandedText, isDestroyed, i = 0) {
-        if (!floatingData) return;
-        if (i < floatingData.comment.length && !isDestroyed()) {
-            expandedText.innerText += floatingData.comment[i];
-            setTimeout(() => this.addLetter(floatingData, expandedText, isDestroyed, i + 1), 1000 / floatingData.comment.length);
+    addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
+        if (!floatingMessage || floatingMessage.length === 0) return;
+        this.floatingMessage = floatingMessage;
+        if (i < floatingMessage.length && !isDestroyed()) {
+            expandedText.innerText += floatingMessage[i];
+            setTimeout(() => this.addLetter(floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
         }
+    }
+
+    async addProductToCart(product) {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+
+        const productObject = {
+            product_no: product.product_no,
+            variants_code: product.variants_code,
+            quantity: product.quantity,
+        }
+
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCart(
+                'A0000',
+                product.prepaid_shipping_fee,
+                [productObject],
+                (err, res) => {
+                    if (err) {
+                        console.error('Failed to add product to cart:', err);
+                        reject(err);
+                    } else {
+                        this.sendPostMessageHandler({ addedProductToCart: true });
+                        resolve(res);
+                    }
+                }
+            );
+        });
     }
 
     // Function to inject Lottie
@@ -954,15 +987,15 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/goods_view')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/goods_list')) { this.displayLocation = 'PRODUCT_LIST' }
+        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
 
-            // 1. 쿼리 파라미터에서 goodsNo 추출 시도
-            const productNoFromQuery = url.searchParams.get('goodsNo');
+            // 1. 쿼리 파라미터에서 product_no 추출 시도
+            const productNoFromQuery = url.searchParams.get('product_no');
             if (productNoFromQuery) {
                 return productNoFromQuery;
             }
@@ -971,8 +1004,10 @@ class FloatingButton {
             const path = url.pathname;
 
             /**
-             * 고려가 필요한 고도몰 경로 패턴
-                /goods/goods_view.php?goodsNo={goodsNo}
+             * 고려가 필요한 cafe24 경로 패턴
+                /product/{product_name}/{product_no}
+                /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
+                /{shop_no}/product/{product_name}/{product_no}
              */
 
             /**
@@ -1021,9 +1056,9 @@ window.FloatingButton = FloatingButton;
     }
 
     // Inject the CSS automatically
-    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-godomall.css");
-    injectCSS("https://dev-sdk.gentooai.com/src/floating-button-sdk-godomall.css");
-    // injectCSS("./floating-button-sdk-godomall.css");
+    // injectCSS("https://sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    injectCSS("https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.css");
+    // injectCSS("./floating-button-sdk-cafe24.css");
 
     var fb; // Keep fb in closure scope
 

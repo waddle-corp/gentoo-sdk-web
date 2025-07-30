@@ -15,12 +15,12 @@ module.exports = (env, argv) => {
   return {
     mode: mode,
     entry: {
-      floatingButtonGodomall: './src/floating-button-sdk-godomall.js',
+      floatingGodomall: './src/floating-sdk-godomall.js',
     },
     output: {
       path: path.resolve(__dirname, 'dist/godomall'),
-      filename: 'floating-button-sdk-godomall.js',
-      library: 'floating-button-sdk-godomall',
+      filename: 'floating-sdk-godomall.js',
+      library: 'floating-sdk-godomall',
       libraryTarget: 'umd',
       clean: true,
     },
