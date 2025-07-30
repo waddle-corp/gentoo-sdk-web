@@ -68,7 +68,6 @@ class FloatingButton {
                 /** 실제 스크롤 핸들러 */
                 const onScroll = throttle(() => {
                     const y = window.scrollY || document.documentElement.scrollTop;
-                    //console.log('y', y);
                 }, 100);
 
                 /** passive:true → 스크롤 성능 보호 */
@@ -108,9 +107,6 @@ class FloatingButton {
 
             Promise.all([getMallInfoPromise, getMemberProfilePromise])
                 .then(([mallInfo, memberProfile]) => {
-                    console.log('godomallMallInfo', mallInfo);
-                    console.log('godomallMemberProfile', memberProfile);
-
                     const godomallMallId = mallInfo.mallDomain.split('.')[0];
                     const partnerIdPromise = fetchGodomallPartnerId(godomallMallId)
                         .then(partnerId => {
@@ -127,7 +123,6 @@ class FloatingButton {
                     });
                 })
                 .then(chatUserId => {
-                    console.log('chatUserId', chatUserId);
                     this.chatUserId = chatUserId;
                     this.gentooSessionData.cuid = chatUserId;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -138,8 +133,6 @@ class FloatingButton {
                     ]);
                 })
                 .then(([chatbotData, floatingData]) => {
-                    console.log('chatbotData', chatbotData);
-                    console.log('floatingData', floatingData);
                     this.chatbotData = chatbotData;
                     this.floatingData = floatingData;
                     const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
