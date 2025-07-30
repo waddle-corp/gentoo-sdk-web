@@ -299,8 +299,8 @@ class FloatingButton {
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
             player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl);
-            player.style.width = this.isSmallResolution ? '68px' : '94px';
-            player.style.height = this.isSmallResolution ? '68px' : '94px';
+            player.style.width = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
+            player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.cursor = 'pointer';
             this.dotLottiePlayer = player;
         }
@@ -426,7 +426,7 @@ class FloatingButton {
                         ) {
                             this.floatingContainer.removeChild(this.expandedButton);
                         }
-                    }, 7000);
+                    }, 70000);
                 }
             }
         }
