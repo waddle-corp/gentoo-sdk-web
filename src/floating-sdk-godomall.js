@@ -81,7 +81,7 @@ class FloatingButton {
             
             /* 고도몰 init process */
 
-            this.godomallAPI = window.GodomallSDK.init('b1hLbVFoS1lUeUVSYTc4UUZVK3dFdz09');
+            this.godomallAPI = window.GodomallSDK.init(process.env.GODOMALL_SYSTEMKEY);
 
             const getMallInfoPromise = new Promise((resolve, reject) => {
                 this.godomallAPI.getMallInfo((err, res) => {
