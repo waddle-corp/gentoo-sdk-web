@@ -81,6 +81,7 @@
         });
         GentooIO('unmount', {});
 
+        // test case 1 : 1500 times per 40ms
         // (function() {
         //     let count = 0;
         //     const maxCount = 1500;
@@ -95,7 +96,172 @@
         //             anonymousId: null,
         //             displayLocation: 'HOME',
         //             pageLocation: window.location.href,
+        //             itemId: count,
+        //         }
+    
+        //         const customPayload = {
+        //             referrerOrigin: 'https://www.google.com',
+        //         }
+                
+        //         const sendEventLog = (event, basicPayload = {}, customPayload = {}) => {
+        //             // if (!customPayload.referrerOrigin) return;
+                    
+        //             const payload = {
+        //                 event,
+        //                 timestamp: Date.now(),
+        //                 ...basicPayload,
+        //                 ...customPayload,
+        //             }
+    
+        //             const url = `https://dev-tracking.gentooai.com/api/v1/beacon/track`;
+        //             navigator.sendBeacon(
+        //                 url,
+        //                 JSON.stringify(payload)
+        //             );
+        //         }
+
+        //         sendEventLog('PageTransitionTest', basicPayload, customPayload);
+        //         count++;
+        //         if (count >= maxCount) {
+        //             clearInterval(interval);
+        //         }
+        //     }, intervalMs);
+        // })();
+
+        // test case 2 : 1500 times no interval
+        // (function() {
+        //     let count = 0;
+        //     const maxCount = 1500;
+        //     // const duration = 60000;
+        //     // const intervalMs = duration / maxCount;
+        //     const interval = setInterval(() => {
+        //         const basicPayload = {
+        //             sessionId: 'sess-1753856485296-xkwyo612',
+        //             externalKey: '6889b848aac23b0c81675a12',
+        //             chatUserId: '8EJqkU2m6HDzui65PP3wEc0SgTEJpvst',
+        //             userId: 'jintaebaek',
+        //             anonymousId: null,
+        //             displayLocation: 'HOME',
+        //             pageLocation: window.location.href,
+        //             itemId: count,
+        //         }
+    
+        //         const customPayload = {
+        //             referrerOrigin: 'https://www.google.com',
+        //         }
+                
+        //         const sendEventLog = (event, basicPayload = {}, customPayload = {}) => {
+        //             // if (!customPayload.referrerOrigin) return;
+                    
+        //             const payload = {
+        //                 event,
+        //                 timestamp: Date.now(),
+        //                 ...basicPayload,
+        //                 ...customPayload,
+        //             }
+    
+        //             const url = `https://dev-tracking.gentooai.com/api/v1/beacon/track`;
+        //             navigator.sendBeacon(
+        //                 url,
+        //                 JSON.stringify(payload)
+        //             );
+        //         }
+
+        //         sendEventLog('PageTransition', basicPayload, customPayload);
+        //         count++;
+        //         if (count >= maxCount) {
+        //             clearInterval(interval);
+        //         }
+        //     });
+        // })();
+
+        // test case 3 : 500times repeat 3 times per 20s
+        // (function() {
+        //     let count = 0;
+        //     const maxCount = 3;
+        //     const duration = 60000;
+        //     const intervalMs = duration / maxCount;
+        //     const interval = setInterval(() => {
+        //         const chatUserId = [
+        //             'chatuser-1',
+        //             'chatuser-2',
+        //             'chatuser-3',
+        //         ];
+
+        //         let innerCount = 0;
+        //         const maxInnerCount = 500;
+        //         const innerInterval = setInterval(() => {
+        //             const basicPayload = {
+        //                 sessionId: 'sess-1753856485296-xkwyo612',
+        //                 externalKey: '6889b848aac23b0c81675a12',
+        //                 chatUserId: chatUserId[count],
+        //                 userId: 'test5',
+        //                 anonymousId: null,
+        //                 displayLocation: 'HOME',
+        //                 pageLocation: window.location.href,
+        //                 itemId: innerCount + (count * maxInnerCount),
+        //             }
+                    
+        //             const customPayload = {
+        //                 referrerOrigin: 'https://www.google.com',
+        //             }
+                    
+        //             const sendEventLog = (event, basicPayload = {}, customPayload = {}) => {
+        //                 // if (!customPayload.referrerOrigin) return;
+                        
+        //                 const payload = {
+        //                     event,
+        //                     timestamp: Date.now(),
+        //                     ...basicPayload,
+        //                     ...customPayload,
+        //                 }
+        
+        //                 const url = `https://dev-tracking.gentooai.com/api/v1/beacon/track`;
+        //                 navigator.sendBeacon(
+        //                     url,
+        //                     JSON.stringify(payload)
+        //                 );
+        //             }
+    
+        //             sendEventLog('PageTransition', basicPayload, customPayload);
+        //             innerCount++;
+        //             if (innerCount >= maxInnerCount) {
+        //                 clearInterval(innerInterval);
+        //             }
+        //         });
+
+        //         count++;
+        //         if (count >= maxCount) {
+        //             clearInterval(interval);
+        //         }
+        //     }, intervalMs);
+        // })();
+
+        // test case 4 : 1500 scroll event per 80~120ms randomly
+        // (function() {
+        //     let count = 0;
+        //     const maxCount = 1500;
+        //     const intervalMs = Math.floor(Math.random() * 40) + 80;
+        //     const interval = setInterval(() => {
+        //         const documentHeight = 4064;
+        //         const viewportHeight = 916;
+        //         let scrollTop = Math.sin(count/100) * 1000;
+        //         let scrollPercentage = scrollTop / (documentHeight - viewportHeight);
+        //         const basicPayload = {
+        //             event: "Scroll",
+        //             timestamp: Date.now(),
+        //             sessionId: 'sess-1753856485296-xkwyo612',
+        //             externalKey: '6889b848aac23b0c81675a12',
+        //             chatUserId: '8EJqkU2m6HDzui65PP3wEc0SgTEJpvst',
+        //             userId: 'jintaebaek',
+        //             anonymousId: null,
+        //             displayLocation: "PRODUCT_DETAIL",
+        //             pageLocation: window.location.href,
         //             itemId: null,
+        //             scrollTop: scrollTop,
+        //             documentHeight: documentHeight,
+        //             viewportHeight: viewportHeight,
+        //             scrollPercentage: scrollPercentage,
         //         }
     
         //         const customPayload = {
