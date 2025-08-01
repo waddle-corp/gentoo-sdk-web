@@ -12,7 +12,6 @@ class FloatingButton {
             '*.myshopify.com',  
         ];
 
-        // console.log("API:", apiDomain, "HOST:", hostSrc);
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
@@ -178,7 +177,6 @@ class FloatingButton {
                         this.warningMessage = warningMessageData?.extra?.message;
                         this.warningActivated = warningMessageData?.activated;
                         this.floatingZoom = floatingZoom?.activated;
-                        console.log("floatingZoom", this.floatingZoom);
                         this.floatingAvatar = chatbotData?.avatar;
                         resolve();
                     })
