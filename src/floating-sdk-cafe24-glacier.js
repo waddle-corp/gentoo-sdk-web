@@ -976,6 +976,7 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
+        console.log('getProductNo', urlString, urlString.includes('keyword='));
         if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else if (urlString.includes('keyword=')) { this.displayLocation = 'PRODUCT_SEARCH' }
