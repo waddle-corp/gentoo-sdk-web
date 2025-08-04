@@ -978,6 +978,7 @@ class FloatingButton {
     getProductNo(urlString = window.location.href) {
         if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
+        else if (urlString.includes('keyword=')) { this.displayLocation = 'PRODUCT_SEARCH' }
         else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
