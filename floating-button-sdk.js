@@ -255,6 +255,7 @@ class FloatingButton {
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
+            player.appendChild(document.createTextNode('\u200B'));
             
             this.dotLottiePlayer = player;
         }
