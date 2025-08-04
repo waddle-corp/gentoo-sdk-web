@@ -443,7 +443,6 @@ class FloatingButton {
             }
 
             if (e.data.floatingMessage) {
-                console.log('floatingMessage', e.data.floatingMessage);
                 if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
@@ -470,7 +469,6 @@ class FloatingButton {
                     if (this.floatingContainer && this.floatingContainer.parentNode) {
                         this.floatingContainer.appendChild(this.expandedButton);
 
-                        console.log('addLetter params', e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
                         this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
                         this.floatingCount += 1;
     
@@ -668,7 +666,6 @@ class FloatingButton {
     }
 
     addLetter(floatingMessage, expandedText, isDestroyed, i = 0) {
-        console.log('addLetter', floatingMessage, expandedText, isDestroyed, i);
         if (!floatingMessage || floatingMessage.length === 0) return;
         this.floatingMessage = floatingMessage;
         if (i < floatingMessage.length && !isDestroyed()) {
@@ -976,10 +973,9 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        console.log('getProductNo', urlString, urlString.includes('keyword='));
-        if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        if (urlString.includes('keyword=')) { this.displayLocation = 'PRODUCT_SEARCH' }
+        else if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else if (urlString.includes('keyword=')) { this.displayLocation = 'PRODUCT_SEARCH' }
         else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
