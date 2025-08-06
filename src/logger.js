@@ -89,6 +89,7 @@ class Logger {
                             displayLocation: this.displayLocation,
                             pageLocation: window.location.href,
                             itemId: this.itemId,
+                            categoryId: this.categoryId,
                         }
 
                         // send event log
