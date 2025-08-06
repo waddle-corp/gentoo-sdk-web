@@ -16,8 +16,6 @@ class Logger {
         this.isInitialized = false;  // Add flag to track initialization
         this.itemId = this.getProductNo()?.productNo;
         this.categoryId = this.getProductNo()?.categoryNo;
-        console.log('[DEBUG] itemId', this.itemId);
-        console.log('[DEBUG] categoryId', this.categoryId);
         this.searchKeyword = this.getSearchKeyword();
         this.cafe24UserId = null;
         this.cafe24MemberId = null;
@@ -288,8 +286,6 @@ class Logger {
             const regexCategoryNo = /(?:\/category\/(?:[^\/]+\/)*|[?&]cate_no=)(\d+)/;
             const matchProductNo = path.match(regexProductNo);
             const matchCategoryNo = path.match(regexCategoryNo);
-            console.log('[DEBUG] matchProductNo', matchProductNo);
-            console.log('[DEBUG] matchCategoryNo', matchCategoryNo);
 
             // 3. 찾을 수 없는 경우 null 반환
             return {
