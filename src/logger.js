@@ -14,7 +14,8 @@ class Logger {
         this.displayLocation;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         this.isInitialized = false;  // Add flag to track initialization
-        this.itemId = this.getProductNo();
+        this.itemId = this.getProductNo()?.productNo;
+        this.categoryId = this.getProductNo()?.categoryNo;
         this.searchKeyword = this.getSearchKeyword();
         this.cafe24UserId = null;
         this.cafe24MemberId = null;
@@ -86,6 +87,7 @@ class Logger {
                             displayLocation: this.displayLocation,
                             pageLocation: window.location.href,
                             itemId: this.itemId,
+                            categoryId: this.categoryId,
                         }
 
                         // send event log
@@ -100,8 +102,8 @@ class Logger {
 
                         window.GentooLogListener = {
                             log: (payload) => {
-                                if (payload.event === 'floatingButtonClick') {
-                                    sendEventLog("FloatingButtonClick", this.basicPayload);
+                                if (payload.type === 'floatingEvent') {
+                                    sendEventLog(payload.event, this.basicPayload);
                                 }
                             }
                         }
@@ -280,15 +282,16 @@ class Logger {
                 \/([^\/]+)	✅ 캡처할 product_no
                 (?:\/category/...)?	🔹 optional category/display path
              */
-            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-
-            const match = path.match(regex);
-            if (match && match[1]) {
-                return match[1]; // product_no
-            }
+            const regexProductNo = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
+            const regexCategoryNo = /(?:\/category\/(?:[^\/]+\/)*|[?&]cate_no=)(\d+)/;
+            const matchProductNo = path.match(regexProductNo);
+            const matchCategoryNo = path.match(regexCategoryNo);
 
             // 3. 찾을 수 없는 경우 null 반환
-            return null;
+            return {
+                productNo: matchProductNo ? matchProductNo[1] : null,
+                categoryNo: matchCategoryNo ? matchCategoryNo[1] : null,
+            };
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
@@ -298,7 +301,7 @@ class Logger {
     getSearchKeyword() {
         const url = new URL(window.location.href);
         const searchParams = url.searchParams;
-        return searchParams.get('keyword') || null;
+        return searchParams.get('keyword') || searchParams.get('query') || null;
     }
 }
 

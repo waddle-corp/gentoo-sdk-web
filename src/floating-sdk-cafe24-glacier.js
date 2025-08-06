@@ -309,6 +309,7 @@ class FloatingButton {
             chatUserId: this.chatUserId,
             products: [],
         }, this.isMobileDevice);
+        window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
 
         // Create floating button
         if (showGentooButton) {
@@ -497,7 +498,7 @@ class FloatingButton {
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.floatingContainer?.addEventListener("click", (e) => {
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
-            window?.GentooLogListener?.log({ event: 'floatingButtonClick' });
+            window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick' });
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
