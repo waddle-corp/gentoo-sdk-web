@@ -102,8 +102,8 @@ class Logger {
 
                         window.GentooLogListener = {
                             log: (payload) => {
-                                if (payload.event === 'floatingButtonClick') {
-                                    sendEventLog("FloatingButtonClick", this.basicPayload);
+                                if (payload.type === 'floatingEvent') {
+                                    sendEventLog(payload.event, this.basicPayload);
                                 }
                             }
                         }
