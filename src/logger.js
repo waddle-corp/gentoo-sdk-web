@@ -298,7 +298,7 @@ class Logger {
     getSearchKeyword() {
         const url = new URL(window.location.href);
         const searchParams = url.searchParams;
-        return searchParams.get('keyword') || null;
+        return searchParams.get('keyword') || searchParams.get('query') || null;
     }
 }
 
