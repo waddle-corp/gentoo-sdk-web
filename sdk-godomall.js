@@ -21,8 +21,8 @@
             // s.src = "https://sdk.gentooai.com/floating-button-sdk-godomall.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-godomall.js'; // dev
             // s.src = "./floating-button-sdk-godomall.js"; 
-            s.src = "https://sdk.gentooai.com/dist/godomall/floating-sdk-godomall.js";
-            // s.src = "https://dev-sdk.gentooai.com/dist/godomall/floating-sdk-godomall.js";
+            // s.src = "https://sdk.gentooai.com/dist/godomall/floating-sdk-godomall.js";
+            s.src = "https://dev-sdk.gentooai.com/dist/godomall/floating-sdk-godomall.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
