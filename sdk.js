@@ -19,8 +19,8 @@
             s.type = "text/javascript"; 
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/floating-button-sdk.js"; 
-            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk.js'; // dev
-            s.src = "./floating-button-sdk.js"; 
+            s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk.js'; // dev
+            // s.src = "./floating-button-sdk.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
