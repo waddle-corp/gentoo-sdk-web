@@ -105,6 +105,9 @@ class Logger {
                                 if (payload.type === 'floatingEvent') {
                                     sendEventLog(payload.event, this.basicPayload);
                                 }
+                                if (payload.type === 'healthCheck') {
+                                    sendEventLog(payload.event, this.basicPayload, { connectionId: payload.connectionId });
+                                }
                             }
                         }
                     })
