@@ -487,7 +487,7 @@ class FloatingButton {
             }
 
             if (e.data.connectionId) {
-                window?.GentooLogListener?.log({ type: 'healthCheck', event: 'connectionId', connectionId: e.data.connectionId });
+                window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
             }
         });
 
