@@ -340,7 +340,7 @@
 }
 
 .chat-close-button-container {
-    width: 108px;
+    width: fit-content;
     height: 36px;
     display: flex;
     align-items: center;
@@ -355,7 +355,7 @@
 }
 
 .chat-close-button-container-md {
-    width: 46px;
+    width: fit-content;
     height: fit-content;
     display: flex;
     align-items: center;
