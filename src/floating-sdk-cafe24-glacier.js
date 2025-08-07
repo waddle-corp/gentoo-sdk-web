@@ -486,13 +486,9 @@ class FloatingButton {
                 }
             }
 
-            // if (this.isMobileDevice) {
-            //     if (e.data.messageExistence === 'exist') {
-            //         this.iframeHeightState = 'full';
-            //     } else if (e.data.messageExistence === 'none') {
-            //         this.iframeHeightState = 'shrink';
-            //     }
-            // }
+            if (e.data.connectionId) {
+                window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
+            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
