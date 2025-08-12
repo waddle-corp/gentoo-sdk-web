@@ -367,6 +367,7 @@
 
 .chat-close-button-container {
     width: fit-content;
+    padding: 0 12px;
     height: 36px;
     display: flex;
     align-items: center;
@@ -382,6 +383,7 @@
 
 .chat-close-button-container-md {
     width: fit-content;
+    padding: 0 12px;
     height: fit-content;
     display: flex;
     align-items: center;
