@@ -85,10 +85,10 @@ class FloatingButton {
             // 🧪 로컬 테스트 환경 설정 - localhost:3000에서 실행되는 채팅 웹 사용
             this.hostSrc = "http://localhost:3000";
             this.domains = {
-                auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else if (
             window.location.hostname === "stage-demo.gentooai.com"
