@@ -193,15 +193,15 @@ class FloatingButton {
                     
                     this.floatingData.comment = this.selectedCommentSet.floating;
                     
-                    console.log('🧪 실험 적용 - 일반 방문자:', { 
-                        floating: this.selectedCommentSet.floating,
-                        greeting: this.selectedCommentSet.greeting
-                    });
+                    // console.log('🧪 실험 적용 - 일반 방문자:', { 
+                    //     floating: this.selectedCommentSet.floating,
+                    //     greeting: this.selectedCommentSet.greeting
+                    // });
                 } else {
-                    console.warn('🧪 실험 데이터 없음');
+                    // console.warn('🧪 실험 데이터 없음');
                 }
             } else if (this.isExperimentTarget && this.gentooSessionData?.redirectState) {
-                console.log('🧪 실험 제외 - PDP 리다이렉트 사용자');
+                // console.log('🧪 실험 제외 - PDP 리다이렉트 사용자');
             }
 
             // 🛍️ Shopify 테스트용 - 특정 파트너 ID에 대한 분기 처리
@@ -857,7 +857,7 @@ class FloatingButton {
             );
 
             const res = await response.json();
-            console.log('fetchShopifyExperimentData:', res);
+            // console.log('fetchShopifyExperimentData:', res);
             return res;
         } catch (error) {
             console.error(`Error while calling fetchShopifyExperimentData API: ${error}`);
@@ -1046,12 +1046,12 @@ class FloatingButton {
         // If there is a customized greeting, add it to the payload
         if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
             payload.customizedGreeting = this.selectedCommentSet.greeting;
-            console.log('🧪 맞춤형 그리팅 postMessage로 전달:', {
-                greeting: this.selectedCommentSet.greeting,
-                payload: payload
-            });
+            // console.log('🧪 맞춤형 그리팅 postMessage로 전달:', {
+            //     greeting: this.selectedCommentSet.greeting,
+            //     payload: payload
+            // });
         } else {
-            console.log('🧪 맞춤형 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
+            // console.log('🧪 맞춤형 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
         }
         
         this.iframe.contentWindow.postMessage(payload, "*");
@@ -1204,7 +1204,7 @@ class FloatingButton {
         const currentHostname = window.location.hostname;
         const isTarget = experimentStores.some(store => currentHostname.includes(store));
         
-        console.log(`🧪 실험 타겟 체크: ${currentHostname} -> ${isTarget ? '실험 대상' : '일반 스토어'}`);
+        // console.log(`🧪 실험 타겟 체크: ${currentHostname} -> ${isTarget ? '실험 대상' : '일반 스토어'}`);
         return isTarget;
     }
 }
