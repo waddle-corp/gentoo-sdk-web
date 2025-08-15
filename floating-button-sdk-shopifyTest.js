@@ -1042,15 +1042,15 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        // If there is an experimental greeting, add it to the payload
+        // If there is a customized greeting, add it to the payload
         if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
-            payload.experimentGreeting = this.selectedCommentSet.greeting;
-            console.log('🧪 실험용 그리팅 postMessage로 전달:', {
+            payload.customizedGreeting = this.selectedCommentSet.greeting;
+            console.log('🧪 맞춤형 그리팅 postMessage로 전달:', {
                 greeting: this.selectedCommentSet.greeting,
                 payload: payload
             });
         } else {
-            console.log('🧪 실험용 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
+            console.log('🧪 맞춤형 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
         }
         
         this.iframe.contentWindow.postMessage(payload, "*");
