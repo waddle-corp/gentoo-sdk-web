@@ -10,6 +10,9 @@ class FloatingButton {
             'localhost',
             '127.0.0.1'
         ];
+
+        // 🧪 check experiment target store
+        this.isExperimentTarget = this.checkExperimentTarget();
         
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
@@ -79,12 +82,13 @@ class FloatingButton {
             window.location.hostname === "localhost" ||
             window.location.hostname.includes("shopify-test")
         ) {
-            this.hostSrc = "https://dev-demo.gentooai.com";
+            // 🧪 로컬 테스트 환경 설정 - localhost:3000에서 실행되는 채팅 웹 사용
+            this.hostSrc = "http://localhost:3000";
             this.domains = {
-                auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
-                chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
-                floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
+                auth: "https://api.gentooai.com/chat/api/v1/user",
+                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
+                floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
             };
         } else if (
             window.location.hostname === "stage-demo.gentooai.com"
@@ -177,6 +181,26 @@ class FloatingButton {
             this.floatingData = await this.fetchFloatingData(this.partnerId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
+            }
+
+            if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
+                this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
+                
+                if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * this.experimentData.comments.length);
+                    this.selectedCommentSet = this.experimentData.comments[randomIndex];
+                    
+                    this.floatingData.comment = this.selectedCommentSet.floating;
+                    
+                    console.log('🧪 실험 적용 - 일반 방문자:', { 
+                        floating: this.selectedCommentSet.floating,
+                        greeting: this.selectedCommentSet.greeting
+                    });
+                } else {
+                    console.warn('🧪 실험 데이터 없음');
+                }
+            } else if (this.isExperimentTarget && this.gentooSessionData?.redirectState) {
+                console.log('🧪 실험 제외 - PDP 리다이렉트 사용자');
             }
 
             // 🛍️ Shopify 테스트용 - 특정 파트너 ID에 대한 분기 처리
@@ -817,6 +841,29 @@ class FloatingButton {
         }
     }
 
+    // 🧪 Experimental comment set API fetch function
+    async fetchShopifyExperimentData(partnerId) {
+        try {
+            // 🧪 하드코딩: Olive This Olive That partnerId 사용
+            const olivePartnerId = '688a88124d4467d1c30ff27f';
+            
+            const response = await fetch(
+                `${this.domains.floating}/shopify/${olivePartnerId}`,
+                {
+                    method: "GET",
+                    headers: {},
+                }
+            );
+
+            const res = await response.json();
+            console.log('fetchShopifyExperimentData:', res);
+            return res;
+        } catch (error) {
+            console.error(`Error while calling fetchShopifyExperimentData API: ${error}`);
+            return null;
+        }
+    }
+
     // Function to inject Lottie
     async injectLottie() {
         return new Promise((resolve, reject) => {
@@ -995,6 +1042,17 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
+        // If there is an experimental greeting, add it to the payload
+        if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
+            payload.experimentGreeting = this.selectedCommentSet.greeting;
+            console.log('🧪 실험용 그리팅 postMessage로 전달:', {
+                greeting: this.selectedCommentSet.greeting,
+                payload: payload
+            });
+        } else {
+            console.log('🧪 실험용 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
+        }
+        
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
@@ -1130,6 +1188,23 @@ class FloatingButton {
             }
         }
         return false;
+    }
+
+    checkExperimentTarget() {
+        const experimentStores = [
+            '0qjyz1-uj.myshopify.com',
+            // 'olivethisolivethat.com',
+            // 'experiment-store-2.com',
+            // 'experiment-store-3.com',
+            // '127.0.0.1', // 🧪 로컬 테스트용
+            // 'localhost'  // 🧪 로컬 테스트용
+        ];
+        
+        const currentHostname = window.location.hostname;
+        const isTarget = experimentStores.some(store => currentHostname.includes(store));
+        
+        console.log(`🧪 실험 타겟 체크: ${currentHostname} -> ${isTarget ? '실험 대상' : '일반 스토어'}`);
+        return isTarget;
     }
 }
 
