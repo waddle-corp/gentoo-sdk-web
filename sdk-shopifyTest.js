@@ -19,9 +19,14 @@
             s.type = "text/javascript"; 
             s.async = true; 
             // 🧪 Shopify 테스트용 SDK 로드
-            s.src = "https://sdk.gentooai.com/floating-button-sdk-shopifyTest.js"; 
-            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-shopifyTest.js'; // dev
-            // s.src = "./floating-button-sdk-shopifyTest.js"; 
+            if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
+                // 로컬 개발 환경
+                s.src = "./floating-button-sdk-shopifyTest.js";
+            } else {
+                // 프로덕션 환경
+                s.src = "https://sdk.gentooai.com/floating-button-sdk-shopifyTest.js"; 
+            }
+            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-shopifyTest.js'; // dev 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
