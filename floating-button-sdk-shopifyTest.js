@@ -83,8 +83,8 @@ class FloatingButton {
             window.location.hostname.includes("shopify-test") ||
             window.location.hostname === "gentoo-bom-shop3.myshopify.com"
         ) {
-            // 🧪 로컬 테스트 환경 설정 - localhost:3000에서 실행되는 채팅 웹 사용
-            this.hostSrc = "http://localhost:3000";
+            // 로컬 테스트 할 때만 localhost:3000에서 실행되는 채팅 웹 사용
+            this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
                 log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
