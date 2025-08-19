@@ -40,6 +40,7 @@ class FloatingButton {
                 "Missing required parameters: partnerId, authCode are required"
             );
         }
+        console.log('t-props', props);
         this.partnerType = props.partnerType || "shopify"; // 🛍️ Shopify 테스트용 기본값
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
@@ -177,8 +178,6 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            // ✨ 플로팅 문구 데이터 API 호출 - "Do you want to go shopping with me today?" 같은 텍스트를 가져옴
-            // API: /chat/api/v1/chat/floating/{partnerId}?displayLocation={}&itemId={}&chatUserId={}
             this.floatingData = await this.fetchFloatingData(this.partnerId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
@@ -193,15 +192,11 @@ class FloatingButton {
                     
                     this.floatingData.comment = this.selectedCommentSet.floating;
                     
-                    // console.log('🧪 실험 적용 - 일반 방문자:', { 
-                    //     floating: this.selectedCommentSet.floating,
-                    //     greeting: this.selectedCommentSet.greeting
-                    // });
-                } else {
-                    // console.warn('🧪 실험 데이터 없음');
+                    console.log('t-floating', { 
+                        floating: this.selectedCommentSet.floating,
+                        greeting: this.selectedCommentSet.greeting
+                    });
                 }
-            } else if (this.isExperimentTarget && this.gentooSessionData?.redirectState) {
-                // console.log('🧪 실험 제외 - PDP 리다이렉트 사용자');
             }
 
             // 🛍️ Shopify 테스트용 - 특정 파트너 ID에 대한 분기 처리
@@ -1043,17 +1038,10 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        // If there is a customized greeting, add it to the payload
         if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
             payload.customizedGreeting = this.selectedCommentSet.greeting;
-            // console.log('🧪 맞춤형 그리팅 postMessage로 전달:', {
-            //     greeting: this.selectedCommentSet.greeting,
-            //     payload: payload
-            // });
-        } else {
-            // console.log('🧪 맞춤형 그리팅 없음 - selectedCommentSet:', this.selectedCommentSet);
         }
-        
+
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
