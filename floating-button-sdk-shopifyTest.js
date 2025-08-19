@@ -11,7 +11,6 @@ class FloatingButton {
             '127.0.0.1'
         ];
 
-        // 🧪 check experiment target store
         this.isExperimentTarget = this.checkExperimentTarget();
         
         // Validate required props
@@ -40,7 +39,7 @@ class FloatingButton {
                 "Missing required parameters: partnerId, authCode are required"
             );
         }
-        console.log('t-props', props);
+
         this.partnerType = props.partnerType || "shopify"; // 🛍️ Shopify 테스트용 기본값
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
@@ -837,22 +836,16 @@ class FloatingButton {
         }
     }
 
-    // 🧪 Experimental comment set API fetch function
     async fetchShopifyExperimentData(partnerId) {
         try {
-            // 🧪 하드코딩: Olive This Olive That partnerId 사용
-            const olivePartnerId = '688a88124d4467d1c30ff27f';
-            
             const response = await fetch(
-                `${this.domains.floating}/shopify/${olivePartnerId}`,
+                `${this.domains.floating}/shopify/${partnerId}`,
                 {
                     method: "GET",
                     headers: {},
                 }
             );
-
             const res = await response.json();
-            // console.log('fetchShopifyExperimentData:', res);
             return res;
         } catch (error) {
             console.error(`Error while calling fetchShopifyExperimentData API: ${error}`);
@@ -1188,11 +1181,8 @@ class FloatingButton {
             // '127.0.0.1', // 🧪 로컬 테스트용
             // 'localhost'  // 🧪 로컬 테스트용
         ];
-        
         const currentHostname = window.location.hostname;
         const isTarget = experimentStores.some(store => currentHostname.includes(store));
-        
-        // console.log(`🧪 실험 타겟 체크: ${currentHostname} -> ${isTarget ? '실험 대상' : '일반 스토어'}`);
         return isTarget;
     }
 }
