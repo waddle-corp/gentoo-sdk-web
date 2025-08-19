@@ -1175,9 +1175,10 @@ class FloatingButton {
     checkExperimentTarget() {
         const experimentStores = [
             '0qjyz1-uj.myshopify.com',
-            // 'olivethisolivethat.com',
-            // 'experiment-store-2.com',
-            // 'experiment-store-3.com',
+            'olivethisolivethat.com',
+            'dualtronusa.com',
+            'paper-tree.com',
+            'saranghello.com',
             // '127.0.0.1', // 🧪 로컬 테스트용
             // 'localhost'  // 🧪 로컬 테스트용
         ];
