@@ -1005,10 +1005,14 @@ class FloatingButton {
                 (?:\/category/...)?	🔹 optional category/display path
              */
             const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
+            const alterRegex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)/;
 
             const match = path.match(regex);
+            const alterMatch = path.match(alterRegex);
             if (match && match[1]) {
                 return match[1]; // product_no
+            } else if (alterMatch && alterMatch[1]) {
+                return alterMatch[1]; // product_no
             }
 
             // 3. 찾을 수 없는 경우 null 반환
