@@ -45,6 +45,7 @@ class FloatingButton {
         this.warningMessage;
         this.warningActivated;
         this.floatingAvatar;
+        this.floatingMessage;
 
         this.itemId = this.getProductNo();
         this.iframeHeightState;
@@ -448,7 +449,7 @@ class FloatingButton {
                     // Check if component is destroyed or clicked
                     if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                         return;
-    
+                    this.floatingMessage = e.data.floatingMessage;
                     this.expandedButton = document.createElement("div");
                     this.expandedText = document.createElement("p");
                     if (this.isSmallResolution) {
@@ -494,7 +495,7 @@ class FloatingButton {
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.floatingContainer?.addEventListener("click", (e) => {
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
-            window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick' });
+            window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick', floatingMessage: this.floatingMessage });
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));

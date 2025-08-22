@@ -103,7 +103,7 @@ class Logger {
                         window.GentooLogListener = {
                             log: (payload) => {
                                 if (payload.type === 'floatingEvent') {
-                                    sendEventLog(payload.event, this.basicPayload);
+                                    sendEventLog(payload.event, this.basicPayload, { floatingMessage: payload.floatingMessage });
                                 }
                                 if (payload.type === 'healthCheck') {
                                     sendEventLog(payload.event, this.basicPayload, { connectionId: payload.connectionId });
