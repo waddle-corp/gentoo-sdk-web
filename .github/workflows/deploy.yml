@@ -32,7 +32,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
           AWS_REGION: ap-northeast-2  # 예: us-west-2
-          SOURCE_DIR: ''  # 업로드할 파일 경로 (예: dist)
+          SOURCE_DIR: .  # 업로드할 파일 경로 (예: dist)
       - name: Deploy to S3 for develop
         if: github.ref == 'refs/heads/develop'
         uses: jakejarvis/s3-sync-action@v0.5.1
@@ -43,7 +43,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-northeast-2  # 예: us-west-2
-          SOURCE_DIR: ''  # 업로드할 파일 경로 (예: dist)
+          SOURCE_DIR: .  # 업로드할 파일 경로 (예: dist)
 
   
 
