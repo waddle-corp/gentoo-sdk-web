@@ -18,10 +18,9 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-sdk-cafe24-glacier.js";
-            s.src = "https://dev-sdk.gentooai.com/dist/cafe24/floating-sdk-cafe24-glacier.js";
-            // s.src = 'https://dev-sdk.gentooai.com/dist/cafe24/floating-sdk-cafe24-glacier.js'; // dev
-            // s.src = "./dist/cafe24/floating-sdk-cafe24-glacier.js"; 
+            // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
+            s.src = "https://dev-sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
+            // s.src = "./dist/cafe24/floating-cafe24-glacier.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
