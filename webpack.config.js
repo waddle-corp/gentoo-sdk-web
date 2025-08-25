@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
         mode,
         entry: { [t.name]: t.entry },
         output: {
-            path: path.resolve(__dirname, 'test_dist', t.output),
+            path: path.resolve(__dirname, 'dist', t.output),
             filename: `${t.name}.js`,
             library: { type: 'umd', name: t.name },
             clean: true,
