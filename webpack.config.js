@@ -30,10 +30,7 @@ module.exports = (env, argv) => {
             clean: true,
         },
         plugins: [
-            new webpack.DefinePlugin({
-                ...envKeys,
-                SDK_ENV: JSON.stringify(process.env.SDK_ENV || 'development'),
-            }),
+            new webpack.DefinePlugin(envKeys),
         ],
         module: {
             rules: [
