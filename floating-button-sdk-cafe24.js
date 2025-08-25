@@ -1,9 +1,3 @@
-// import ENV_CONFIG from './src/config/env';
-
-// const currentEnv = SDK_ENV; // Webpack으로 주입됨
-// const { apiDomain, hostSrc } = ENV_CONFIG[currentEnv];
-// import CryptoJS from "crypto-js";
-
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
