@@ -7,11 +7,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: 'npm' }
       - run: npm ci
+
+      # 환경변수 주입
+      - name: Create env file
+        run: |
+          FILENAME=".env.${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
+          echo "API_AUTH_CAFE24_ENDPOINT=${{ secrets.API_AUTH_CAFE24_ENDPOINT }}" >> $FILENAME
+          echo "API_CHATEVENT_ENDPOINT=${{ secrets.API_CHATEVENT_ENDPOINT }}" >> $FILENAME
+          echo "API_CHATBOT_ENDPOINT=${{ secrets.API_CHATBOT_ENDPOINT }}" >> $FILENAME
+          echo "API_FLOATING_ENDPOINT=${{ secrets.API_FLOATING_ENDPOINT }}" >> $FILENAME
+          echo "API_PARTNERID_ENDPOINT=${{ secrets.API_PARTNERID_ENDPOINT }}" >> $FILENAME
+          echo "API_GODOMALL_PARTNERID_ENDPOINT=${{ secrets.API_GODOMALL_PARTNERID_ENDPOINT }}" >> $FILENAME
+          echo "API_USEREVENT_ENDPOINT=${{ secrets.API_USEREVENT_ENDPOINT }}" >> $FILENAME
+          echo "API_CAFE24UTILS_ENDPOINT=${{ secrets.API_CAFE24UTILS_ENDPOINT }}" >> $FILENAME
+          echo "SDK_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}" >> $FILENAME
+          echo "API_CHAT_BASE_URL=${{ vars.API_CHAT_BASE_URL }}" >> $FILENAME
+          echo "API_MAIN_BASE_URL=${{ vars.API_MAIN_BASE_URL }}" >> $FILENAME
+          echo "API_TRACKER_BASE_URL=${{ vars.API_TRACKER_BASE_URL }}" >> $FILENAME
+          echo "API_CHAT_HOST_URL=${{ vars.API_CHAT_HOST_URL }}" >> $FILENAME
+          echo "CAFE24_CLIENTID=${{ secrets.CAFE24_CLIENTID }}" >> $FILENAME
+          echo "CAFE24_VERSION=${{ secrets.CAFE24_VERSION }}" >> $FILENAME
+          echo "GODOMALL_SYSTEMKEY=${{ secrets.GODOMALL_SYSTEMKEY }}" >> $FILENAME
+      - run: cat $FILENAME
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:  
