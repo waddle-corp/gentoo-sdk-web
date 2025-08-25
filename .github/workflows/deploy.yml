@@ -22,7 +22,6 @@ jobs:
             !.git/**
             !.github/**
             !node_modules/**
-            !.env*
             !**/*.pem
             !**/*.key
           retention-days: 1
