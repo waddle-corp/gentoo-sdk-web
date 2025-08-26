@@ -1192,6 +1192,7 @@ class FloatingButton {
             'dualtronusa.com',
             'paper-tree.com',
             'saranghello.com',
+            'sftequilashop.com',
             // '127.0.0.1', // 🧪 로컬 테스트용
             // 'localhost'  // 🧪 로컬 테스트용
         ];
