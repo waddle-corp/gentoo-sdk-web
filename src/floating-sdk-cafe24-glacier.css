@@ -57,27 +57,16 @@
 }
 
 .floating-button-common {
-    /* position: fixed;
-    bottom: 66px;
-    right: 0px; */
     background-size: contain;
     color: white;
     border: none;
     cursor: pointer;
     z-index: 9999999;
-
-    /* @media screen and (min-width: 600px) {
-        bottom: 66px;
-        right: 0px;
-    } */
 }
 
 .button-image {
     width: 94px;
     height: 94px;
-    /* box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
-    border-radius: 50%; */
-    /* background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif'); */
     background-repeat: no-repeat;
 }
 
@@ -91,7 +80,6 @@
 .button-image-md {
     width: 68px;
     height: 68px;
-    /* background-image: url('https://d32xcphivq9687.cloudfront.net/public/img/units/gentoo-anime-web-noloop.gif'); */
     background-repeat: no-repeat;
 }
 
@@ -100,7 +88,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('../public/img/units/sdk-floating-close.png');
+    background-image: url('https://assets.gentooai.com/sdk/sdk-floating-close.png');
 }
 
 .button-image-close-mr {
@@ -108,7 +96,7 @@
     height: 54px;
     box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.16);
     border-radius: 50%;
-    background-image: url('../public/img/units/sdk-floating-close.png');
+    background-image: url('https://assets.gentooai.com/sdk/sdk-floating-close.png');
     margin-right: 24px;
 }
 
@@ -116,7 +104,7 @@
     width: 40px;
     height: 40px;
     margin: 5px;
-    background-image: url('../public/img/units/floating-gentoo-shrink.png');
+    background-image: url('https://assets.gentooai.com/sdk/floating-gentoo-shrink.png');
 }
 
 .expanded-button {
@@ -362,7 +350,7 @@
 .chat-handler {
     width: 44px;
     height: 4px;
-    background-image: url('../public/img/units/sdk-bs-handler.png');
+    background-image: url('https://assets.gentooai.com/sdk/sdk-bs-handler.png');
 }
 
 .chat-close-button-container {
@@ -396,14 +384,14 @@
     height: 20px;
     margin-right: 2px;
     background-size: contain;
-    background-image: url('https://d3qrvyizob9ouf.cloudfront.net/public/img/units/chat-shrink.png');
+    background-image: url('https://assets.gentooai.com/sdk/chat-shrink.png');
 }
 
 .chat-close-button-icon-md {
     width: 20px;
     height: 20px;
     background-size: contain;
-    background-image: url('https://d3qrvyizob9ouf.cloudfront.net/public/img/units/chat-shrink-md.png');
+    background-image: url('https://assets.gentooai.com/sdk/chat-shrink-md.png');
 }
 
 .chat-close-button-text {
@@ -437,7 +425,7 @@
 .chat-handler-md {
     width: 44px;
     height: 4px;
-    background-image: url('../public/img/units/sdk-bs-handler.png');
+    background-image: url('https://assets.gentooai.com/sdk/sdk-bs-handler.png');
 }
 
 .chat-header-text-md {
