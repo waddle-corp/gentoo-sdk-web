@@ -73,7 +73,7 @@
 .button-image-zoom {
     width: 120px;
     height: 120px;
-    background-image: url('../public/img/units/gentoo-anime-web-noloop.gif');
+    background-image: url('https://assets.gentooai.com/sdk/gentoo-anime-web-noloop.gif');
     background-repeat: no-repeat;
 }
 
