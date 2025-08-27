@@ -196,6 +196,9 @@ class FloatingButton {
             }
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
+                if (this.displayLocation === 'PRODUCT_DETAIL') {
+                    return;
+                }
                 this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
                 
                 if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
@@ -203,11 +206,6 @@ class FloatingButton {
                     this.selectedCommentSet = this.experimentData.comments[randomIndex];
                     
                     this.floatingData.comment = this.selectedCommentSet.floating;
-                    
-                    console.log('t-floating', { 
-                        floating: this.selectedCommentSet.floating,
-                        greeting: this.selectedCommentSet.greeting
-                    });
                 }
             }
 

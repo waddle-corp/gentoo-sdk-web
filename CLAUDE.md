@@ -9,7 +9,7 @@ Gentoo 플로팅 버튼 SDK는 다양한 이커머스 플랫폼에 젠투 AI 챗
 ```
 floating-button-sdk.js        # 기본 프로덕션 SDK
 floating-button-sdk-cafe24.js # 카페24 플랫폼 특화
-floating-button-sdk-shopifyTest.js # Shopify 실험용 (맞춤형 문구)
+floating-button-sdk-shopifyTest.js # Shopify 특화
 sdk.js                        # 기본 로더
 sdk-shopifyTest.js           # Shopify 실험용 로더
 ```
@@ -26,6 +26,62 @@ sdk-shopifyTest.js           # Shopify 실험용 로더
 - `fetchShopifyExperimentData()`: 실험용 맞춤 문구 API 호출
 - `sendPostMessageHandler()`: iframe 통신
 - `checkExperimentTarget()`: 실험 대상 스토어 판별
+
+## displayLocation 시스템
+
+### 핵심 역할
+`displayLocation`은 **페이지 컨텍스트 인식**을 통해 상황에 맞는 AI 응답과 플로팅 문구를 제공하는 핵심 변수입니다.
+
+### 공식 지원 값 (백엔드 Enum)
+```typescript
+// gentoo-backend/apps/gentoo-nest-chat/src/const/floating-button.ts
+export const DisplayLocationEnum = {
+  HOME: 'HOME',                    // 홈페이지/메인페이지
+  PRODUCT_DETAIL: 'PRODUCT_DETAIL', // 상품 상세페이지 (PDP)
+  PRODUCT_LIST: 'PRODUCT_LIST',    // 상품 목록/카테고리 페이지
+} as const;
+```
+
+### SDK 전용 값 (로컬 처리)
+```javascript
+'PRODUCT_SEARCH'     // 검색 결과 페이지 (Cafe24만, 백엔드 미지원)
+'UNDEFINED_LOCATION' // 분류 불가능한 페이지 (Logger만, 백엔드 미지원)
+```
+
+### 플랫폼별 설정 방식
+| 플랫폼 | 설정 방법 | 지원 값 |
+|--------|-----------|---------|
+| **Shopify** | Liquid 템플릿 자동 감지 (`{{ template }}`), extensions/gentoo-floating/blocks/floating_button.liquid 참고 | HOME, PRODUCT_DETAIL, PRODUCT_LIST, CART, OTHER |
+| **Cafe24** | JavaScript URL 패턴 자동 감지 | HOME, PRODUCT_DETAIL, PRODUCT_LIST, PRODUCT_SEARCH |
+| **고도몰** | JavaScript URL 패턴 자동 감지 | HOME, PRODUCT_DETAIL, PRODUCT_LIST |
+
+### 사용 위치
+1. **채팅 URL 쿼리 파라미터**: `dp=${this.displayLocation}`
+2. **플로팅 데이터 API 호출**: 페이지별 맞춤 문구 요청
+3. **로깅/분석**: 사용자 행동 분석 데이터
+
+### PRODUCT_DETAIL의 특별함
+- **itemId와 연동**: 상품 ID와 함께 전달하여 상품별 맞춤 응답 제공
+- **실험 로직**: PDP 방문 후 채팅 자동 열기 등 특수 시나리오 처리
+- **백엔드 특화 처리**: 상품 상세 페이지에서만 작동하는 로직들
+
+### Shopify의 실제 감지 방식
+```liquid
+// SDK로 전달
+window.GentooIO('boot', {
+    displayLocation: pageCategory,  // 자동 감지된 값
+    itemId: "{{ product.id }}",     // Liquid로 자동 주입
+})
+```
+
+### 테스트 페이지에서의 수동 설정
+```javascript
+// test_pdp.html - 개발/테스트용
+GentooIO('boot', {
+    displayLocation: 'PRODUCT_DETAIL', // 수동 지정
+    itemId: '3607505',                  // 수동 지정
+})
+```
 
 ### 환경별 분기 로직
 
@@ -69,6 +125,18 @@ checkExperimentTarget() {
 - **플로팅 문구**: `floatingData.comment` 오버라이드
 - **그리팅 문구**: `postMessage`로 채팅 웹에 전달
 - **하드코딩된 API**: Olive This Olive That partnerId 사용
+- **PDP 제외**: 상품 상세페이지에서는 실험 문구 적용 안함 (안정적인 구매 전환 보장)
+
+```javascript
+// PDP에서는 실험 로직 완전 건너뛰기
+if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
+    if (this.displayLocation === 'PRODUCT_DETAIL') {
+        return; // 🚫 PDP는 기본 문구만 사용
+    }
+    // HOME, PRODUCT_LIST에서만 실험 문구 적용
+    this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
+}
+```
 
 ### redirectState 관리
 **핵심 인사이트**: `redirectState`는 PDP 리다이렉트 플로우와 실험을 분리하는 핵심 메커니즘
@@ -151,11 +219,6 @@ this.allowedDomainsForIframe = [
 ];
 ```
 
-### 실험 안전성
-- **타겟 제한**: 특정 스토어에서만 실행
-- **API 하드코딩**: Olive partnerId로 고정
-- **폴백 로직**: 실험 실패 시 기존 문구 사용
-
 ### 플로팅 문구 표시 조건
 ```javascript
 // 3가지 조건 모두 만족해야 표시
@@ -169,20 +232,7 @@ if (!this.gentooSessionData?.redirectState &&    // PDP 리다이렉트 아님
 
 ## 빌드 & 배포
 
-### 개발 파일
-- `src/floating-sdk.js`: 소스 파일
-- 웹팩으로 번들링
-
-### 배포 파일
-- CDN 업로드: `floating-button-sdk-shopifyTest.js`
-- Shopify Extension 업데이트 필요
-
 ## 디버깅 팁
-
-### 콘솔 로그 패턴
-- `🧪`: 실험 관련 로그
-- `🛍️`: Shopify 특화 기능
-- `💬`: 플로팅 문구 관련
 
 ### 자주 확인할 사항
 1. `isExperimentTarget` 값
