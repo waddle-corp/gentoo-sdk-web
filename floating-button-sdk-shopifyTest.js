@@ -196,16 +196,15 @@ class FloatingButton {
             }
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-                if (this.displayLocation === 'PRODUCT_DETAIL') {
-                    return;
-                }
-                this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
-                
-                if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * this.experimentData.comments.length);
-                    this.selectedCommentSet = this.experimentData.comments[randomIndex];
+                if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                    this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
                     
-                    this.floatingData.comment = this.selectedCommentSet.floating;
+                    if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * this.experimentData.comments.length);
+                        this.selectedCommentSet = this.experimentData.comments[randomIndex];
+                        
+                        this.floatingData.comment = this.selectedCommentSet.floating;
+                    }
                 }
             }
 
