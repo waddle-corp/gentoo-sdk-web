@@ -392,60 +392,9 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             
-            // 💬 플로팅 문구 최초 표시 (반복 표시는 별도 interval에서 처리)
+            // 💬 플로팅 문구 최초 표시 (공통 함수 사용)
             if (!this.gentooSessionData?.redirectState && this.floatingData.comment && this.floatingData.comment.length > 0) {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
-
-                // 🗨️ 플로팅 문구 UI 요소 생성 (expandedButton과 expandedText)
-                this.expandedButton = document.createElement("div");
-                this.expandedText = document.createElement("p");
-                if (this.isSmallResolution) {
-                    this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area-md" :
-                        "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
-                } else {
-                    this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area" :
-                        "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
-                }
-                this.expandedButton.appendChild(this.expandedText);
-
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
-
-                    // ⚡ 플로팅 문구 타이핑 애니메이션 시작 - API의 comment 데이터를 한 글자씩 표시
-                    // 🛍️ Shopify 테스트용 - 영어 문구에 최적화된 타이핑 애니메이션
-                    let i = 0;
-                    const addLetter = () => {
-                        if (!this.floatingData) return;
-                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                            this.expandedText.innerText += this.floatingData.comment[i];
-                            i++;
-                            // 🛍️ 영어 문구에 맞춰 타이핑 속도 조정
-                            setTimeout(addLetter, 800 / this.floatingData.comment.length);
-                        }
-                    };
-                    addLetter();
-                    this.floatingCount += 1;
-
-                    // Remove expanded button after delay
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
-                        }
-                    }, 7000);
-                }
+                this.createFloatingMessage(this.floatingData.comment, true);
             }
 
             // Start repeating interval for experiment target (every 10 seconds)
@@ -492,57 +441,84 @@ class FloatingButton {
         window.__GentooInited = 'created';
     }
 
-    // Method to display a random floating message
-    showRandomFloatingMessage() {
-        if (this.floatingClicked || this.isDestroyed || !this.floatingContainer || 
-            !this.availableComments || this.availableComments.length === 0) {
+    // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
+    createFloatingMessage(messageText, shouldIncrementCounter = false) {
+        // 기존 코드의 안전장치들 유지
+        if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
             return;
-        }
 
+        // 기존 expandedButton 정리 (새로운 메시지용)
         if (this.expandedButton && this.expandedButton.parentNode === this.floatingContainer) {
             this.floatingContainer.removeChild(this.expandedButton);
         }
 
-        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
-        const selectedComment = this.availableComments[randomIndex];
-
+        // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
         this.expandedButton = document.createElement("div");
         this.expandedText = document.createElement("p");
         
         if (this.isSmallResolution) {
             this.expandedButton.className = 
                 !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                "expanded-area-md" : "expanded-area-md expanded-area-neutral-md";
+                "expanded-area-md" :
+                "expanded-area-md expanded-area-neutral-md";
             this.expandedText.className = "expanded-area-text-md";
         } else {
             this.expandedButton.className = 
                 !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                "expanded-area" : "expanded-area expanded-area-neutral";
+                "expanded-area" :
+                "expanded-area expanded-area-neutral";
             this.expandedText.className = "expanded-area-text";
         }
-        
         this.expandedButton.appendChild(this.expandedText);
-        this.floatingContainer.appendChild(this.expandedButton);
 
-        // Typing animation
-        let i = 0;
-        const floatingText = selectedComment.floating;
-        const addLetter = () => {
-            if (i < floatingText.length && !this.isDestroyed) {
-                this.expandedText.innerText += floatingText[i];
-                i++;
-                setTimeout(addLetter, TYPING_ANIMATION_SPEED_MS / floatingText.length);
-            }
-        };
-        addLetter();
+        // 기존 코드의 안전한 DOM 추가 로직 유지
+        if (this.floatingContainer && this.floatingContainer.parentNode) {
+            this.floatingContainer.appendChild(this.expandedButton);
 
-        // Remove after 7 seconds
-        setTimeout(() => {
-            if (this.floatingContainer && this.expandedButton && 
-                this.expandedButton.parentNode === this.floatingContainer) {
-                this.floatingContainer.removeChild(this.expandedButton);
+            // ⚡ 플로팅 문구 타이핑 애니메이션 (기존 로직 기반)
+            let i = 0;
+            const addLetter = () => {
+                // 기존 안전장치 유지
+                if (!messageText) return;
+                if (i < messageText.length && !this.isDestroyed) {
+                    this.expandedText.innerText += messageText[i];
+                    i++;
+                    setTimeout(addLetter, TYPING_ANIMATION_SPEED_MS / messageText.length);
+                }
+            };
+            addLetter();
+            
+            // 카운터 증가 (옵션)
+            if (shouldIncrementCounter) {
+                this.floatingCount += 1;
             }
-        }, FLOATING_MESSAGE_DISPLAY_MS);
+
+            // 7초 후 제거 (기존 로직 그대로)
+            setTimeout(() => {
+                if (
+                    this.floatingContainer &&
+                    this.expandedButton &&
+                    this.expandedButton.parentNode === this.floatingContainer
+                ) {
+                    this.floatingContainer.removeChild(this.expandedButton);
+                }
+            }, FLOATING_MESSAGE_DISPLAY_MS);
+        }
+    }
+
+    // 🎲 랜덤 플로팅 메시지 표시 메서드 (공통 함수 사용)
+    showRandomFloatingMessage() {
+        // 조건 체크
+        if (!this.availableComments || this.availableComments.length === 0) {
+            return;
+        }
+
+        // 랜덤 comment 선택
+        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+        const selectedComment = this.availableComments[randomIndex];
+
+        // 공통 함수로 메시지 생성 (카운터 증가 안 함)
+        this.createFloatingMessage(selectedComment.floating, false);
     }
 
     setupEventListeners(position) {
