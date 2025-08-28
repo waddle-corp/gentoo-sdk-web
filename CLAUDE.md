@@ -106,38 +106,6 @@ else {
 }
 ```
 
-## Shopify 실험 기능
-
-### 실험 타겟 체크
-```javascript
-checkExperimentTarget() {
-    const experimentStores = [
-        '0qjyz1-uj.myshopify.com',  // 테스트 스토어
-        // 추가 실험 스토어들...
-    ];
-    return experimentStores.some(store => 
-        window.location.hostname.includes(store)
-    );
-}
-```
-
-### 맞춤형 문구 시스템
-- **플로팅 문구**: `floatingData.comment` 오버라이드
-- **그리팅 문구**: `postMessage`로 채팅 웹에 전달
-- **하드코딩된 API**: Olive This Olive That partnerId 사용
-- **PDP 제외**: 상품 상세페이지에서는 실험 문구 적용 안함 (안정적인 구매 전환 보장)
-
-```javascript
-// PDP에서는 실험 로직 완전 건너뛰기
-if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-    if (this.displayLocation === 'PRODUCT_DETAIL') {
-        return; // 🚫 PDP는 기본 문구만 사용
-    }
-    // HOME, PRODUCT_LIST에서만 실험 문구 적용
-    this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
-}
-```
-
 ### redirectState 관리
 **핵심 인사이트**: `redirectState`는 PDP 리다이렉트 플로우와 실험을 분리하는 핵심 메커니즘
 
@@ -145,14 +113,6 @@ if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
 1. **설정**: 상품 카드 클릭 시 `true`
 2. **전파**: sessionStorage로 페이지 간 유지
 3. **해제**: 자동 채팅 열기 완료 후 `false`
-
-#### 실험과의 관계
-```javascript
-// 실험 적용 조건: 타겟 스토어 + 리다이렉트 아님
-if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-    // 맞춤형 문구 적용
-}
-```
 
 ## 플랫폼별 특화 기능
 

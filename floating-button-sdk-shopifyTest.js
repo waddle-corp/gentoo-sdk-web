@@ -1,5 +1,10 @@
 class FloatingButton {
     constructor(props) {
+        this.FLOATING_MESSAGE_INTERVAL_MS = 30000;
+        this.FLOATING_MESSAGE_DISPLAY_MS = 7000;
+        this.TYPING_ANIMATION_SPEED_MS = 800;
+        this.MIN_TYPING_SPEED_MS = 50;
+
         // 🛍️ Shopify 테스트용 - iframe 허용 도메인 확장
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
@@ -59,6 +64,8 @@ class FloatingButton {
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.availableComments = null;
+        this.floatingMessageIntervalId = null;
         this.warningMessage;
         this.warningActivated;
         this.floatingData;
@@ -73,6 +80,11 @@ class FloatingButton {
         this.iframeHeightState;
         this.viewportInjected = false;
         this.originalViewport = null;
+
+        // 🛡️ 메모리 누수 방지를 위한 다중 cleanup 전략
+        this.handlePageUnload = this.handlePageUnload.bind(this);
+        window.addEventListener('pagehide', this.handlePageUnload);
+        window.addEventListener('beforeunload', this.handlePageUnload);
 
         // 🧪 Shopify 테스트용 환경 설정
         if (
@@ -90,6 +102,7 @@ class FloatingButton {
                 log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://dev-api.gentooai.com",
             };
         } else if (
             window.location.hostname === "stage-demo.gentooai.com"
@@ -101,6 +114,7 @@ class FloatingButton {
                 log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://stage-api.gentooai.com",
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
@@ -109,12 +123,12 @@ class FloatingButton {
                 log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://api.gentooai.com",
             };
         }
 
         // Add a promise to track initialization status
         this.bootPromise = this.checkTrainingProgress(this.partnerId).then((canProceed) => {
-            console.log("gentoo-canProceed", canProceed);
             if (!canProceed) {
                 console.warn("GentooIO: Training not completed, skipping initialization");
                 window.__GentooInited = 'training_incomplete';
@@ -196,13 +210,34 @@ class FloatingButton {
             }
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-                if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                if (this.displayLocation === 'PRODUCT_DETAIL') {
+                    const pdpComment = this.floatingData?.comment;
+                    this.availableComments = [
+                        {
+                            "floating": pdpComment,
+                            "greeting": null,
+                        },
+                    ];
+                } else {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
-                    
-                    if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * this.experimentData.comments.length);
-                        this.selectedCommentSet = this.experimentData.comments[randomIndex];
-                        
+
+                    if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
+                        this.availableComments = this.experimentData.comments;
+                        // LOCAL_DEV_AVAILABLE_COMMENTS
+                        // this.availableComments = [
+                        //     {
+                        //         "floating": "Hello! What can I get for you?",
+                        //         "greeting": "Welcome 😊 What product are you looking for? I'd be happy to provide some recommendations."
+                        //     },
+                        //     {
+                        //         "floating": "Cooking, finishing or dipping? I’ll get it for you.",
+                        //         "greeting": "Looking for the perfect olive oil for your next dish? We have a curated selection for every culinary purpose. What's on your menu?"
+                        //     },
+                        // ];
+
+                        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+                        this.selectedCommentSet = this.availableComments[randomIndex];
+
                         this.floatingData.comment = this.selectedCommentSet.floating;
                     }
                 }
@@ -374,62 +409,17 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             
-            // 💬 플로팅 문구 렌더링 조건 체크
-            // - redirectState가 없고, 2회 미만 표시했고, API에서 받은 comment가 있는 경우
-            // 🛍️ Shopify 테스트용 - 플로팅 문구 표시 로직
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment && this.floatingData.comment.length > 0) {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
+            // 💬 플로팅 문구 최초 표시 (공통 함수 사용)
+            if (!this.gentooSessionData?.redirectState && this.floatingData.comment && this.floatingData.comment.length > 0) {
+                this.createFloatingMessage(this.floatingData.comment, true);
+            }
 
-                // 🗨️ 플로팅 문구 UI 요소 생성 (expandedButton과 expandedText)
-                this.expandedButton = document.createElement("div");
-                this.expandedText = document.createElement("p");
-                if (this.isSmallResolution) {
-                    this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area-md" :
-                        "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
-                } else {
-                    this.expandedButton.className = 
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area" :
-                        "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
-                }
-                this.expandedButton.appendChild(this.expandedText);
-
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
-
-                    // ⚡ 플로팅 문구 타이핑 애니메이션 시작 - API의 comment 데이터를 한 글자씩 표시
-                    // 🛍️ Shopify 테스트용 - 영어 문구에 최적화된 타이핑 애니메이션
-                    let i = 0;
-                    const addLetter = () => {
-                        if (!this.floatingData) return;
-                        if (i < this.floatingData.comment.length && !this.isDestroyed) {
-                            this.expandedText.innerText += this.floatingData.comment[i];
-                            i++;
-                            // 🛍️ 영어 문구에 맞춰 타이핑 속도 조정
-                            setTimeout(addLetter, 800 / this.floatingData.comment.length);
-                        }
-                    };
-                    addLetter();
-                    this.floatingCount += 1;
-
-                    // Remove expanded button after delay
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
-                        }
-                    }, 7000);
-                }
+            // Start repeating interval for experiment target (every 10 seconds)
+            console.log('ac-length', this.availableComments?.length, this.isExperimentTarget);
+            if (this.isExperimentTarget && this.availableComments && this.availableComments?.length > 0) {
+                this.floatingMessageIntervalId = setInterval(() => {
+                    this.showRandomFloatingMessage();
+                }, this.FLOATING_MESSAGE_INTERVAL_MS);
             }
         }
 
@@ -466,6 +456,105 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+    }
+
+    // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
+    createFloatingMessage(messageText, shouldIncrementCounter = false) {
+        if (!messageText || typeof messageText !== 'string' || messageText.length === 0) {
+            console.warn('Invalid messageText for floating message:', messageText);
+            return;
+        }
+
+        // 기존 코드의 안전장치들 유지
+        if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+            return;
+
+        // 기존 expandedButton 정리 (새로운 메시지용) - 안전한 제거
+        this.safeRemoveExpandedButton();
+
+        // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
+        this.expandedButton = document.createElement("div");
+        this.expandedText = document.createElement("p");
+        
+        if (this.isSmallResolution) {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area-md" :
+                "expanded-area-md expanded-area-neutral-md";
+            this.expandedText.className = "expanded-area-text-md";
+        } else {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area" :
+                "expanded-area expanded-area-neutral";
+            this.expandedText.className = "expanded-area-text";
+        }
+        this.expandedButton.appendChild(this.expandedText);
+
+        // 기존 코드의 안전한 DOM 추가 로직 유지
+        if (this.floatingContainer && this.floatingContainer.parentNode) {
+            this.floatingContainer.appendChild(this.expandedButton);
+
+            // ⚡ 플로팅 문구 타이핑 애니메이션 (기존 로직 기반)
+            let i = 0;
+            const typeSpeed = Math.max(this.MIN_TYPING_SPEED_MS, this.TYPING_ANIMATION_SPEED_MS / messageText.length); // 최소 타이핑 속도 보장
+            const addLetter = () => {
+                // 기존 안전장치 유지 + DOM 존재 확인
+                if (!messageText || !this.expandedText || !this.expandedText.parentNode) return;
+                if (i < messageText.length && !this.isDestroyed) {
+                    try {
+                        this.expandedText.innerText += messageText[i];
+                        i++;
+                        if (i < messageText.length && !this.isDestroyed) {
+                            setTimeout(addLetter, typeSpeed);
+                        }
+                    } catch (error) {
+                        console.warn('Error during typing animation:', error);
+                    }
+                }
+            };
+            addLetter();
+            
+            // 카운터 증가 (옵션)
+            if (shouldIncrementCounter) {
+                this.floatingCount += 1;
+            }
+
+            // 7초 후 제거 (안전한 제거 메서드 사용)
+            setTimeout(() => {
+                this.safeRemoveExpandedButton();
+            }, this.FLOATING_MESSAGE_DISPLAY_MS);
+        }
+    }
+
+    // Method to display a random floating message (uses common function)
+    showRandomFloatingMessage() {
+        if (!this.availableComments || this.availableComments?.length === 0) {
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+        const selectedComment = this.availableComments[randomIndex];
+
+        if (!selectedComment || !selectedComment.floating || typeof selectedComment.floating !== 'string') {
+            console.warn('Invalid comment data for floating message:', selectedComment);
+            return;
+        }
+
+        this.createFloatingMessage(selectedComment.floating, false);
+    }
+
+    safeRemoveExpandedButton() {
+        try {
+            if (this.expandedButton && 
+                this.expandedButton.parentNode && 
+                this.floatingContainer &&
+                this.expandedButton.parentNode === this.floatingContainer) {
+                this.floatingContainer.removeChild(this.expandedButton);
+            }
+        } catch (error) {
+            console.warn('Error removing expanded button:', error);
+        }
     }
 
     setupEventListeners(position) {
@@ -693,6 +782,9 @@ class FloatingButton {
 
         console.log("Destroying FloatingButton instance");
 
+        // Clear floating message interval (cleanup 메서드로 통합)
+        this.cleanup();
+
         // Delete viewport meta tag
         this.deleteViewport();
 
@@ -757,8 +849,31 @@ class FloatingButton {
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.availableComments = null;
 
         window.__GentooInited = null;
+    }
+
+    // 🛡️ 페이지 언로드 시 리소스 정리 (다중 이벤트 대응)
+    handlePageUnload() {
+        this.cleanup();
+    }
+
+    // 🧹 리소스 정리 메서드 (멱등성 보장)
+    cleanup() {
+        if (this.isDestroyed) return; // 중복 실행 방지
+        
+        // interval 정리
+        if (this.floatingMessageIntervalId) {
+            clearInterval(this.floatingMessageIntervalId);
+            this.floatingMessageIntervalId = null;
+        }
+        
+        // 이벤트 리스너 정리
+        window.removeEventListener('pagehide', this.handlePageUnload);
+        window.removeEventListener('beforeunload', this.handlePageUnload);
+        
+        this.isDestroyed = true;
     }
 
     setPageList(pageList) {
@@ -1041,8 +1156,10 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
-            payload.customizedGreeting = this.selectedCommentSet.greeting;
+        if (this.selectedCommentSet && this.selectedCommentSet?.greeting) {
+            if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                payload.customizedGreeting = this.selectedCommentSet.greeting;
+            }
         }
 
         this.iframe.contentWindow.postMessage(payload, "*");
@@ -1190,8 +1307,9 @@ class FloatingButton {
             'paper-tree.com',
             'saranghello.com',
             'sftequilashop.com',
-            // '127.0.0.1', // 🧪 로컬 테스트용
-            // 'localhost'  // 🧪 로컬 테스트용
+            // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
+            // '127.0.0.1',
+            // 'localhost'
         ];
         const currentHostname = window.location.hostname;
         const isTarget = experimentStores.some(store => currentHostname.includes(store));
@@ -1199,8 +1317,14 @@ class FloatingButton {
     }
 
     async checkTrainingProgress(partnerId) {
+        // LOCAL_DEV_SKIP_TRAINING_CHECK
+        // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        //     console.log('🧪 Local development mode: skipping training progress check');
+        //     return true;
+        // }
+
         try {
-            const response = await fetch(`https://api.gentooai.com/app/api/shop/data/check/progress/${partnerId}`);
+            const response = await fetch(`${this.domains.console}/app/api/shop/data/check/progress/${partnerId}`);
             const data = await response.json();
 
             if (data.success && data.data) {
