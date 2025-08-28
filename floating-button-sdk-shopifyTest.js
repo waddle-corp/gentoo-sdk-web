@@ -80,6 +80,11 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        // 🛡️ 메모리 누수 방지를 위한 다중 cleanup 전략
+        this.handlePageUnload = this.handlePageUnload.bind(this);
+        window.addEventListener('pagehide', this.handlePageUnload);
+        window.addEventListener('beforeunload', this.handlePageUnload);
+
         // 🧪 Shopify 테스트용 환경 설정
         if (
             window.location.hostname === "dailyshot.co" ||
@@ -765,11 +770,8 @@ class FloatingButton {
 
         console.log("Destroying FloatingButton instance");
 
-        // Clear floating message interval
-        if (this.floatingMessageIntervalId) {
-            clearInterval(this.floatingMessageIntervalId);
-            this.floatingMessageIntervalId = null;
-        }
+        // Clear floating message interval (cleanup 메서드로 통합)
+        this.cleanup();
 
         // Delete viewport meta tag
         this.deleteViewport();
@@ -838,6 +840,28 @@ class FloatingButton {
         this.availableComments = null;
 
         window.__GentooInited = null;
+    }
+
+    // 🛡️ 페이지 언로드 시 리소스 정리 (다중 이벤트 대응)
+    handlePageUnload() {
+        this.cleanup();
+    }
+
+    // 🧹 리소스 정리 메서드 (멱등성 보장)
+    cleanup() {
+        if (this.isDestroyed) return; // 중복 실행 방지
+        
+        // interval 정리
+        if (this.floatingMessageIntervalId) {
+            clearInterval(this.floatingMessageIntervalId);
+            this.floatingMessageIntervalId = null;
+        }
+        
+        // 이벤트 리스너 정리
+        window.removeEventListener('pagehide', this.handlePageUnload);
+        window.removeEventListener('beforeunload', this.handlePageUnload);
+        
+        this.isDestroyed = true;
     }
 
     setPageList(pageList) {
