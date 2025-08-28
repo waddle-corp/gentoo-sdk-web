@@ -89,10 +89,10 @@ class FloatingButton {
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
             }),
-            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
-                if (!res) throw new Error("Failed to fetch boot config");
-                this.bootConfig = res;
-            }),
+            // getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
+            //     if (!res) throw new Error("Failed to fetch boot config");
+            //     this.bootConfig = res;
+            // }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
             throw error;
