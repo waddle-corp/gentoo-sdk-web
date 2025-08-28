@@ -1,5 +1,5 @@
 import './floating-sdk.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, sendChatEventLog } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getBootConfig, postChatEventLog } from './apis/chatConfig';
 
 
 class FloatingButton {
@@ -72,7 +72,7 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
-            fetchChatUserId(this.authCode, this.udid, this.partnerId, this.chatUserId).then((res) => {
+            postChatUserId(this.authCode, this.udid, this.partnerId, this.chatUserId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
@@ -81,13 +81,17 @@ class FloatingButton {
             .catch(() => {
                 this.chatUserId = 'test';
             }),
-            fetchChatbotData(this.partnerId, this.chatUserId).then((res) => {
+            getChatbotData(this.partnerId, this.chatUserId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
                 this.floatingAvatar = res?.avatar || null;
                 const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
+            }),
+            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
+                if (!res) throw new Error("Failed to fetch boot config");
+                this.bootConfig = res;
             }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
@@ -136,7 +140,7 @@ class FloatingButton {
             this.isInitialized = true;
 
             // Fetch floating data before creating UI elements
-            this.floatingData = await fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId);
+            this.floatingData = await getFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
             }
@@ -258,7 +262,7 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
         
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -788,7 +792,7 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -848,8 +852,8 @@ class FloatingButton {
     async sendLog(input) {
         try {
             await this.bootPromise;
-            // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await fetchChatUserId(input?.authCode, input?.udid, input?.partnerId, '');
+            // Wait for postChatUserId to complete before proceeding
+            this.chatUserId = await postChatUserId(input?.authCode, input?.udid, input?.partnerId, '');
 
             const payload = {
                 eventCategory: input.eventCategory,
@@ -858,7 +862,7 @@ class FloatingButton {
                 products: input.products,
             };
 
-            return sendChatEventLog(payload, this.isMobileDevice);
+            return postChatEventLog(payload, this.isMobileDevice);
         } catch (error) {
             console.error("Failed to send log:", error);
             throw error;

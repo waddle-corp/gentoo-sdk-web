@@ -1,5 +1,5 @@
 import './floating-sdk-cafe24-glacier.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchPartnerId, sendChatEventLog } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {
@@ -101,7 +101,7 @@ class FloatingButton {
                 };
 
                 // Fetch partner ID first
-                fetchPartnerId(CAFE24API.MALL_ID)
+                getPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
                         return getCustomerIDInfoPromise();
@@ -114,7 +114,7 @@ class FloatingButton {
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return fetchChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                        return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
                     })
                     .then(chatUserId => {
                         this.chatUserId = chatUserId;
@@ -123,8 +123,8 @@ class FloatingButton {
 
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
-                            fetchChatbotData(this.partnerId, chatUserId),
-                            fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                            getChatbotData(this.partnerId, chatUserId),
+                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
@@ -304,7 +304,7 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -831,7 +831,7 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,

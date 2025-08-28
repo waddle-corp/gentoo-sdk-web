@@ -135,7 +135,7 @@ class FloatingButton {
                 };
 
                 // Fetch partner ID first
-                this.fetchPartnerId(CAFE24API.MALL_ID)
+                this.getPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
 
@@ -150,7 +150,7 @@ class FloatingButton {
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return this.fetchChatUserId(this.cafe24UserId);
+                        return this.postChatUserId(this.cafe24UserId);
                     })
                     .then(chatUserId => {
                         this.chatUserId = chatUserId;
@@ -159,8 +159,8 @@ class FloatingButton {
 
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
-                            this.fetchChatbotData(this.partnerId, chatUserId),
-                            this.fetchFloatingData(this.partnerId, chatUserId)
+                            this.getChatbotData(this.partnerId, chatUserId),
+                            this.getFloatingData(this.partnerId, chatUserId)
                         ]);
                     })
                     .then(([chatbotData, floatingData]) => {
@@ -734,7 +734,7 @@ class FloatingButton {
         }
     }
 
-    async fetchChatUserId(userToken, udid = "") {
+    async postChatUserId(userToken, udid = "") {
         const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const params = {
             externalKey: String(this.partnerId),
@@ -756,11 +756,11 @@ class FloatingButton {
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            console.error(`Error while calling fetchChatUserId API: ${error}`)
+            console.error(`Error while calling postChatUserId API: ${error}`)
         }
     }
 
-    async fetchChatbotData(partnerId, chatUserId) {
+    async getChatbotData(partnerId, chatUserId) {
         try {
             const response = await fetch(`${this.domains.chatbot}/${partnerId}?chatUserId=${chatUserId}`, {
                 method: "GET",
@@ -773,7 +773,7 @@ class FloatingButton {
         }
     }
 
-    async fetchFloatingData(partnerId, chatUserId) {
+    async getFloatingData(partnerId, chatUserId) {
         try {
             const response = await fetch(
                 `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${chatUserId}`,
@@ -786,11 +786,11 @@ class FloatingButton {
             const res = await response.json();
             return res;
         } catch (error) {
-            console.error(`Error while calling fetchFloatingData API: ${error}`);
+            console.error(`Error while calling getFloatingData API: ${error}`);
         }
     }
 
-    async fetchPartnerId(mallId) {
+    async getPartnerId(mallId) {
         try {
             const url = `${this.domains.partnerId}/${mallId}`;
             const response = await fetch(url, {
@@ -800,7 +800,7 @@ class FloatingButton {
             const res = await response.json();
             return res.partnerId;
         } catch (error) {
-            console.error(`Error while calling fetchPartnerId API: ${error}`)
+            console.error(`Error while calling getPartnerId API: ${error}`)
         }
     }
 

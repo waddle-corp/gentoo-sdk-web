@@ -1,5 +1,5 @@
 import './floating-sdk-godomall.css';
-import { fetchChatbotData, fetchChatUserId, fetchFloatingData, fetchGodomallPartnerId, sendChatEventLog } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getGodomallPartnerId, postChatEventLog } from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {
@@ -108,7 +108,7 @@ class FloatingButton {
             Promise.all([getMallInfoPromise, getMemberProfilePromise])
                 .then(([mallInfo, memberProfile]) => {
                     const godomallMallId = mallInfo.mallDomain.split('.')[0];
-                    const partnerIdPromise = fetchGodomallPartnerId(godomallMallId)
+                    const partnerIdPromise = getGodomallPartnerId(godomallMallId)
                         .then(partnerId => {
                             this.partnerId = partnerId;
                             return partnerId;
@@ -119,7 +119,7 @@ class FloatingButton {
 
                     // Wait for partner ID before fetching chat user ID
                     return partnerIdPromise.then(partnerId => {
-                        return fetchChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
+                        return postChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
                     });
                 })
                 .then(chatUserId => {
@@ -128,8 +128,8 @@ class FloatingButton {
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
 
                     return Promise.all([
-                        fetchChatbotData(this.partnerId, chatUserId),
-                        fetchFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                        getChatbotData(this.partnerId, chatUserId),
+                        getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
                     ]);
                 })
                 .then(([chatbotData, floatingData]) => {
@@ -305,7 +305,7 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -793,7 +793,7 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        sendChatEventLog({
+        postChatEventLog({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
