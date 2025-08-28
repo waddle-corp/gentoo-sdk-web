@@ -444,9 +444,9 @@ class FloatingButton {
             if (e.data.preInputSubmittedState) {
                 if (this.eventCallback.preInputSubmitted !== null) {
                     if (e.data.step1) {
-                        this.eventCallback?.preInputSubmitted(e.data.step1);
+                        this.eventCallback?.preInputSubmitted({step1: e.data.step1});
                     } else if (e.data.step2) {
-                        this.eventCallback?.preInputSubmitted(e.data.step2);
+                        this.eventCallback?.preInputSubmitted({step2: e.data.step2});
                     }
                 }
             }
