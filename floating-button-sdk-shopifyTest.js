@@ -443,14 +443,18 @@ class FloatingButton {
 
     // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
     createFloatingMessage(messageText, shouldIncrementCounter = false) {
+        // 입력 검증
+        if (!messageText || typeof messageText !== 'string' || messageText.length === 0) {
+            console.warn('Invalid messageText for floating message:', messageText);
+            return;
+        }
+
         // 기존 코드의 안전장치들 유지
         if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
             return;
 
-        // 기존 expandedButton 정리 (새로운 메시지용)
-        if (this.expandedButton && this.expandedButton.parentNode === this.floatingContainer) {
-            this.floatingContainer.removeChild(this.expandedButton);
-        }
+        // 기존 expandedButton 정리 (새로운 메시지용) - 안전한 제거
+        this.safeRemoveExpandedButton();
 
         // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
         this.expandedButton = document.createElement("div");
@@ -477,13 +481,20 @@ class FloatingButton {
 
             // ⚡ 플로팅 문구 타이핑 애니메이션 (기존 로직 기반)
             let i = 0;
+            const typeSpeed = Math.max(50, TYPING_ANIMATION_SPEED_MS / messageText.length); // 최소 50ms 보장
             const addLetter = () => {
-                // 기존 안전장치 유지
-                if (!messageText) return;
+                // 기존 안전장치 유지 + DOM 존재 확인
+                if (!messageText || !this.expandedText || !this.expandedText.parentNode) return;
                 if (i < messageText.length && !this.isDestroyed) {
-                    this.expandedText.innerText += messageText[i];
-                    i++;
-                    setTimeout(addLetter, TYPING_ANIMATION_SPEED_MS / messageText.length);
+                    try {
+                        this.expandedText.innerText += messageText[i];
+                        i++;
+                        if (i < messageText.length && !this.isDestroyed) {
+                            setTimeout(addLetter, typeSpeed);
+                        }
+                    } catch (error) {
+                        console.warn('Error during typing animation:', error);
+                    }
                 }
             };
             addLetter();
@@ -493,15 +504,9 @@ class FloatingButton {
                 this.floatingCount += 1;
             }
 
-            // 7초 후 제거 (기존 로직 그대로)
+            // 7초 후 제거 (안전한 제거 메서드 사용)
             setTimeout(() => {
-                if (
-                    this.floatingContainer &&
-                    this.expandedButton &&
-                    this.expandedButton.parentNode === this.floatingContainer
-                ) {
-                    this.floatingContainer.removeChild(this.expandedButton);
-                }
+                this.safeRemoveExpandedButton();
             }, FLOATING_MESSAGE_DISPLAY_MS);
         }
     }
@@ -517,8 +522,28 @@ class FloatingButton {
         const randomIndex = Math.floor(Math.random() * this.availableComments.length);
         const selectedComment = this.availableComments[randomIndex];
 
+        // 데이터 검증
+        if (!selectedComment || !selectedComment.floating || typeof selectedComment.floating !== 'string') {
+            console.warn('Invalid comment data for floating message:', selectedComment);
+            return;
+        }
+
         // 공통 함수로 메시지 생성 (카운터 증가 안 함)
         this.createFloatingMessage(selectedComment.floating, false);
+    }
+
+    // 🛡️ 안전한 expandedButton 제거 메서드
+    safeRemoveExpandedButton() {
+        try {
+            if (this.expandedButton && 
+                this.expandedButton.parentNode && 
+                this.floatingContainer &&
+                this.expandedButton.parentNode === this.floatingContainer) {
+                this.floatingContainer.removeChild(this.expandedButton);
+            }
+        } catch (error) {
+            console.warn('Error removing expanded button:', error);
+        }
     }
 
     setupEventListeners(position) {
