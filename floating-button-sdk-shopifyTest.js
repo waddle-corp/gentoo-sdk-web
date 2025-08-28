@@ -1,3 +1,7 @@
+const FLOATING_MESSAGE_INTERVAL_MS = 30000;
+const FLOATING_MESSAGE_DISPLAY_MS = 7000;
+const TYPING_ANIMATION_SPEED_MS = 800;
+
 class FloatingButton {
     constructor(props) {
         // 🛍️ Shopify 테스트용 - iframe 허용 도메인 확장
@@ -59,6 +63,8 @@ class FloatingButton {
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.availableComments = null;
+        this.floatingMessageIntervalId = null;
         this.warningMessage;
         this.warningActivated;
         this.floatingData;
@@ -90,6 +96,7 @@ class FloatingButton {
                 log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://dev-api.gentooai.com",
             };
         } else if (
             window.location.hostname === "stage-demo.gentooai.com"
@@ -101,6 +108,7 @@ class FloatingButton {
                 log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://stage-api.gentooai.com",
             };
         } else {
             this.hostSrc = "https://demo.gentooai.com";
@@ -109,6 +117,7 @@ class FloatingButton {
                 log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
+                console: "https://api.gentooai.com",
             };
         }
 
@@ -198,12 +207,16 @@ class FloatingButton {
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
                 if (this.displayLocation !== 'PRODUCT_DETAIL') {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
-                    
-                    if (this.experimentData && this.experimentData.comments && this.experimentData.comments.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * this.experimentData.comments.length);
-                        this.selectedCommentSet = this.experimentData.comments[randomIndex];
+
+                    if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
+                        this.availableComments = this.experimentData.comments;
+
+                        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+                        this.selectedCommentSet = this.availableComments[randomIndex];
                         
                         this.floatingData.comment = this.selectedCommentSet.floating;
+                    } else {
+                        // fallback needed
                     }
                 }
             }
@@ -374,10 +387,8 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             
-            // 💬 플로팅 문구 렌더링 조건 체크
-            // - redirectState가 없고, 2회 미만 표시했고, API에서 받은 comment가 있는 경우
-            // 🛍️ Shopify 테스트용 - 플로팅 문구 표시 로직
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment && this.floatingData.comment.length > 0) {
+            // 💬 플로팅 문구 최초 표시 (반복 표시는 별도 interval에서 처리)
+            if (!this.gentooSessionData?.redirectState && this.floatingData.comment && this.floatingData.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -431,6 +442,14 @@ class FloatingButton {
                     }, 7000);
                 }
             }
+
+            // Start repeating interval for experiment target (every 10 seconds)
+            console.log('ac-length', this.availableComments?.length, this.isExperimentTarget);
+            if (this.isExperimentTarget && this.availableComments && this.availableComments?.length > 0) {
+                this.floatingMessageIntervalId = setInterval(() => {
+                    this.showRandomFloatingMessage();
+                }, FLOATING_MESSAGE_INTERVAL_MS);
+            }
         }
 
         this.elems = {
@@ -466,6 +485,59 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+    }
+
+    // Method to display a random floating message
+    showRandomFloatingMessage() {
+        if (this.floatingClicked || this.isDestroyed || !this.floatingContainer || 
+            !this.availableComments || this.availableComments.length === 0) {
+            return;
+        }
+
+        if (this.expandedButton && this.expandedButton.parentNode === this.floatingContainer) {
+            this.floatingContainer.removeChild(this.expandedButton);
+        }
+
+        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+        const selectedComment = this.availableComments[randomIndex];
+
+        this.expandedButton = document.createElement("div");
+        this.expandedText = document.createElement("p");
+        
+        if (this.isSmallResolution) {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area-md" : "expanded-area-md expanded-area-neutral-md";
+            this.expandedText.className = "expanded-area-text-md";
+        } else {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area" : "expanded-area expanded-area-neutral";
+            this.expandedText.className = "expanded-area-text";
+        }
+        
+        this.expandedButton.appendChild(this.expandedText);
+        this.floatingContainer.appendChild(this.expandedButton);
+
+        // Typing animation
+        let i = 0;
+        const floatingText = selectedComment.floating;
+        const addLetter = () => {
+            if (i < floatingText.length && !this.isDestroyed) {
+                this.expandedText.innerText += floatingText[i];
+                i++;
+                setTimeout(addLetter, TYPING_ANIMATION_SPEED_MS / floatingText.length);
+            }
+        };
+        addLetter();
+
+        // Remove after 7 seconds
+        setTimeout(() => {
+            if (this.floatingContainer && this.expandedButton && 
+                this.expandedButton.parentNode === this.floatingContainer) {
+                this.floatingContainer.removeChild(this.expandedButton);
+            }
+        }, FLOATING_MESSAGE_DISPLAY_MS);
     }
 
     setupEventListeners(position) {
@@ -693,6 +765,12 @@ class FloatingButton {
 
         console.log("Destroying FloatingButton instance");
 
+        // Clear floating message interval
+        if (this.floatingMessageIntervalId) {
+            clearInterval(this.floatingMessageIntervalId);
+            this.floatingMessageIntervalId = null;
+        }
+
         // Delete viewport meta tag
         this.deleteViewport();
 
@@ -757,6 +835,7 @@ class FloatingButton {
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
+        this.availableComments = null;
 
         window.__GentooInited = null;
     }
@@ -1199,8 +1278,14 @@ class FloatingButton {
     }
 
     async checkTrainingProgress(partnerId) {
+        // 🧪 로컬 개발 환경에서는 훈련 체크 우회
+        // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        //     console.log('🧪 Local development mode: skipping training progress check');
+        //     return true;
+        // }
+
         try {
-            const response = await fetch(`https://api.gentooai.com/app/api/shop/data/check/progress/${partnerId}`);
+            const response = await fetch(`${this.domains.console}/app/api/shop/data/check/progress/${partnerId}`);
             const data = await response.json();
 
             if (data.success && data.data) {
