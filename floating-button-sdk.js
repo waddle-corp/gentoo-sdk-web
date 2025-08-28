@@ -102,7 +102,7 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
-            this.fetchChatUserId(this.authCode, this.udid).then((res) => {
+            this.postChatUserId(this.authCode, this.udid).then((res) => {
                 if (!res) throw new Error("Failed to fetch chat user ID");
                 this.chatUserId = res;
                 this.gentooSessionData.cuid = res;
@@ -166,7 +166,7 @@ class FloatingButton {
             this.isInitialized = true;
 
             // Fetch floating data before creating UI elements
-            this.floatingData = await this.fetchFloatingData(this.partnerId);
+            this.floatingData = await this.getFloatingData(this.partnerId);
             if (!this.floatingData) {
                 throw new Error("Failed to fetch floating data");
             }
@@ -736,7 +736,7 @@ class FloatingButton {
         }
     }
 
-    async fetchChatUserId(userToken, udid = "") {
+    async postChatUserId(userToken, udid = "") {
         const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const params = {
             externalKey: String(this.partnerId),
@@ -758,7 +758,7 @@ class FloatingButton {
             const res = await response.json();
             return res.chatUserId;
         } catch (error) {
-            // console.error(`Error while calling fetchChatUserId API: ${error}`)
+            // console.error(`Error while calling postChatUserId API: ${error}`)
         }
     }
 
@@ -775,7 +775,7 @@ class FloatingButton {
         }
     }
 
-    async fetchFloatingData(partnerId) {
+    async getFloatingData(partnerId) {
         try {
             const response = await fetch(
                 `${this.domains.floating}/${partnerId}?displayLocation=${this.displayLocation}&itemId=${this.itemId}&chatUserId=${this.chatUserId}`,
@@ -788,7 +788,7 @@ class FloatingButton {
             const res = await response.json();
             return res;
         } catch (error) {
-            console.error(`Error while calling fetchFloatingData API: ${error}`);
+            console.error(`Error while calling getFloatingData API: ${error}`);
         }
     }
 
@@ -980,8 +980,8 @@ class FloatingButton {
     async sendLog(input) {
         try {
             await this.bootPromise;
-            // Wait for fetchChatUserId to complete before proceeding
-            this.chatUserId = await this.fetchChatUserId(input.authCode);
+            // Wait for postChatUserId to complete before proceeding
+            this.chatUserId = await this.postChatUserId(input.authCode);
 
             const payload = {
                 eventCategory: input.eventCategory,

@@ -1,4 +1,4 @@
-import { fetchChatUserId, sendEventLog } from './apis/chatConfig';
+import { postChatUserId, sendEventLog } from './apis/chatConfig';
 
 class Logger {
     constructor(props) {
@@ -53,7 +53,7 @@ class Logger {
                 };
 
                 // Fetch partner ID first
-                this.fetchPartnerId(CAFE24API.MALL_ID)
+                this.getPartnerId(CAFE24API.MALL_ID)
                     .then(partnerId => {
                         this.partnerId = partnerId;
 
@@ -70,7 +70,7 @@ class Logger {
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return fetchChatUserId(this.cafe24UserId, "", this.partnerId, this.chatUserId)
+                        return postChatUserId(this.cafe24UserId, "", this.partnerId, this.chatUserId)
                     })
                     .then(chatUserId => {
                         this.chatUserId = chatUserId;
@@ -213,7 +213,7 @@ class Logger {
         }
     }
 
-    async fetchPartnerId(mallId) {
+    async getPartnerId(mallId) {
         try {
             const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_PARTNERID_ENDPOINT}/${mallId}`;
             const response = await fetch(url, {
@@ -223,7 +223,7 @@ class Logger {
             const res = await response.json();
             return res.partnerId;
         } catch (error) {
-            console.error(`Error while calling fetchPartnerId API: ${error}`)
+            console.error(`Error while calling getPartnerId API: ${error}`)
         }
     }
 

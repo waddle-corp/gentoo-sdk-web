@@ -1,5 +1,5 @@
 // logger apis
-export async function fetchChatUserId(userToken, udid = "", partnerId, chatUserId) {
+export async function postChatUserId(userToken, udid = "", partnerId, chatUserId) {
     const convertedUserToken = (userToken && userToken !== 'null') ? String(userToken) : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const params = {
         externalKey: String(partnerId),
@@ -21,7 +21,7 @@ export async function fetchChatUserId(userToken, udid = "", partnerId, chatUserI
         const res = await response.json();
         return res.chatUserId;
     } catch (error) {
-        console.error(`Error while calling fetchChatUserId API: ${error}`)
+        console.error(`Error while calling postChatUserId API: ${error}`)
     }
 }
 
@@ -43,7 +43,7 @@ export async function sendEventLog(event, basicPayload = {}, customPayload = {})
 }
 
 // floating button apis
-export async function fetchChatbotData(partnerId, chatUserId) {
+export async function getChatbotData(partnerId, chatUserId) {
     try {
         const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_CHATBOT_ENDPOINT}/${partnerId}?chatUserId=${chatUserId}`, {
             method: "GET",
@@ -52,11 +52,11 @@ export async function fetchChatbotData(partnerId, chatUserId) {
         const res = await response.json();
         return res;
     } catch (error) {
-        console.error(`Error while calling fetchChatbotId API: ${error}`);
+        console.error(`Error while calling getChatbotData API: ${error}`);
     }
 }
 
-export async function fetchFloatingData(partnerId, displayLocation, itemId, chatUserId) {
+export async function getFloatingData(partnerId, displayLocation, itemId, chatUserId) {
     try {
         const response = await fetch(
             `${process.env.API_CHAT_BASE_URL}${process.env.API_FLOATING_ENDPOINT}/${partnerId}?displayLocation=${displayLocation}&itemId=${itemId}&chatUserId=${chatUserId}`,
@@ -69,11 +69,11 @@ export async function fetchFloatingData(partnerId, displayLocation, itemId, chat
         const res = await response.json();
         return res;
     } catch (error) {
-        console.error(`Error while calling fetchFloatingData API: ${error}`);
+        console.error(`Error while calling getFloatingData API: ${error}`);
     }
 }
 
-export async function fetchPartnerId(mallId) {
+export async function getPartnerId(mallId) {
     try {
         const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_PARTNERID_ENDPOINT}/${mallId}`;
         const response = await fetch(url, {
@@ -83,11 +83,11 @@ export async function fetchPartnerId(mallId) {
         const res = await response.json();
         return res.partnerId;
     } catch (error) {
-        console.error(`Error while calling fetchPartnerId API: ${error}`)
+        console.error(`Error while calling getPartnerId API: ${error}`)
     }
 }
 
-export async function fetchGodomallPartnerId(mallId) {
+export async function getGodomallPartnerId(mallId) {
     try {
         const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_GODOMALL_PARTNERID_ENDPOINT}/${mallId}`;
         const response = await fetch(url, {
@@ -97,11 +97,11 @@ export async function fetchGodomallPartnerId(mallId) {
         const res = await response.json();
         return res.partnerId;
     } catch (error) {
-        console.error(`Error while calling fetchGodomallPartnerId API: ${error}`)
+        console.error(`Error while calling getGodomallPartnerId API: ${error}`)
     }
 }
 
-export async function sendChatEventLog(payload, isMobileDevice) {
+export async function postChatEventLog(payload, isMobileDevice) {
     try {
         const params = {
             eventCategory: String(payload.eventCategory),
@@ -123,5 +123,20 @@ export async function sendChatEventLog(payload, isMobileDevice) {
         return res;
     } catch (error) {
         console.error(`Error while calling logEvent API: ${error}`);
+    }
+}
+
+export async function getBootConfig(chatUserId, currentUrl, displayLocation, itemId, partnerId) {
+    try {
+        const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_BOOTCONFIG_ENDPOINT}?chatUserId=${chatUserId}&url=${currentUrl}&displayLocation=${displayLocation}&itemId=${itemId}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${partnerId}`,
+            }
+        });
+        const res = await response.json();
+        return res.floating;
+    } catch (error) {
+        console.error(`Error while calling getBootConfig API: ${error}`);
     }
 }
