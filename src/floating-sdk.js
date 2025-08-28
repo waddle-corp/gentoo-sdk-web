@@ -89,10 +89,10 @@ class FloatingButton {
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
             }),
-            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
-                if (!res) throw new Error("Failed to fetch boot config");
-                this.bootConfig = res;
-            }),
+            // getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
+            //     if (!res) throw new Error("Failed to fetch boot config");
+            //     this.bootConfig = res;
+            // }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
             throw error;
@@ -444,9 +444,9 @@ class FloatingButton {
             if (e.data.preInputSubmittedState) {
                 if (this.eventCallback.preInputSubmitted !== null) {
                     if (e.data.step1) {
-                        this.eventCallback?.preInputSubmitted(e.data.step1);
+                        this.eventCallback?.preInputSubmitted({step1: e.data.step1});
                     } else if (e.data.step2) {
-                        this.eventCallback?.preInputSubmitted(e.data.step2);
+                        this.eventCallback?.preInputSubmitted({step2: e.data.step2});
                     }
                 }
             }
