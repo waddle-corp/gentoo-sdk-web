@@ -65,6 +65,7 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.availableComments = null;
+        this.selectedCommentSet = null;
         this.floatingMessageIntervalId = null;
         this.warningMessage;
         this.warningActivated;
@@ -235,10 +236,14 @@ class FloatingButton {
                         //     },
                         // ];
 
-                        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
-                        this.selectedCommentSet = this.availableComments[randomIndex];
-
-                        this.floatingData.comment = this.selectedCommentSet.floating;
+                        if (this.availableComments && this.availableComments?.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+                            this.selectedCommentSet = this.availableComments[randomIndex];
+                            
+                            if (this.selectedCommentSet && this.selectedCommentSet?.floating) {
+                                this.floatingData.comment = this.selectedCommentSet.floating;
+                            }
+                        }
                     }
                 }
             }
@@ -533,15 +538,17 @@ class FloatingButton {
             return;
         }
 
-        const randomIndex = Math.floor(Math.random() * this.availableComments.length);
-        const selectedComment = this.availableComments[randomIndex];
+        if (this.availableComments && this.availableComments?.length > 0) {
+            const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+            this.selectedCommentSet = this.availableComments[randomIndex];
+        }
 
-        if (!selectedComment || !selectedComment.floating || typeof selectedComment.floating !== 'string') {
-            console.warn('Invalid comment data for floating message:', selectedComment);
+        if (!this.selectedCommentSet || !this.selectedCommentSet.floating || typeof this.selectedCommentSet.floating !== 'string') {
+            console.warn('Invalid comment data for floating message:', this.selectedCommentSet);
             return;
         }
 
-        this.createFloatingMessage(selectedComment.floating, false);
+        this.createFloatingMessage(this.selectedCommentSet.floating, false);
     }
 
     safeRemoveExpandedButton() {
