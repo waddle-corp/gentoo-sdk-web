@@ -862,7 +862,19 @@ class FloatingButton {
     }
 
     // 🛡️ 페이지 언로드 시 리소스 정리 (다중 이벤트 대응)
-    handlePageUnload() {
+    handlePageUnload(event) {
+        // 🔍 어떤 이벤트가 발생했는지 구분하여 로깅
+        if (event.type === 'pagehide') {
+            // 페이지 숨김/전환
+            console.log('pagehide event');
+        } else if (event.type === 'beforeunload') {
+            // 페이지 언로드 직전
+            console.log('beforeunload event');
+        } else {
+            console.log('unknown event type:', event.type);
+        }
+        
+        console.log('cleanup started - event type:', event.type);
         this.cleanup();
     }
 
