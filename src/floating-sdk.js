@@ -38,7 +38,6 @@ class FloatingButton {
         }
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
-        if (this.partnerId === '67f487a8db6583cc1d270858') this.partnerId = '677c96df903d570bb95ace04';
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
