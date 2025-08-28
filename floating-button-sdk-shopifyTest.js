@@ -1,9 +1,11 @@
-const FLOATING_MESSAGE_INTERVAL_MS = 30000;
-const FLOATING_MESSAGE_DISPLAY_MS = 7000;
-const TYPING_ANIMATION_SPEED_MS = 800;
-
 class FloatingButton {
     constructor(props) {
+        // 🎛️ 플로팅 메시지 관련 상수 정의
+        this.FLOATING_MESSAGE_INTERVAL_MS = 30000;  // 플로팅 메시지 표시 간격 (30초)
+        this.FLOATING_MESSAGE_DISPLAY_MS = 7000;    // 플로팅 메시지 표시 지속 시간 (7초)
+        this.TYPING_ANIMATION_SPEED_MS = 800;       // 타이핑 애니메이션 속도 (800ms)
+        this.MIN_TYPING_SPEED_MS = 50;              // 최소 타이핑 속도 (50ms)
+
         // 🛍️ Shopify 테스트용 - iframe 허용 도메인 확장
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
@@ -402,7 +404,7 @@ class FloatingButton {
             if (this.isExperimentTarget && this.availableComments && this.availableComments?.length > 0) {
                 this.floatingMessageIntervalId = setInterval(() => {
                     this.showRandomFloatingMessage();
-                }, FLOATING_MESSAGE_INTERVAL_MS);
+                }, this.FLOATING_MESSAGE_INTERVAL_MS);
             }
         }
 
@@ -481,7 +483,7 @@ class FloatingButton {
 
             // ⚡ 플로팅 문구 타이핑 애니메이션 (기존 로직 기반)
             let i = 0;
-            const typeSpeed = Math.max(50, TYPING_ANIMATION_SPEED_MS / messageText.length); // 최소 50ms 보장
+            const typeSpeed = Math.max(this.MIN_TYPING_SPEED_MS, this.TYPING_ANIMATION_SPEED_MS / messageText.length); // 최소 타이핑 속도 보장
             const addLetter = () => {
                 // 기존 안전장치 유지 + DOM 존재 확인
                 if (!messageText || !this.expandedText || !this.expandedText.parentNode) return;
@@ -507,7 +509,7 @@ class FloatingButton {
             // 7초 후 제거 (안전한 제거 메서드 사용)
             setTimeout(() => {
                 this.safeRemoveExpandedButton();
-            }, FLOATING_MESSAGE_DISPLAY_MS);
+            }, this.FLOATING_MESSAGE_DISPLAY_MS);
         }
     }
 
