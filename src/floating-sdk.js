@@ -38,7 +38,6 @@ class FloatingButton {
         }
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
-        if (this.partnerId === '67f487a8db6583cc1d270858') this.partnerId = '677c96df903d570bb95ace04';
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
@@ -63,6 +62,7 @@ class FloatingButton {
             show: null,
             click: null,
             formSubmitted: null,
+            preInputSubmitted: null,
             userSentMessage: null,
         }
         this.iframeHeightState;
@@ -435,6 +435,15 @@ class FloatingButton {
                 const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
+                }
+            }
+            if (e.data.preInputSubmittedState) {
+                if (this.eventCallback.preInputSubmitted !== null) {
+                    if (e.data.step1) {
+                        this.eventCallback?.preInputSubmitted(e.data.step1);
+                    } else if (e.data.step2) {
+                        this.eventCallback?.preInputSubmitted(e.data.step2);
+                    }
                 }
             }
             if (e.data.userSentMessageState) {
@@ -877,6 +886,13 @@ class FloatingButton {
         }
     }
 
+    getPreInputSubmittedEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.preInputSubmitted = callback;
+        }
+    }
+
     getUserSentMessageEvent(callback) {
         // Execute the callback function
         if (typeof callback === "function" && this.eventCallback) {
@@ -1065,6 +1081,13 @@ window.FloatingButton = FloatingButton;
                 case "getFormSubmittedEvent":
                     if (typeof fb.getFormSubmittedEvent === "function") {
                         Promise.resolve(fb.getFormSubmittedEvent(params.callback)).catch((error) => {
+                            console.error("Failed to get GentooIO event:", error);
+                        });
+                    }
+                    break;
+                case "getPreInputSubmittedEvent":
+                    if (typeof fb.getPreInputSubmittedEvent === "function") {
+                        Promise.resolve(fb.getPreInputSubmittedEvent(params.callback)).catch((error) => {
                             console.error("Failed to get GentooIO event:", error);
                         });
                     }

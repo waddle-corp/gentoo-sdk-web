@@ -35,7 +35,8 @@
         GentooIO('boot', {
             udid: 'test-udid', // optional, only for dlst
             authCode: 'test-auth-code',
-            partnerId: '676a4b3cac97386117d1838d', // lycle dev
+            // partnerId: '676a4b3cac97386117d1838d', // lycle dev
+            partnerId: '6756ad3d3aaf5b928eec329b', // fastfive dev
             itemId: '', // optional, only @PRODUCT_DETAIL page
             displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
         })
@@ -73,6 +74,13 @@
                 console.log('getFormSubmittedEvent called');
             }
         });
+
+        GentooIO('getPreInputSubmittedEvent', {
+            callback: (params) => {
+                console.log('getPreInputSubmittedEvent called', params);
+            }
+        });
+
         GentooIO('unmount', {});
     </script>
     <div>
