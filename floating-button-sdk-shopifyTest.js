@@ -1,10 +1,9 @@
 class FloatingButton {
     constructor(props) {
-        // 🎛️ 플로팅 메시지 관련 상수 정의
-        this.FLOATING_MESSAGE_INTERVAL_MS = 30000;  // 플로팅 메시지 표시 간격 (30초)
-        this.FLOATING_MESSAGE_DISPLAY_MS = 7000;    // 플로팅 메시지 표시 지속 시간 (7초)
-        this.TYPING_ANIMATION_SPEED_MS = 800;       // 타이핑 애니메이션 속도 (800ms)
-        this.MIN_TYPING_SPEED_MS = 50;              // 최소 타이핑 속도 (50ms)
+        this.FLOATING_MESSAGE_INTERVAL_MS = 30000;
+        this.FLOATING_MESSAGE_DISPLAY_MS = 7000;
+        this.TYPING_ANIMATION_SPEED_MS = 800;
+        this.MIN_TYPING_SPEED_MS = 50;
 
         // 🛍️ Shopify 테스트용 - iframe 허용 도메인 확장
         this.allowedDomainsForIframe = [
@@ -130,7 +129,6 @@ class FloatingButton {
 
         // Add a promise to track initialization status
         this.bootPromise = this.checkTrainingProgress(this.partnerId).then((canProceed) => {
-            console.log("gentoo-canProceed", canProceed);
             if (!canProceed) {
                 console.warn("GentooIO: Training not completed, skipping initialization");
                 window.__GentooInited = 'training_incomplete';
@@ -212,18 +210,35 @@ class FloatingButton {
             }
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-                if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                if (this.displayLocation === 'PRODUCT_DETAIL') {
+                    const pdpComment = this.floatingData?.comment;
+                    this.availableComments = [
+                        {
+                            "floating": pdpComment,
+                            "greeting": null,
+                        },
+                    ];
+                } else {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
 
                     if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
                         this.availableComments = this.experimentData.comments;
+                        // LOCAL_DEV_AVAILABLE_COMMENTS
+                        // this.availableComments = [
+                        //     {
+                        //         "floating": "Hello! What can I get for you?",
+                        //         "greeting": "Welcome 😊 What product are you looking for? I'd be happy to provide some recommendations."
+                        //     },
+                        //     {
+                        //         "floating": "Cooking, finishing or dipping? I’ll get it for you.",
+                        //         "greeting": "Looking for the perfect olive oil for your next dish? We have a curated selection for every culinary purpose. What's on your menu?"
+                        //     },
+                        // ];
 
                         const randomIndex = Math.floor(Math.random() * this.availableComments.length);
                         this.selectedCommentSet = this.availableComments[randomIndex];
-                        
+
                         this.floatingData.comment = this.selectedCommentSet.floating;
-                    } else {
-                        // fallback needed
                     }
                 }
             }
@@ -445,7 +460,6 @@ class FloatingButton {
 
     // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
     createFloatingMessage(messageText, shouldIncrementCounter = false) {
-        // 입력 검증
         if (!messageText || typeof messageText !== 'string' || messageText.length === 0) {
             console.warn('Invalid messageText for floating message:', messageText);
             return;
@@ -513,28 +527,23 @@ class FloatingButton {
         }
     }
 
-    // 🎲 랜덤 플로팅 메시지 표시 메서드 (공통 함수 사용)
+    // Method to display a random floating message (uses common function)
     showRandomFloatingMessage() {
-        // 조건 체크
-        if (!this.availableComments || this.availableComments.length === 0) {
+        if (!this.availableComments || this.availableComments?.length === 0) {
             return;
         }
 
-        // 랜덤 comment 선택
         const randomIndex = Math.floor(Math.random() * this.availableComments.length);
         const selectedComment = this.availableComments[randomIndex];
 
-        // 데이터 검증
         if (!selectedComment || !selectedComment.floating || typeof selectedComment.floating !== 'string') {
             console.warn('Invalid comment data for floating message:', selectedComment);
             return;
         }
 
-        // 공통 함수로 메시지 생성 (카운터 증가 안 함)
         this.createFloatingMessage(selectedComment.floating, false);
     }
 
-    // 🛡️ 안전한 expandedButton 제거 메서드
     safeRemoveExpandedButton() {
         try {
             if (this.expandedButton && 
@@ -1147,8 +1156,10 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        if (this.selectedCommentSet && this.selectedCommentSet.greeting) {
-            payload.customizedGreeting = this.selectedCommentSet.greeting;
+        if (this.selectedCommentSet && this.selectedCommentSet?.greeting) {
+            if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                payload.customizedGreeting = this.selectedCommentSet.greeting;
+            }
         }
 
         this.iframe.contentWindow.postMessage(payload, "*");
@@ -1296,8 +1307,9 @@ class FloatingButton {
             'paper-tree.com',
             'saranghello.com',
             'sftequilashop.com',
-            // '127.0.0.1', // 🧪 로컬 테스트용
-            // 'localhost'  // 🧪 로컬 테스트용
+            // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
+            // '127.0.0.1',
+            // 'localhost'
         ];
         const currentHostname = window.location.hostname;
         const isTarget = experimentStores.some(store => currentHostname.includes(store));
@@ -1305,7 +1317,7 @@ class FloatingButton {
     }
 
     async checkTrainingProgress(partnerId) {
-        // 🧪 로컬 개발 환경에서는 훈련 체크 우회
+        // LOCAL_DEV_SKIP_TRAINING_CHECK
         // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         //     console.log('🧪 Local development mode: skipping training progress check');
         //     return true;
