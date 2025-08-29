@@ -67,6 +67,7 @@ class FloatingButton {
         this.availableComments = null;
         this.selectedCommentSet = null;
         this.floatingMessageIntervalId = null;
+        this.currentTypingTimeoutId = null;
         this.warningMessage;
         this.warningActivated;
         this.floatingData;
@@ -474,7 +475,8 @@ class FloatingButton {
         if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
             return;
 
-        // 기존 expandedButton 정리 (새로운 메시지용) - 안전한 제거
+        // 기존 타이핑 애니메이션과 expandedButton 정리 (새로운 메시지용) - 안전한 제거
+        this.clearCurrentTyping();
         this.safeRemoveExpandedButton();
 
         // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
@@ -511,10 +513,15 @@ class FloatingButton {
                         this.expandedText.innerText += messageText[i];
                         i++;
                         if (i < messageText.length && !this.isDestroyed) {
-                            setTimeout(addLetter, typeSpeed);
+                            // 다음 타이핑을 예약하고 ID 저장 (충돌 방지)
+                            this.currentTypingTimeoutId = setTimeout(addLetter, typeSpeed);
+                        } else {
+                            // 타이핑 완료시 ID 초기화
+                            this.currentTypingTimeoutId = null;
                         }
                     } catch (error) {
                         console.warn('Error during typing animation:', error);
+                        this.currentTypingTimeoutId = null;
                     }
                 }
             };
@@ -551,7 +558,18 @@ class FloatingButton {
         this.createFloatingMessage(this.selectedCommentSet.floating, false);
     }
 
+    // 현재 진행 중인 타이핑 애니메이션 중단
+    clearCurrentTyping() {
+        if (this.currentTypingTimeoutId) {
+            clearTimeout(this.currentTypingTimeoutId);
+            this.currentTypingTimeoutId = null;
+        }
+    }
+
     safeRemoveExpandedButton() {
+        // 타이핑 애니메이션 먼저 중단
+        this.clearCurrentTyping();
+        
         try {
             if (this.expandedButton && 
                 this.expandedButton.parentNode && 
@@ -875,6 +893,9 @@ class FloatingButton {
             clearInterval(this.floatingMessageIntervalId);
             this.floatingMessageIntervalId = null;
         }
+        
+        // 타이핑 애니메이션 정리
+        this.clearCurrentTyping();
         
         // 이벤트 리스너 정리
         window.removeEventListener('pagehide', this.handlePageUnload);
