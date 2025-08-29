@@ -1335,6 +1335,7 @@ class FloatingButton {
             'paper-tree.com',
             'saranghello.com',
             'sftequilashop.com',
+            'vomfassghirardellisquare.com',
             // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
             // '127.0.0.1',
             // 'localhost'
