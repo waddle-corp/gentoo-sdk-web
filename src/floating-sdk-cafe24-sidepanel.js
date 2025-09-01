@@ -53,6 +53,7 @@ class FloatingButton {
         this.originalViewport = null;
 
         this.sidePanelWidth = 400;
+        this.originalDocStyles = {};    // store original document styles before pushing
 
         // Ensure layout is restored on page unload (failsafe)
         this._bindedUnloadHandler = () => {
@@ -791,15 +792,25 @@ class FloatingButton {
     restoreParentLayout() {
         const html = document.documentElement;
         const body = document.body;
-        if (typeof this._originalBodyMarginRight !== "undefined") {
-            body.style.marginRight = this._originalBodyMarginRight;
+        if (typeof this.originalDocStyles.bodyMarginRight !== "undefined") {
+            body.style.marginRight = this.originalDocStyles.bodyMarginRight;
         } else {
             body.style.marginRight = "";
         }
-        if (typeof this._originalHtmlOverflow !== "undefined") {
-            html.style.overflow = this._originalHtmlOverflow;
+        if (typeof this.originalDocStyles.htmlOverflow !== "undefined") {
+            html.style.overflow = this.originalDocStyles.htmlOverflow;
         } else {
             html.style.overflow = "";
+        }
+        if (typeof this.originalDocStyles.bodyTransition !== "undefined") {
+            body.style.transition = this.originalDocStyles.bodyTransition;
+        } else {
+            body.style.transition = "";
+        }
+        if (typeof this.originalDocStyles.bodyMinWidth !== "undefined") {
+            body.style.minWidth = this.originalDocStyles.bodyMinWidth;
+        } else {
+            body.style.minWidth = "";
         }
     }
 
@@ -896,13 +907,19 @@ class FloatingButton {
             try {
                 const html = document.documentElement;
                 const body = document.body;
-                if (!this._originalBodyMarginRight) {
-                    this._originalBodyMarginRight = body.style.marginRight || "";
+                if (!this.originalDocStyles.bodyMarginRight) {
+                    this.originalDocStyles.bodyMarginRight = body.style.marginRight || "";
                 }
-                if (!this._originalHtmlOverflow) {
-                    this._originalHtmlOverflow = html.style.overflow || "";
+                if (!this.originalDocStyles.htmlOverflow) {
+                    this.originalDocStyles.htmlOverflow = html.style.overflow || "";
                 }
-                body.style.transition = body.style.transition || "margin-right 0.3s ease";
+                if (!this.originalDocStyles.bodyTransition) {
+                    this.originalDocStyles.bodyTransition = body.style.transition || "";
+                }
+                if (!this.originalDocStyles.bodyMinWidth) {
+                    this.originalDocStyles.bodyMinWidth = body.style.minWidth || "";
+                }
+                body.style.transition = "margin-right 0.3s ease";
                 body.style.marginRight = `${this.sidePanelWidth}px`;
                 body.style.minWidth = "0px";
                 html.style.overflow = "hidden";
