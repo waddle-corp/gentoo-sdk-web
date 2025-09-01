@@ -52,7 +52,7 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
-        this.sidePanelWidth = 350;
+        this.sidePanelWidth = 400;
 
         // Ensure layout is restored on page unload (failsafe)
         this._bindedUnloadHandler = () => {
@@ -904,6 +904,7 @@ class FloatingButton {
                 }
                 body.style.transition = body.style.transition || "margin-right 0.3s ease";
                 body.style.marginRight = `${this.sidePanelWidth}px`;
+                body.style.minWidth = "0px";
                 html.style.overflow = "hidden";
             } catch (_) {}
         } else {
