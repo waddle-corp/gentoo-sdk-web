@@ -797,11 +797,6 @@ class FloatingButton {
         } else {
             body.style.marginRight = "";
         }
-        if (typeof this.originalDocStyles.htmlOverflow !== "undefined") {
-            html.style.overflow = this.originalDocStyles.htmlOverflow;
-        } else {
-            html.style.overflow = "";
-        }
         if (typeof this.originalDocStyles.bodyTransition !== "undefined") {
             body.style.transition = this.originalDocStyles.bodyTransition;
         } else {
@@ -910,9 +905,6 @@ class FloatingButton {
                 if (!this.originalDocStyles.bodyMarginRight) {
                     this.originalDocStyles.bodyMarginRight = body.style.marginRight || "";
                 }
-                if (!this.originalDocStyles.htmlOverflow) {
-                    this.originalDocStyles.htmlOverflow = html.style.overflow || "";
-                }
                 if (!this.originalDocStyles.bodyTransition) {
                     this.originalDocStyles.bodyTransition = body.style.transition || "";
                 }
@@ -922,7 +914,6 @@ class FloatingButton {
                 body.style.transition = "margin-right 0.3s ease";
                 body.style.marginRight = `${this.sidePanelWidth}px`;
                 body.style.minWidth = "0px";
-                html.style.overflow = "hidden";
             } catch (_) {}
         } else {
             return;
