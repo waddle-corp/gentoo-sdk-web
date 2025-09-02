@@ -18,7 +18,8 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
+            // s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
+            s.src = "https://stage-sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./floating-button-sdk-cafe24.js"; 
             s.onload = () => { 

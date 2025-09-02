@@ -18,7 +18,8 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
+            s.src = "https://stage-sdk.gentooai.com/dist/gentoo/floating.js"; 
+            // s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js";  // prod
             // s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
             // s.src = "./dist/gentoo/floating.js"; 
             s.onload = () => { 
