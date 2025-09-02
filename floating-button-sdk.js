@@ -273,6 +273,7 @@ class FloatingButton {
             this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
+            this.closeActionArea.appendChild(document.createTextNode('\u200B'));
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
