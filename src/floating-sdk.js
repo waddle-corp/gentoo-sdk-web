@@ -92,7 +92,6 @@ class FloatingButton {
             getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch boot config");
                 this.bootConfig = res;
-                console.log('getBootConfig', this.bootConfig);
             }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
