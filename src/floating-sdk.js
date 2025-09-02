@@ -190,6 +190,7 @@ class FloatingButton {
         this.dimmedBackground = document.createElement("div");
         this.dimmedBackground.className = "dimmed-background hide";
         this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+        this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
         
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
@@ -218,6 +219,7 @@ class FloatingButton {
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
+            player.appendChild(document.createTextNode('\u200B'));
             
             this.dotLottiePlayer = player;
         }
@@ -225,13 +227,16 @@ class FloatingButton {
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
+            this.chatHandler.appendChild(document.createTextNode('\u200B'));
             this.chatHeaderText.className = "chat-header-text-md";
             this.closeButtonContainer.className = "chat-close-button-container-md";
             this.closeButtonIcon.className = "chat-close-button-icon-md";
+            this.closeButtonIcon.appendChild(document.createTextNode('\u200B'));
             this.closeButtonText.className = "chat-close-button-text-md";
             this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
             this.closeActionArea = document.createElement("div");
             this.closeActionArea.className = "chat-close-action-area-md";
+            this.closeActionArea.appendChild(document.createTextNode('\u200B'));
             this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
             this.closeButtonContainer.appendChild(this.closeButtonIcon);
             this.closeButtonContainer.appendChild(this.closeButtonText);
