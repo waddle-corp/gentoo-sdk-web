@@ -34,16 +34,13 @@
     <script>
         // Initialize GentooIO parameters
         GentooIO('boot', {
-            udid: 'd02a7e31-3727-4e72-8768-88d06d313eed', // optional, only for dlst
-            authCode: 'Token 65ca7bbe5995ac373b06bf3a2c09962a65403245',
-            // partnerId: '6718be2310310e41ab5276ef', // dummy dev
-            // partnerId: '676a4b3cac97386117d1838d', // lycle dev
-            // partnerId: '676a4cef7efd43d2d6a93cd7', // lycle prod
-            partnerId: '67b41281b349db2983b0660d', // athler dev
-            // partnerId: '67615284c5ff44110dbc6613', // fastfive prod
-            // partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
-            itemId: '3607505', // optional, only @PRODUCT_DETAIL page
-            displayLocation: 'PRODUCT_DETAIL', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
+            udid: 'test-udid', // optional, only for dlst
+            authCode: 'test-auth-code',
+            partnerId: '6889b848aac23b0c81675a12', // product team test dev
+            // partnerId: '6756ad3d3aaf5b928eec329b', // fastfive dev
+            itemId: '', // optional, only @PRODUCT_DETAIL page
+            displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
+            // partnerType: 'shopify',
         })
 
         // Render Floating Button
@@ -58,7 +55,7 @@
                     right: 10,
                 }
             },
-            showGentooButton: true,
+            showGentooButton: false,
             isCustomButton: true,
         });
 

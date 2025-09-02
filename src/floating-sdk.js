@@ -335,6 +335,8 @@ class FloatingButton {
                     }, 7000);
                 }
             }
+        } else {
+            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
         }
 
         this.elems = {
