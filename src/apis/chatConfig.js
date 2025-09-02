@@ -135,7 +135,7 @@ export async function getBootConfig(chatUserId, currentUrl, displayLocation, ite
             }
         });
         const res = await response.json();
-        return res.floating;
+        return res;
     } catch (error) {
         console.error(`Error while calling getBootConfig API: ${error}`);
     }
