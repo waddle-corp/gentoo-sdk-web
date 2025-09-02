@@ -19,8 +19,8 @@
             s.type = "text/javascript"; 
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
-            // s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
-            s.src = "./dist/gentoo/floating.js"; 
+            s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
+            // s.src = "./dist/gentoo/floating.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
