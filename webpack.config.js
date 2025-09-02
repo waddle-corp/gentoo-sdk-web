@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 
 module.exports = (env, argv) => {
     const mode = argv.mode || 'development';
-    const envFile = mode === 'development' ? '.env.development' : '.env.production';
+    const envFile = mode === 'development' ? '.env.development' : mode === 'stage' ? '.env.stage' : '.env.production';
     const envVars = dotenv.config({ path: envFile }).parsed || {};
 
     const envKeys = Object.keys(envVars).reduce((acc, key) => {
