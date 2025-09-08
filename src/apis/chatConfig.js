@@ -140,3 +140,18 @@ export async function getBootConfig(chatUserId, currentUrl, displayLocation, ite
         console.error(`Error while calling getBootConfig API: ${error}`);
     }
 }
+
+// imweb api
+export async function getImwebPartnerId(mallId) {
+    try {
+        const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_IMWEB_PARTNERID_ENDPOINT}/${mallId}`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {}
+        });
+        const res = await response.json();
+        return res.partnerId;
+    } catch (error) {
+        console.error(`Error while calling getImwebPartnerId API: ${error}`)
+    }
+}
