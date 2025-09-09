@@ -1,5 +1,12 @@
 import './floating-sdk-godomall.css';
-import { getChatbotData, postChatUserId, getFloatingData, getGodomallPartnerId, postChatEventLog } from './apis/chatConfig';
+import { 
+    getChatbotData, 
+    postChatUserId, 
+    getFloatingData, 
+    getGodomallPartnerId, 
+    postChatEventLog,
+    generateGuestUserToken
+} from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {
@@ -116,6 +123,16 @@ class FloatingButton {
 
                     // Handle both member and guest users
                     this.godomallUserId = memberProfile?.id || null;
+
+                    // 비회원이면 난수로 대체
+                    if (!this.godomallUserId || this.godomallUserId.length === 0) {
+                        if (sessionStorage.getItem('gentooGuest')) {
+                            this.godomallUserId = sessionStorage.getItem('gentooGuest');
+                        } else {
+                            this.godomallUserId = generateGuestUserToken();
+                            sessionStorage.setItem('gentooGuest', this.godomallUserId);
+                        }
+                    }
 
                     // Wait for partner ID before fetching chat user ID
                     return partnerIdPromise.then(partnerId => {

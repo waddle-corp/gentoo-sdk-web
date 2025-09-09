@@ -4,7 +4,8 @@ import {
     postChatUserId, 
     getFloatingData, 
     postChatEventLog, 
-    getImwebPartnerId
+    getImwebPartnerId,
+    generateGuestUserToken
 } from './apis/chatConfig';
 
 class FloatingButton {
@@ -90,16 +91,19 @@ class FloatingButton {
             const imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
             const imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
 
-            console.log('imwebMallUnitCode', imwebMallUnitCode);
-            console.log('imwebMemberUid', imwebMemberUid);
-            
+            // 비회원이면 난수로 대체
+            if (!imwebMemberUid || imwebMemberUid.length === 0) {
+                if (sessionStorage.getItem('gentooGuest')) {
+                    imwebMemberUid = sessionStorage.getItem('gentooGuest');
+                } else {
+                    imwebMemberUid = generateGuestUserToken();
+                    sessionStorage.setItem('gentooGuest', imwebMemberUid);
+                }
+            }
+
             getImwebPartnerId(imwebMallUnitCode)
                 .then((partnerId) => {
-                    if (!imwebMemberUid || imwebMemberUid.length === 0) {
-                        this.imwebUserId = null;
-                    } else {
-                        this.imwebUserId = imwebMemberUid;
-                    }
+                    this.imwebUserId = imwebMemberUid;
                     this.partnerId = partnerId;
                 })
                 .then(() => {
