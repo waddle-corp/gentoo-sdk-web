@@ -90,6 +90,9 @@ class FloatingButton {
             const imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
             const imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
 
+            console.log('imwebMallUnitCode', imwebMallUnitCode);
+            console.log('imwebMemberUid', imwebMemberUid);
+            
             getImwebPartnerId(imwebMallUnitCode)
                 .then((partnerId) => {
                     if (!imwebMemberUid || imwebMemberUid.length === 0) {

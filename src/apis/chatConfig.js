@@ -144,12 +144,15 @@ export async function getBootConfig(chatUserId, currentUrl, displayLocation, ite
 // imweb api
 export async function getImwebPartnerId(mallId) {
     try {
+        console.log('received param for getImwebPartnerId', mallId);
         const url = `${process.env.API_MAIN_BASE_URL}${process.env.API_IMWEB_PARTNERID_ENDPOINT}/${mallId}`;
+        console.log('url', url);
         const response = await fetch(url, {
             method: "GET",
             headers: {}
         });
         const res = await response.json();
+        console.log('res', res);
         return res.partnerId;
     } catch (error) {
         console.error(`Error while calling getImwebPartnerId API: ${error}`)
