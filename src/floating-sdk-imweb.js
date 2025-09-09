@@ -88,8 +88,8 @@ class FloatingButton {
             
             /* 아임웹 init process */
 
-            const imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
-            const imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
+            let imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
+            let imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
 
             // 비회원이면 난수로 대체
             if (!imwebMemberUid || imwebMemberUid.length === 0) {
