@@ -1,10 +1,10 @@
-import './floating-sdk-godomall.css';
+import './floating-sdk-imweb.css';
 import { 
     getChatbotData, 
     postChatUserId, 
     getFloatingData, 
-    getGodomallPartnerId, 
-    postChatEventLog,
+    postChatEventLog, 
+    getImwebPartnerId,
     generateGuestUserToken
 } from './apis/chatConfig';
 
@@ -86,58 +86,28 @@ class FloatingButton {
                 };
             })();
             
-            /* 고도몰 init process */
+            /* 아임웹 init process */
 
-            this.godomallAPI = window.GodomallSDK.init(process.env.GODOMALL_SYSTEMKEY);
+            let imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
+            let imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
 
-            const getMallInfoPromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMallInfo((err, res) => {
-                    if (err) {
-                        reject(new Error(`Error while calling godomall getMallInfo api: ${err}`));
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
+            // 비회원이면 난수로 대체
+            if (!imwebMemberUid || imwebMemberUid.length === 0) {
+                if (sessionStorage.getItem('gentooGuest')) {
+                    imwebMemberUid = sessionStorage.getItem('gentooGuest');
+                } else {
+                    imwebMemberUid = generateGuestUserToken();
+                    sessionStorage.setItem('gentooGuest', imwebMemberUid);
+                }
+            }
 
-            const getMemberProfilePromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMemberProfile((err, res) => {
-                    if (err) {
-                        // Handle guest users who get 403 error - they're not logged in
-                        console.log('User is guest (not logged in):', err);
-                        resolve(null); // Resolve with null for guest users
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
-
-            Promise.all([getMallInfoPromise, getMemberProfilePromise])
-                .then(([mallInfo, memberProfile]) => {
-                    const godomallMallId = mallInfo.mallDomain.split('.')[0];
-                    const partnerIdPromise = getGodomallPartnerId(godomallMallId)
-                        .then(partnerId => {
-                            this.partnerId = partnerId;
-                            return partnerId;
-                        });
-
-                    // Handle both member and guest users
-                    this.godomallUserId = memberProfile?.id || null;
-
-                    // 비회원이면 난수로 대체
-                    if (!this.godomallUserId || this.godomallUserId.length === 0) {
-                        if (sessionStorage.getItem('gentooGuest')) {
-                            this.godomallUserId = sessionStorage.getItem('gentooGuest');
-                        } else {
-                            this.godomallUserId = generateGuestUserToken();
-                            sessionStorage.setItem('gentooGuest', this.godomallUserId);
-                        }
-                    }
-
-                    // Wait for partner ID before fetching chat user ID
-                    return partnerIdPromise.then(partnerId => {
-                        return postChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
-                    });
+            getImwebPartnerId(imwebMallUnitCode)
+                .then((partnerId) => {
+                    this.imwebUserId = imwebMemberUid;
+                    this.partnerId = partnerId;
+                })
+                .then(() => {
+                    return postChatUserId(this.imwebUserId, '', this.partnerId, this.chatUserId);
                 })
                 .then(chatUserId => {
                     this.chatUserId = chatUserId;
