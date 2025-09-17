@@ -322,7 +322,13 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
-                    this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
+                    if (this.bootConfig?.floating?.button?.comment && Array.isArray(this.bootConfig.floating.button.comment)) {
+                        const randomFloatingCommentIndex = Math.floor(Math.random() * this.bootConfig.floating.button.comment.length);
+                        const randomFloatingComment = this.bootConfig.floating.button.comment[randomFloatingCommentIndex];
+                        this.addLetter(randomFloatingComment, this.expandedText, () =>this.isDestroyed);
+                    } else if (this.bootConfig?.floating?.button?.comment) {
+                        this.addLetter(this.bootConfig.floating.button.comment, this.expandedText, () =>this.isDestroyed);
+                    }
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -375,11 +381,11 @@ class FloatingButton {
         window.__GentooInited = 'created';
     }
 
-    addLetter(bootConfig, expandedText, isDestroyed, i = 0) {
-        if (!bootConfig?.floating?.button?.comment) return;
-        if (i < bootConfig.floating.button.comment.length && !isDestroyed()) {
-            expandedText.innerText += bootConfig.floating.button.comment[i];
-            setTimeout(() => this.addLetter(bootConfig, expandedText, isDestroyed, i + 1), 1000 / bootConfig.floating.button.comment.length);
+    addLetter(floatingComment, expandedText, isDestroyed, i = 0) {
+        if (!floatingComment) return;
+        if (i < floatingComment.length && !isDestroyed()) {
+            expandedText.innerText += floatingComment[i];
+            setTimeout(() => this.addLetter(floatingComment, expandedText, isDestroyed, i + 1), 1000 / floatingComment.length);
         }
     }
 
