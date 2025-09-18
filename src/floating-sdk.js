@@ -212,12 +212,14 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        // if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl);
+            // bootConfig 우선 순위로 변경
+            player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
@@ -810,6 +812,9 @@ class FloatingButton {
         }, this.isMobileDevice);
 
         this.sendPostMessageHandler({enableMode: mode});
+        if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
+            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
+        }
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
