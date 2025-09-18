@@ -212,12 +212,14 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        // if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl);
+            // bootConfig 우선 순위로 변경
+            player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
@@ -322,13 +324,7 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
-                    if (this.bootConfig?.floating?.button?.comment && Array.isArray(this.bootConfig.floating.button.comment)) {
-                        const randomFloatingCommentIndex = Math.floor(Math.random() * this.bootConfig.floating.button.comment.length);
-                        const randomFloatingComment = this.bootConfig.floating.button.comment[randomFloatingCommentIndex];
-                        this.addLetter(randomFloatingComment, this.expandedText, () =>this.isDestroyed);
-                    } else if (this.bootConfig?.floating?.button?.comment) {
-                        this.addLetter(this.bootConfig.floating.button.comment, this.expandedText, () =>this.isDestroyed);
-                    }
+                    this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -381,11 +377,11 @@ class FloatingButton {
         window.__GentooInited = 'created';
     }
 
-    addLetter(floatingComment, expandedText, isDestroyed, i = 0) {
-        if (!floatingComment) return;
-        if (i < floatingComment.length && !isDestroyed()) {
-            expandedText.innerText += floatingComment[i];
-            setTimeout(() => this.addLetter(floatingComment, expandedText, isDestroyed, i + 1), 1000 / floatingComment.length);
+    addLetter(bootConfig, expandedText, isDestroyed, i = 0) {
+        if (!bootConfig?.floating?.button?.comment) return;
+        if (i < bootConfig.floating.button.comment.length && !isDestroyed()) {
+            expandedText.innerText += bootConfig.floating.button.comment[i];
+            setTimeout(() => this.addLetter(bootConfig, expandedText, isDestroyed, i + 1), 1000 / bootConfig.floating.button.comment.length);
         }
     }
 
@@ -816,6 +812,9 @@ class FloatingButton {
         }, this.isMobileDevice);
 
         this.sendPostMessageHandler({enableMode: mode});
+        if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
+            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
+        }
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
