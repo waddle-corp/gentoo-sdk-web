@@ -308,12 +308,20 @@ class FloatingButton {
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
+                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
+                        "expanded-area-md" :
+                        this.bootConfig?.floating?.button?.imageUrl ?
+                        "expanded-are-md expanded-area-neutral-md" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
                     this.expandedText.className = "expanded-area-text-md";
                 } else {
                     this.expandedButton.className = 
+                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
+                        "expanded-area" :
+                        this.bootConfig?.floating?.button?.imageUrl ?
+                        "expanded-area expanded-area-neutral" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
                         "expanded-area expanded-area-neutral";
