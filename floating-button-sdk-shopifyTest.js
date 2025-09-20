@@ -1337,6 +1337,7 @@ class FloatingButton {
             'saranghello.com',
             'sftequilashop.com',
             'vomfassghirardellisquare.com',
+            'biondivino.com',
             // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
             // '127.0.0.1',
             // 'localhost'
