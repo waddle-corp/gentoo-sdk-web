@@ -1,6 +1,6 @@
-import './floating-sdk-cafe24-instant.css';
+import './floating-sdk-cafe24-modal.css';
 import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
-import { createUIElements } from './utils/createUIElements';
+import { createUIElementsModal } from './utils/createUIElementsModal';
 
 class FloatingButton {
     constructor(props) {
@@ -52,6 +52,7 @@ class FloatingButton {
         this.iframeHeightState;
         this.viewportInjected = false;
         this.originalViewport = null;
+        this.isInteractingWithSend = false;
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -196,11 +197,11 @@ class FloatingButton {
             this.isInitialized = true;
 
             this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            // this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-prod-4275-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
-            if (!this.isDestroyed) createUIElements(
+            if (!this.isDestroyed) createUIElementsModal(
                 this, // this 객체를 첫 번째 인자로 전달
                 position, 
                 showGentooButton, 
@@ -392,6 +393,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
+            console.log('clicked element', e.target);
 
             // if (this.iframeContainer.classList.contains("iframe-container-hide")) {
             //     if (this.expandedButton)
@@ -431,7 +433,9 @@ class FloatingButton {
             //         this.dotLottiePlayer.classList.remove('hide');
             //     }
             // }
-            if (this.inputContainer.classList.contains("visibility-hide")) {
+            if (this.messageExistence) {
+                this.openChat();
+            } else if (this.inputContainer.classList.contains("visibility-hide")) {
                 this.inputContainer.classList.remove("visibility-hide");
                 this.inputWrapper.classList.remove("shrink-hide");
                 this.input.classList.remove("shrink-hide");
@@ -478,7 +482,7 @@ class FloatingButton {
             // }
         };
 
-        this.input?.addEventListener("blur", () => {
+        const performInputBlur = () => {
             this.inputContainer.classList.add("visibility-hide");
             this.inputWrapper.classList.add("shrink-hide");
             this.input.classList.add("shrink-hide");
@@ -488,6 +492,7 @@ class FloatingButton {
             this.profileImage.classList.add("hide");
 
             this.inputContainerTimeout = setTimeout(() => {
+                if (this.iframeContainer.classList.contains("iframe-container-shrink")) return;
                 if (this.button) {
                     if (this.isSmallResolution) {
                         this.button.className = "floating-button-common button-image-md";
@@ -499,8 +504,19 @@ class FloatingButton {
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
                 }
-            }, 400);
-            this.inputContainerTimeout = null;  // Clear the timeout
+            }, 100);
+            this.inputContainerTimeout = null;
+        };
+
+        this.input?.addEventListener("blur", () => {
+            if (this.isInteractingWithSend) {
+                setTimeout(() => {
+                    this.isInteractingWithSend = false;
+                    performInputBlur();
+                }, 0);
+                return;
+            }
+            performInputBlur();
         });
 
         window?.addEventListener("message", (e) => {
@@ -519,7 +535,7 @@ class FloatingButton {
                 }
             }
             if (this.isSmallResolution && e.data.inputFocusState) {
-                this.enableChat("full");
+                // this.enableChat("full");
             }
             if (e.data.resetState) {
                 if (this.isMobileDevice && this.iframeContainer) {
@@ -579,6 +595,11 @@ class FloatingButton {
             if (e.data.connectionId) {
                 window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
             }
+            if (e.data.type === 'messageExistence') {
+                console.log('messageExistence', e.data.messageExistenceState);
+                this.messageExistence = e.data.messageExistenceState;
+                sessionStorage.setItem('gentoo', JSON.stringify({ ...this.gentooSessionData, messageExistence: e.data.messageExistenceState }));
+            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
@@ -589,10 +610,20 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", buttonClickHandler);
+        this.closeActionArea?.addEventListener("click", (e) => { this.hideChat(); });
         this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.sendButton?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
+        this.sendButton?.addEventListener("mousedown", () => { this.isInteractingWithSend = true; });
+        this.sendButton?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
+        this.sendButton?.addEventListener("click", (e) => {
+            this.iframeContainer.style.height = "400px";
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
+            this.openChat();
+            this.input.value = "";
+            this.input.blur();
+        });
         // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -628,14 +659,6 @@ class FloatingButton {
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
         if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
-        this.dimmedBackground?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            this.dimmedBackground.className = 'dimmed-background hide';
-            this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
-        })
-
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
         }, { passive: true });
@@ -646,7 +669,6 @@ class FloatingButton {
                 this.iframeContainer,
                 this.button,
                 this.expandedButton,
-                this.dimmedBackground
             );
         });
 
@@ -666,7 +688,6 @@ class FloatingButton {
                     this.iframe,
                     this.button,
                     this.expandedButton,
-                    this.dimmedBackground,
                 );
                 document.removeEventListener("mousemove", onMouseMove);
                 window.removeEventListener("mouseup", onMouseUp);
@@ -726,9 +747,6 @@ class FloatingButton {
         if (this.iframeContainer && this.iframeContainer.parentNode) {
             this.iframeContainer.parentNode.removeChild(this.iframeContainer);
         }
-        if (this.dimmedBackground && this.dimmedBackground.parentNode) {
-            this.dimmedBackground.parentNode.removeChild(this.dimmedBackground);
-        }
 
         // Reset all properties
         this.button = null;
@@ -736,7 +754,6 @@ class FloatingButton {
         this.expandedText = null;
         this.iframeContainer = null;
         this.floatingContainer = null;
-        this.dimmedBackground = null;
         this.chatHeader = null;
         this.iframe = null;
         this.chatHandler = null;
@@ -934,7 +951,6 @@ class FloatingButton {
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
-            this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
@@ -964,7 +980,6 @@ class FloatingButton {
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
-        this.dimmedBackground.className = "dimmed-background hide";
     }
 
     sendPostMessageHandler(payload) {
@@ -982,11 +997,10 @@ class FloatingButton {
         const isInIframe = window !== window.top;
 
         // 현재 document의 SDK set 
-        const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
 
-        if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
+        if (hasIframeContainer || hasFloatingContainer) {
             return true;
         }
 
@@ -998,11 +1012,10 @@ class FloatingButton {
                     }
 
                     // 부모 document의 SDK set 
-                    const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
                     const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
                     const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
 
-                    return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
+                    return parentHasIframeContainer || parentHasFloatingContainer;
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");

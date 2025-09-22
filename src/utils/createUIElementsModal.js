@@ -1,8 +1,8 @@
 import { postChatEventLog } from "../apis/chatConfig";
-import '../floating-sdk-cafe24-instant.css';
+import '../floating-sdk-cafe24-modal.css';
 
 // Separate UI creation into its own method for clarity
-export const createUIElements = (
+export const createUIElementsModal = (
     context, // this 객체를 받는 인자
     position, 
     showGentooButton, 
@@ -37,10 +37,6 @@ export const createUIElements = (
     }
 
     // Create iframe elements
-    context.dimmedBackground = document.createElement("div");
-    context.dimmedBackground.className = "dimmed-background hide";
-    context.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
-
     context.iframeContainer = document.createElement("div");
     context.iframeContainer.className = "iframe-container iframe-container-hide";
     context.iframeContainer.setAttribute("data-gentoo-sdk", "true");
@@ -143,7 +139,6 @@ export const createUIElements = (
         context.footerText.innerText = context.warningMessage;
         context.iframeContainer.appendChild(context.footer);
     }
-    document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
     postChatEventLog({
@@ -181,7 +176,6 @@ export const createUIElements = (
         iframeContainer: context.iframeContainer,
         iframe: context.iframe,
         chatHeader: context.chatHeader,
-        dimmedBackground: context.dimmedBackground,
         button: context.button,
         expandedButton: context.expandedButton,
         customButton: customButton,
@@ -207,4 +201,8 @@ export const createUIElements = (
         }, 500);
     }
     window.__GentooInited = 'created';
+}
+
+export const postMessageToIframe = (iframe, payload) => {
+    iframe.contentWindow.postMessage(payload, "*");
 }

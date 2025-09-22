@@ -20,7 +20,7 @@
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
             // s.src = "https://dev-sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
-            s.src = "./dist/cafe24-instant/floating-cafe24-instant.js"; 
+            s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
