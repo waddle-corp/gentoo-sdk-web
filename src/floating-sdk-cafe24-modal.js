@@ -539,7 +539,34 @@ class FloatingButton {
             }
             if (e.data.resetState) {
                 if (this.isMobileDevice && this.iframeContainer) {
-                    this.iframeContainer.style.height = "449px";
+                    this.hideChat();
+                    // open modal 로 묶어야 됨
+                    if (this.inputContainer.classList.contains("visibility-hide")) {
+                        this.inputContainer.classList.remove("visibility-hide");
+                        this.inputWrapper.classList.remove("shrink-hide");
+                        this.input.classList.remove("shrink-hide");
+                        this.examFloatingGroup.classList.add("slide-up");
+                        this.examFloatingGroup.classList.remove("hide");
+                        // this.examFloatingButton.classList.remove("slide-down");
+                        // this.examFloatingButton.classList.remove("hide");
+                        this.sendButton.classList.remove("hide");
+                        this.profileImage.classList.remove("hide");
+                        if (this.expandedButton)
+                            this.expandedButton.classList.add('hide');
+                        if (this.button) {
+                            if (this.isSmallResolution) {
+                                this.button.className =
+                                    "floating-button-common button-image-close-mr hide";
+                            } else {
+                                this.button.className =
+                                    "floating-button-common button-image-close hide";
+                            }
+                        }
+                        if (this.dotLottiePlayer) {
+                            this.dotLottiePlayer.classList.add('hide');
+                        }
+                        this.input.focus();
+                    }
                 }
             }
             if (e.data.closeRequestState) {
@@ -610,7 +637,45 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => { this.hideChat(); });
+        this.closeActionArea?.addEventListener("click", (e) => { 
+            this.hideChat(); 
+            // add letter 관련 묶어야 됨
+            setTimeout(() => {
+                this.floatingMessage = '궁금한 게 있으시면 언제든 다시 눌러주세요!';
+                this.expandedButton = document.createElement("div");
+                this.expandedText = document.createElement("p");
+                if (this.isSmallResolution) {
+                    this.expandedButton.className =
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            "expanded-area-md" :
+                            "expanded-area-md expanded-area-neutral-md";
+                    this.expandedText.className = "expanded-area-text-md";
+                } else {
+                    this.expandedButton.className =
+                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            "expanded-area" :
+                            "expanded-area expanded-area-neutral";
+                            this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+                }
+                this.expandedButton.appendChild(this.expandedText);
+                if (this.floatingContainer && this.floatingContainer.parentNode) {
+                    this.floatingContainer.appendChild(this.expandedButton);
+
+                    this.addLetter(this.floatingMessage, this.expandedText, () => this.isDestroyed);
+                    this.floatingCount += 1;
+
+                    setTimeout(() => {
+                        if (
+                            this.floatingContainer &&
+                            this.expandedButton &&
+                            this.expandedButton.parentNode === this.floatingContainer
+                        ) {
+                            this.floatingContainer.removeChild(this.expandedButton);
+                        }
+                    }, 7000);
+                }
+            }, 500);
+        });
         this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
@@ -957,7 +1022,7 @@ class FloatingButton {
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
-            if (this.isMobileDevice) this.iframeContainer.style.height = "449px";
+            if (this.isMobileDevice) this.iframeContainer.style.height = "400px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
             if (this.isMobileDevice) this.iframeContainer.style.height = "99%";
