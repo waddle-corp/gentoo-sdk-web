@@ -196,7 +196,7 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             this.chatUrl = `https://accio-webclient-git-prod-4275-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
@@ -433,7 +433,7 @@ class FloatingButton {
             //         this.dotLottiePlayer.classList.remove('hide');
             //     }
             // }
-            if (this.messageExistence) {
+            if (this.messageExistence || this.displayLocation === 'PRODUCT_DETAIL') {
                 this.openChat();
             } else if (this.inputContainer.classList.contains("visibility-hide")) {
                 this.inputContainer.classList.remove("visibility-hide");
@@ -1146,6 +1146,7 @@ class FloatingButton {
         else if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
+        // else { this.displayLocation = 'PRODUCT_DETAIL' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
@@ -1186,7 +1187,8 @@ class FloatingButton {
             }
 
             // 3. 찾을 수 없는 경우 null 반환
-            return null;
+            // return null;
+            return '13';
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
