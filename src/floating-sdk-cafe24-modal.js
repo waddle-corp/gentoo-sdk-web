@@ -87,69 +87,67 @@ class FloatingButton {
             ((CAFE24API) => {
                 // Store the CAFE24API instance for use in other methods
                 this.cafe24API = CAFE24API;
-            (() => {
 
-            // Wrap CAFE24API methods in Promises
-            const getCustomerIDInfoPromise = () => {
-                return new Promise((innerResolve, innerReject) => {
-                    CAFE24API.getCustomerIDInfo((err, res) => {
-                        if (err) {
-                            console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                            innerReject(err);
-                        } else {
-                            innerResolve(res);
-                        }
+                // Wrap CAFE24API methods in Promises
+                const getCustomerIDInfoPromise = () => {
+                    return new Promise((innerResolve, innerReject) => {
+                        CAFE24API.getCustomerIDInfo((err, res) => {
+                            if (err) {
+                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                                innerReject(err);
+                            } else {
+                                innerResolve(res);
+                            }
+                        });
                     });
-                });
-            };
+                };
 
-            // Fetch partner ID first
-            getPartnerId(CAFE24API.MALL_ID)
-                .then(partnerId => {
-                    this.partnerId = partnerId;
-                    return getCustomerIDInfoPromise();
-                })
-                .then(res => {
-                    if (res.id.member_id) {
-                        this.cafe24UserId = res.id.member_id;
-                    } else {
-                        this.cafe24UserId = res.id['guest_id'];
-                    }
-                    console.log('this.cafe24UserId', this.cafe24UserId);
+                // Fetch partner ID first
+                getPartnerId(CAFE24API.MALL_ID)
+                    .then(partnerId => {
+                        this.partnerId = partnerId;
+                        return getCustomerIDInfoPromise();
+                    })
+                    .then(res => {
+                        if (res.id.member_id) {
+                            this.cafe24UserId = res.id.member_id;
+                        } else {
+                            this.cafe24UserId = res.id['guest_id'];
+                        }
+                        console.log('this.cafe24UserId', this.cafe24UserId);
 
-                    // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                    return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                })
-                .then(chatUserId => {
-                    console.log('chatUserId', chatUserId);
-                    this.chatUserId = chatUserId;
-                    this.gentooSessionData.cuid = chatUserId;
-                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
+                        return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                    })
+                    .then(chatUserId => {
+                        console.log('chatUserId', chatUserId);
+                        this.chatUserId = chatUserId;
+                        this.gentooSessionData.cuid = chatUserId;
+                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
 
-                    // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
-                    return Promise.all([
-                        getChatbotData(this.partnerId, chatUserId),
-                        getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
-                    ]);
-                })
-                .then(([chatbotData, floatingData]) => {
-                    console.log('chatbotData', chatbotData);
-                    console.log('floatingData', floatingData);
-                    this.chatbotData = chatbotData;
-                    this.floatingData = floatingData;
-                    const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                    const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
-                    this.warningMessage = warningMessageData?.extra?.message;
-                    this.warningActivated = warningMessageData?.activated;
-                    this.floatingZoom = floatingZoom?.activated;
-                    this.floatingAvatar = chatbotData?.avatar;
-                    resolve();
-                })
-                .catch(error => {
-                    console.error('Initialization error:', error);
-                    reject(error);
-                });
-            });
+                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
+                        return Promise.all([
+                            getChatbotData(this.partnerId, chatUserId),
+                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                        ]);
+                    })
+                    .then(([chatbotData, floatingData]) => {
+                        console.log('chatbotData', chatbotData);
+                        console.log('floatingData', floatingData);
+                        this.chatbotData = chatbotData;
+                        this.floatingData = floatingData;
+                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                        const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                        this.warningMessage = warningMessageData?.extra?.message;
+                        this.warningActivated = warningMessageData?.activated;
+                        this.floatingZoom = floatingZoom?.activated;
+                        this.floatingAvatar = chatbotData?.avatar;
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Initialization error:', error);
+                        reject(error);
+                    });
             })(CAFE24API.init({
                 client_id: process.env.CAFE24_CLIENTID,
                 version: process.env.CAFE24_VERSION
