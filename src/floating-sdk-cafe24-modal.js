@@ -107,8 +107,7 @@ class FloatingButton {
             getPartnerId(CAFE24API.MALL_ID)
                 .then(partnerId => {
                     this.partnerId = partnerId;
-                    return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                    // return getCustomerIDInfoPromise();
+                    return getCustomerIDInfoPromise();
                 })
                 .then(res => {
                     if (res.id.member_id) {
