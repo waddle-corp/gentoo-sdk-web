@@ -115,11 +115,13 @@ class FloatingButton {
                     } else {
                         this.cafe24UserId = res.id['guest_id'];
                     }
+                    console.log('this.cafe24UserId', this.cafe24UserId);
 
                     // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
                     return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
                 })
                 .then(chatUserId => {
+                    console.log('chatUserId', chatUserId);
                     this.chatUserId = chatUserId;
                     this.gentooSessionData.cuid = chatUserId;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -131,6 +133,8 @@ class FloatingButton {
                     ]);
                 })
                 .then(([chatbotData, floatingData]) => {
+                    console.log('chatbotData', chatbotData);
+                    console.log('floatingData', floatingData);
                     this.chatbotData = chatbotData;
                     this.floatingData = floatingData;
                     const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");

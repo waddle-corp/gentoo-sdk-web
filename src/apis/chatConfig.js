@@ -19,6 +19,7 @@ export async function postChatUserId(userToken, udid = "", partnerId, chatUserId
         });
 
         const res = await response.json();
+        console.log('postChatUserId res', res);
         return res.chatUserId;
     } catch (error) {
         console.error(`Error while calling postChatUserId API: ${error}`)
