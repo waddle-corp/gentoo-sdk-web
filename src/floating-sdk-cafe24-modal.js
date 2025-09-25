@@ -84,75 +84,73 @@ class FloatingButton {
                 };
             })();
 
-            // ((CAFE24API) => {
-            //     // Store the CAFE24API instance for use in other methods
-            //     this.cafe24API = CAFE24API;
-            // (() => {
+            ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
+            (() => {
 
-                // Wrap CAFE24API methods in Promises
-                // const getCustomerIDInfoPromise = () => {
-                //     return new Promise((innerResolve, innerReject) => {
-                //         CAFE24API.getCustomerIDInfo((err, res) => {
-                //             if (err) {
-                //                 console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                //                 innerReject(err);
-                //             } else {
-                //                 innerResolve(res);
-                //             }
-                //         });
-                //     });
-                // };
-
-                // Fetch partner ID first
-                // getPartnerId(CAFE24API.MALL_ID)
-                getPartnerId('jintaebaek')
-                    .then(partnerId => {
-                        this.partnerId = partnerId;
-                        this.cafe24UserId = 'selen_test';
-                        return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                        // return getCustomerIDInfoPromise();
-                    })
-                    // .then(res => {
-                    //     if (res.id.member_id) {
-                    //         this.cafe24UserId = res.id.member_id;
-                    //     } else {
-                    //         this.cafe24UserId = res.id['guest_id'];
-                    //     }
-
-                    //     // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                    //     return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                    // })
-                    .then(chatUserId => {
-                        this.chatUserId = chatUserId;
-                        this.gentooSessionData.cuid = chatUserId;
-                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-
-                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
-                        return Promise.all([
-                            getChatbotData(this.partnerId, chatUserId),
-                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
-                        ]);
-                    })
-                    .then(([chatbotData, floatingData]) => {
-                        this.chatbotData = chatbotData;
-                        this.floatingData = floatingData;
-                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                        const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
-                        this.warningMessage = warningMessageData?.extra?.message;
-                        this.warningActivated = warningMessageData?.activated;
-                        this.floatingZoom = floatingZoom?.activated;
-                        this.floatingAvatar = chatbotData?.avatar;
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Initialization error:', error);
-                        reject(error);
+            // Wrap CAFE24API methods in Promises
+            const getCustomerIDInfoPromise = () => {
+                return new Promise((innerResolve, innerReject) => {
+                    CAFE24API.getCustomerIDInfo((err, res) => {
+                        if (err) {
+                            console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                            innerReject(err);
+                        } else {
+                            innerResolve(res);
+                        }
                     });
-            // });
-            // })(CAFE24API.init({
-            //     client_id: process.env.CAFE24_CLIENTID,
-            //     version: process.env.CAFE24_VERSION
-            // }));
+                });
+            };
+
+            // Fetch partner ID first
+            getPartnerId(CAFE24API.MALL_ID)
+                .then(partnerId => {
+                    this.partnerId = partnerId;
+                    return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                    // return getCustomerIDInfoPromise();
+                })
+                .then(res => {
+                    if (res.id.member_id) {
+                        this.cafe24UserId = res.id.member_id;
+                    } else {
+                        this.cafe24UserId = res.id['guest_id'];
+                    }
+
+                    // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
+                    return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
+                })
+                .then(chatUserId => {
+                    this.chatUserId = chatUserId;
+                    this.gentooSessionData.cuid = chatUserId;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+
+                    // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
+                    return Promise.all([
+                        getChatbotData(this.partnerId, chatUserId),
+                        getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                    ]);
+                })
+                .then(([chatbotData, floatingData]) => {
+                    this.chatbotData = chatbotData;
+                    this.floatingData = floatingData;
+                    const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                    const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                    this.warningMessage = warningMessageData?.extra?.message;
+                    this.warningActivated = warningMessageData?.activated;
+                    this.floatingZoom = floatingZoom?.activated;
+                    this.floatingAvatar = chatbotData?.avatar;
+                    resolve();
+                })
+                .catch(error => {
+                    console.error('Initialization error:', error);
+                    reject(error);
+                });
+            });
+            })(CAFE24API.init({
+                client_id: process.env.CAFE24_CLIENTID,
+                version: process.env.CAFE24_VERSION
+            }));
         });
     }
 
@@ -203,8 +201,8 @@ class FloatingButton {
 
             if (!this.isDestroyed) createUIElementsModal(
                 this, // this 객체를 첫 번째 인자로 전달
-                position, 
-                showGentooButton, 
+                position,
+                showGentooButton,
                 isCustomButton,
                 this.checkSDKExists(),
                 this.customButton,
@@ -219,7 +217,7 @@ class FloatingButton {
         }
     }
 
-     // Separate UI creation into its own method for clarity
+    // Separate UI creation into its own method for clarity
     //  createUIElements(position, showGentooButton, isCustomButton = false) {
     //     // Check if any SDK elements exist in document
     //     if (this.checkSDKExists()) {
@@ -467,7 +465,7 @@ class FloatingButton {
             //     this.input.classList.add("shrink-hide");
             //     this.sendButton.classList.add("hide");
             //     this.profileImage.classList.add("hide");
-                
+
             //     if (this.button) {
             //         if (this.isSmallResolution) {
             //             this.button.className = "floating-button-common button-image-md";
@@ -595,17 +593,17 @@ class FloatingButton {
                             !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                                 "expanded-area" :
                                 "expanded-area expanded-area-neutral";
-                                this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+                        this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                     }
                     this.expandedButton.appendChild(this.expandedText);
-    
+
                     // Double check if floatingContainer still exists before appending
                     if (this.floatingContainer && this.floatingContainer.parentNode) {
                         this.floatingContainer.appendChild(this.expandedButton);
 
                         this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
                         this.floatingCount += 1;
-    
+
                         setTimeout(() => {
                             if (
                                 this.floatingContainer &&
@@ -637,8 +635,8 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => { 
-            this.hideChat(); 
+        this.closeActionArea?.addEventListener("click", (e) => {
+            this.hideChat();
             // add letter 관련 묶어야 됨
             setTimeout(() => {
                 this.floatingMessage = '궁금한 게 있으시면 언제든 다시 눌러주세요!';
@@ -655,7 +653,7 @@ class FloatingButton {
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                             "expanded-area" :
                             "expanded-area expanded-area-neutral";
-                            this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
                 this.expandedButton.appendChild(this.expandedText);
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
@@ -688,6 +686,35 @@ class FloatingButton {
             this.openChat();
             this.input.value = "";
             this.input.blur();
+        });
+
+        // 예시 버튼 클릭 이벤트 추가
+        console.log('examFloatingGroup', this.examFloatingGroup);
+        this.examFloatingGroup?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
+        this.examFloatingGroup?.addEventListener("mousedown", () => { this.isInteractingWithSend = true; });
+        this.examFloatingGroup?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
+        this.examFloatingGroup.addEventListener("click", (e) => {
+            const button = e.target.closest('.exam-floating-button');
+            console.log('button', button);
+            if (button) {
+                console.log('button innerText', button.innerText);
+                this.iframeContainer.style.height = "400px";
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: button.innerText });
+                this.openChat();
+                this.input.blur();
+            }
+        });
+
+        // 엔터키 이벤트 추가
+        this.input?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.keyCode === 13) {
+                e.preventDefault(); // 기본 엔터 동작 방지
+                this.iframeContainer.style.height = "400px";
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
+                this.openChat();
+                this.input.value = "";
+                this.input.blur();
+            }
         });
         // this.testButton?.addEventListener("click", testButtonClickHandler);
         // Add event listener for the resize event
@@ -1146,7 +1173,6 @@ class FloatingButton {
         else if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
         else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
-        // else { this.displayLocation = 'PRODUCT_DETAIL' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
@@ -1187,8 +1213,7 @@ class FloatingButton {
             }
 
             // 3. 찾을 수 없는 경우 null 반환
-            // return null;
-            return '13';
+            return null;
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
