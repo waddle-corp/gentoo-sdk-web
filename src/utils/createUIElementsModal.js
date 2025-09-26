@@ -89,6 +89,7 @@ export const createUIElementsModal = (
         context.iframeContainer.appendChild(context.closeActionArea);
         // context.iframeContainer.appendChild(context.testButton);
         context.inputContainer = document.createElement("div");
+        context.inputContainer.setAttribute("data-gentoo-sdk", "true");
         context.inputWrapper = document.createElement("div");
         context.inputWrapper.className = "chat-input-wrapper shrink-hide";
         context.input = document.createElement("input");
