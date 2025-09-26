@@ -19,7 +19,8 @@
             s.type = "text/javascript"; 
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/floating-button-sdk-cafe24.js"; 
-            s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
+            s.src = isMobile ? 'https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js' : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./floating-button-sdk-cafe24.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
