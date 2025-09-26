@@ -1,3 +1,4 @@
+import './global.css';
 import './floating-sdk-cafe24-modal.css';
 import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';

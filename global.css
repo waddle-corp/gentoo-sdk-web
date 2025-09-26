@@ -77,3 +77,8 @@ input::placeholder {
     margin: 0;
     font-family: "pretendard", sans-serif;
 }
+
+input {
+    border: none;
+    outline: none;
+}
