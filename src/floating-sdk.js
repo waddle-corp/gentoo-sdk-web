@@ -1,5 +1,10 @@
 import './floating-sdk.css';
-import { getChatbotData, postChatUserId, getBootConfig, postChatEventLog } from './apis/chatConfig';
+import { 
+    getChatbotData, 
+    postChatUserId, 
+    getBootConfig, 
+    postChatEventLog 
+} from './apis/chatConfig';
 
 
 class FloatingButton {

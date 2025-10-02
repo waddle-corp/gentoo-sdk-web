@@ -1,5 +1,11 @@
 import './floating-sdk-cafe24-glacier.css';
-import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
+import { 
+    getChatbotData, 
+    postChatUserId, 
+    getFloatingData, 
+    getPartnerId, 
+    postChatEventLog 
+} from './apis/chatConfig';
 
 class FloatingButton {
     constructor(props) {

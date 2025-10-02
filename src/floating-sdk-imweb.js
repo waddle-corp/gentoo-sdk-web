@@ -2,7 +2,7 @@ import './floating-sdk-imweb.css';
 import { 
     getChatbotData, 
     postChatUserId, 
-    getFloatingData, 
+    getBootConfig, 
     postChatEventLog, 
     getImwebPartnerId,
     generateGuestUserToken
@@ -116,12 +116,12 @@ class FloatingButton {
 
                     return Promise.all([
                         getChatbotData(this.partnerId, chatUserId),
-                        getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                        getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId)
                     ]);
                 })
-                .then(([chatbotData, floatingData]) => {
+                .then(([chatbotData, bootConfig]) => {
                     this.chatbotData = chatbotData;
-                    this.floatingData = floatingData;
+                    this.bootConfig = bootConfig;
                     const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
@@ -178,8 +178,12 @@ class FloatingButton {
             // this.chatUrl = `https://accio-webclient-git-prod-4028-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
-            if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
-            else this.destroy();
+            if (this.isDestroyed) this.destroy();
+            else if (!this.bootConfig?.floating?.isVisible) {
+                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+            } else {
+                this.createUIElements(position, showGentooButton, isCustomButton);
+            }
 
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -208,7 +212,7 @@ class FloatingButton {
             return;
         }
 
-        if (!this.floatingData || !this.floatingData.imageUrl) {
+        if (!this.bootConfig?.floating || !this.bootConfig?.floating?.button?.imageUrl) {
             console.error('Floating data is incomplete');
             return;
         }
@@ -236,12 +240,12 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl);
+            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.imageUrl);
             player.style.width = this.isSmallResolution ? '68px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
@@ -313,7 +317,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common button-image`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
@@ -321,7 +325,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.floatingData.comment.length > 0) {
+            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -346,7 +350,7 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButton);
-                    this.addLetter(this.floatingData, this.expandedText, () =>this.isDestroyed);
+                    this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
 
                     setTimeout(() => {
                         if (
@@ -359,6 +363,8 @@ class FloatingButton {
                     }, 7000);
                 }
             }
+        } else {
+            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
         }
 
         this.elems = {
@@ -432,7 +438,7 @@ class FloatingButton {
                     } else {
                         this.button.className = "floating-button-common button-image";
                     }
-                    this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
@@ -525,7 +531,7 @@ class FloatingButton {
             e.preventDefault();
             this.dimmedBackground.className = 'dimmed-background hide';
             this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            if (this.button) this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
         })
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
@@ -632,7 +638,7 @@ class FloatingButton {
         this.closeButtonIcon = null;
         this.closeButtonText = null;
         this.chatUserId = null;
-        this.floatingData = null;
+        this.bootConfig = null;
         this.chatbotData = null;
         this.chatUrl = null;
 
@@ -644,11 +650,11 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    addLetter(floatingData, expandedText, isDestroyed, i = 0) {
-        if (!floatingData) return;
-        if (i < floatingData.comment.length && !isDestroyed()) {
-            expandedText.innerText += floatingData.comment[i];
-            setTimeout(() => this.addLetter(floatingData, expandedText, isDestroyed, i + 1), 1000 / floatingData.comment.length);
+    addLetter(bootConfig, expandedText, isDestroyed, i = 0) {
+        if (!bootConfig?.floating?.button?.comment) return;
+        if (i < bootConfig.floating.button.comment.length && !isDestroyed()) {
+            expandedText.innerText += bootConfig.floating.button.comment[i];
+            setTimeout(() => this.addLetter(bootConfig, expandedText, isDestroyed, i + 1), 1000 / bootConfig.floating.button.comment.length);
         }
     }
 

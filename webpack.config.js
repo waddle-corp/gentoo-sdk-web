@@ -18,7 +18,6 @@ module.exports = (env, argv) => {
         { name: 'floating-godomall', entry: './src/floating-sdk-godomall.js', output: 'godomall' },
         { name: 'floating-imweb', entry: './src/floating-sdk-imweb.js', output: 'imweb' },
         { name: 'gentoo-logger', entry: './src/logger.js', output: 'logger' },
-        { name: 'floating-cafe24-sidepanel', entry: './src/floating-sdk-cafe24-sidepanel.js', output: 'cafe24-sidepanel' },
     ];
 
     return targets.map(t => ({
