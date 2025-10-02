@@ -828,9 +828,9 @@ class FloatingButton {
         }, this.isMobileDevice);
 
         this.sendPostMessageHandler({enableMode: mode});
-        if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
+        /* if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
             this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
-        }
+        } activate later */ 
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
