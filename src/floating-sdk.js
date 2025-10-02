@@ -1,5 +1,10 @@
 import './floating-sdk.css';
-import { getChatbotData, postChatUserId, getFloatingData, getBootConfig, postChatEventLog } from './apis/chatConfig';
+import { 
+    getChatbotData, 
+    postChatUserId, 
+    getBootConfig, 
+    postChatEventLog 
+} from './apis/chatConfig';
 
 
 class FloatingButton {
@@ -92,7 +97,6 @@ class FloatingButton {
             getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch boot config");
                 this.bootConfig = res;
-                console.log('getBootConfig', this.bootConfig);
             }),
         ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
@@ -148,8 +152,12 @@ class FloatingButton {
             this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
 
             // Create UI elements after data is ready
-            if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
-            else this.destroy();
+            if (this.isDestroyed) this.destroy();
+            else if (!this.bootConfig?.floating?.isVisible) {
+                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+            } else {
+                this.createUIElements(position, showGentooButton, isCustomButton);
+            }
 
         } catch (error) {
             console.error("Failed to initialize:", error);
@@ -820,9 +828,9 @@ class FloatingButton {
         }, this.isMobileDevice);
 
         this.sendPostMessageHandler({enableMode: mode});
-        if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
+        /* if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
             this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
-        }
+        } activate later */ 
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
