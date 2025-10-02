@@ -2,7 +2,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 300;
-    src: url("../fonts/Pretendard-Light.woff2") format("woff2");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Light.woff2") format("woff2");
     /* light */
 }
 
@@ -10,7 +10,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 400;
-    src: url("../fonts/Pretendard-Regular.woff2") format("woff2");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Regular.woff2") format("woff2");
     /* regular */
 }
 
@@ -18,7 +18,7 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 600;
-    src: url("../fonts/Pretendard-SemiBold.woff2") format("woff2");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-SemiBold.woff2") format("woff2");
     /* semi bold */
 }
 
@@ -26,54 +26,50 @@
     font-family: "pretendard";
     font-style: normal;
     font-weight: 700;
-    src: url("../fonts/Pretendard-Bold.woff2") format("woff2");
+    src: url("https://assets.gentooai.com/fonts/Pretendard-Bold.woff2") format("woff2");
     /* regular */
 }
 
-html {
+/* 스코프 기본 */
+[data-gentoo-sdk="true"],
+[data-gentoo-sdk="true"] * {
+    box-sizing: border-box;
     -webkit-text-size-adjust: none;
 }
 
-#root {
-    width: 100%;
-    max-width: 100%;
-    --vh: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: none;
-}
-
-body,
-html {
-    width: 100%;
-    max-width: 100%;
-    height: var(--vh);
-    overflow-y: hidden;
-    font-family: "pretendard";
-    margin: 0;
-    overflow-x: hidden;
-    color: #222222;
-    -webkit-text-size-adjust: none;
+/* 폰트/텍스트(호스트가 !important면 같이 맞춰줌) */
+[data-gentoo-sdk="true"],
+[data-gentoo-sdk="true"] * {
+    font-family: "pretendard", sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color: #222222;
 }
 
-body *,
-html * {
-    box-sizing: border-box;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-.label,
-span,
-input,
-input::placeholder {
+/* 공통 리셋 */
+[data-gentoo-sdk="true"] h1,
+[data-gentoo-sdk="true"] h2,
+[data-gentoo-sdk="true"] h3,
+[data-gentoo-sdk="true"] h4,
+[data-gentoo-sdk="true"] h5,
+[data-gentoo-sdk="true"] h6,
+[data-gentoo-sdk="true"] p,
+[data-gentoo-sdk="true"] .label,
+[data-gentoo-sdk="true"] span,
+[data-gentoo-sdk="true"] input,
+[data-gentoo-sdk="true"] input::placeholder {
     margin: 0;
-    font-family: "pretendard", sans-serif;
+    font-family: "pretendard", sans-serif !important;
+}
+
+/* 폼 요소 베이스 */
+[data-gentoo-sdk="true"] input,
+[data-gentoo-sdk="true"] textarea,
+[data-gentoo-sdk="true"] button,
+[data-gentoo-sdk="true"] select {
+    font: inherit !important;
+    color: inherit;
+    background: transparent;
+    border: none;
+    outline: none;
 }
