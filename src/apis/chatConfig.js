@@ -19,7 +19,7 @@ export async function postChatUserId(userToken, udid = "", partnerId, chatUserId
         });
 
         const res = await response.json();
-        console.log('postChatUserId res.chatUserId', res.chatUserId);
+        // console.log('postChatUserId res.chatUserId', res.chatUserId);
         return res.chatUserId;
     } catch (error) {
         console.error(`Error while calling postChatUserId API: ${error}`)
@@ -41,6 +41,24 @@ export async function sendEventLog(event, basicPayload = {}, customPayload = {})
         url,
         JSON.stringify(payload)
     );
+}
+
+export async function sendEventLogShopify(event, basicPayload = {}, customPayload = {}) {
+    // if (!customPayload.referrerOrigin) return;
+    
+    const payload = {
+        event,
+        timestamp: Date.now(),
+        ...basicPayload,
+        ...customPayload,
+    }
+
+    /* const url = `${process.env.API_TRACKER_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`;
+    navigator.sendBeacon(
+        url,
+        JSON.stringify(payload)
+    ); */
+    console.log('sendEventLogShopify payload', payload);
 }
 
 // floating button apis
@@ -159,4 +177,23 @@ export async function getImwebPartnerId(mallId) {
 
 export function generateGuestUserToken(length = 16) {
     return 'guest' + Math.random().toString(36).substring(2, length);
+}
+
+// shopify
+export async function checkTrainingProgress(partnerId) {
+
+    try {
+        const response = await fetch(`${process.env.API_MAIN_BASE_URL}/api/shop/data/check/progress/${partnerId}`);
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            return data.data.status === 'success';
+        }
+
+        console.log("Training progress is not 'success'. Initialization will not proceed.");
+        return false;
+    } catch (error) {
+        console.log("Training progress check failed, proceeding with initialization.");
+        return false;
+    }
 }

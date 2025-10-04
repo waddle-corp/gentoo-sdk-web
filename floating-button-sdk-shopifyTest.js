@@ -394,6 +394,7 @@ class FloatingButton {
             chatUserId: this.chatUserId,
             products: [],
         });
+        window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
 
         // Create floating button
         if (showGentooButton) {
@@ -678,10 +679,16 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
+            if (e.data.connectionId) {
+                window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
+            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.floatingContainer?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href});
+            window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick', floatingMessage: this.floatingMessage });
+        });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);

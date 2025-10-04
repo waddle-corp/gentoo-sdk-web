@@ -104,7 +104,7 @@ class FloatingButton {
                 this.godomallAPI.getMemberProfile((err, res) => {
                     if (err) {
                         // Handle guest users who get 403 error - they're not logged in
-                        console.log('User is guest (not logged in):', err);
+                        // console.log('User is guest (not logged in):', err);
                         resolve(null); // Resolve with null for guest users
                     } else {
                         resolve(res);
@@ -210,7 +210,7 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+                // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
                 this.createUIElements(position, showGentooButton, isCustomButton);
             }

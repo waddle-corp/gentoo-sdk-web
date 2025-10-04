@@ -232,7 +232,7 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+                // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
                 this.createUIElements(position, showGentooButton, isCustomButton);
             }
