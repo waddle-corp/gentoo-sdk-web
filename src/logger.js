@@ -1,4 +1,7 @@
-import { postChatUserId, sendEventLog } from './apis/chatConfig';
+import { 
+    postChatUserId, 
+    sendEventLog 
+} from './apis/chatConfig';
 
 class Logger {
     constructor(props) {
