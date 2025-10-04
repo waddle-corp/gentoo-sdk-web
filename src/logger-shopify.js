@@ -23,6 +23,7 @@ class Logger {
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         this.isInitialized = false;  // Add flag to track initialization
         this.categoryName = this.parseInfoFromUrl()?.categoryName;
+        this.pageNumber = this.parseInfoFromUrl()?.pageNumber;
         this.searchKeyword = this.getSearchKeyword();
         this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
         if (!this.gentooSessionData?.sessionId) {
@@ -65,6 +66,7 @@ class Logger {
                     pageLocation: window.location.href,
                     itemId: this.itemId,
                     categoryName: this.categoryName, 
+                    pageNumber: this.pageNumber,
                 }
 
                 // send event log
@@ -201,6 +203,8 @@ class Logger {
             //const regexProductNo = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
             //const regexCategoryNo = /(?:\/category\/(?:[^\/]+\/)*|[?&]cate_no=)(\d+)/;
             const regexCategoryName = /\/collections\/([^\/\?]+)/;
+            const searchParams = url.searchParams;
+            const pageNumber = searchParams.get('page') || null;
             //const matchProductNo = path.match(regexProductNo);
             //const matchCategoryNo = path.match(regexCategoryNo);
             const matchCategoryName = path.match(regexCategoryName);
@@ -210,6 +214,7 @@ class Logger {
                 //productNo: matchProductNo ? matchProductNo[1] : null,
                 //categoryNo: matchCategoryNo ? matchCategoryNo[1] : null,
                 categoryName: matchCategoryName ? matchCategoryName[1] : null,
+                pageNumber: pageNumber,
             };
         } catch (error) {
             console.error('Invalid URL:', error);
