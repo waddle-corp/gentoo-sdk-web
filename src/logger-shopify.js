@@ -32,12 +32,10 @@ class Logger {
         }
 
         this.bootPromise = async () => {
-            console.log('[Logger] bootPromise starting...', { partnerId: this.partnerId, authCode: this.authCode });
 
             try {
                 try {
                     const canProceed = await checkTrainingProgress(this.partnerId);
-                    console.log('[Logger] checkTrainingProgress result:', canProceed);
                     if (!canProceed) {
                         console.warn("GentooIO: Training not completed, skipping initialization");
                         window.__GentooInited = 'training_incomplete';
@@ -73,7 +71,6 @@ class Logger {
 
                 // send event log
                 const ref = document.referrer;
-                console.log('[Logger] Sending PageTransition event...', { ref, searchKeyword: this.searchKeyword });
                 if (ref && !ref.includes(window.location.host)) {
                     sendEventLogShopify("PageTransition", this.basicPayload, { referrerOrigin: ref });
                 } else if (this.searchKeyword) {
@@ -142,8 +139,6 @@ class Logger {
             return;
         }
 
-        console.log('[Logger] init() called, starting boot process...');
-
         try {
             // Wait for boot process to complete
             await this.bootPromise();
@@ -153,7 +148,6 @@ class Logger {
             }
 
             this.isInitialized = true;
-            console.log('[Logger] init() completed successfully');
 
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -238,7 +232,6 @@ class Logger {
 
     // Create a persistent queue processor
     function createQueueProcessor() {
-        console.log('[Logger] createQueueProcessor started');
         var ge = function () {
             ge.q.push(Array.from(arguments));
             processQueue();
@@ -285,7 +278,6 @@ class Logger {
     }
 
     function processQueue() {
-        console.log('[Logger] processQueue started');
         while (w.GentooLogger.q && w.GentooLogger.q.length) {
             var args = w.GentooLogger.q.shift();
             w.GentooLogger.process(args);
@@ -295,22 +287,11 @@ class Logger {
     // Initialize or get existing GentooLogger
     var existingGentooLogger = w.GentooLogger;
     w.GentooLogger = createQueueProcessor();
-    console.log('[Logger] window.GentooLogger initialized', w.GentooLogger);
 
     // Process any existing queue items
     if (existingGentooLogger && existingGentooLogger.q) {
-        console.log('[Logger] Processing existing queue', existingGentooLogger.q);
         existingGentooLogger.q.forEach(function (args) {
             w.GentooLogger.process(args);
         });
-    } else {
-        console.log('[Logger] No existing queue found, ready for new calls');
     }
 })(window, document);
-
-
-/* GentooLogger('boot', {
-    partnerType: 'shopify',
-})
-
-GentooLogger('init', {}); */ // 아마도 Liquid 파일에서 실행되어야 할 듯

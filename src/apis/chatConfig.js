@@ -53,11 +53,11 @@ export async function sendEventLogShopify(event, basicPayload = {}, customPayloa
         ...customPayload,
     }
 
-    /* const url = `${process.env.API_TRACKER_BASE_URL}${process.env.API_USEREVENT_ENDPOINT}`;
+    const url = `${process.env.API_TRACKER_BASE_URL}/api/v1/beacon/track-shopify`;
     navigator.sendBeacon(
         url,
         JSON.stringify(payload)
-    ); */
+    );
     console.log('sendEventLogShopify payload', payload);
 }
 
