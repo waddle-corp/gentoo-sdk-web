@@ -229,10 +229,7 @@ class Logger {
     }
 }
 
-// Export as a global variable
-window.GentooLogger = Logger;
-console.log('[Logger] window.GentooLogger', window.GentooLogger);
-
+// Initialize queue processor immediately to avoid timing issues
 (function (global, document) {
     var w = global;
 
@@ -297,16 +294,16 @@ console.log('[Logger] window.GentooLogger', window.GentooLogger);
     // Initialize or get existing GentooLogger
     var existingGentooLogger = w.GentooLogger;
     w.GentooLogger = createQueueProcessor();
-    console.log('[Logger] w.GentooLogger', w.GentooLogger);
+    console.log('[Logger] window.GentooLogger initialized', w.GentooLogger);
 
     // Process any existing queue items
     if (existingGentooLogger && existingGentooLogger.q) {
-        console.log('[Logger] existingGentooLogger.q', existingGentooLogger.q);
+        console.log('[Logger] Processing existing queue', existingGentooLogger.q);
         existingGentooLogger.q.forEach(function (args) {
             w.GentooLogger.process(args);
         });
     } else {
-        console.log('[Logger] existingGentooLogger.q is not found');
+        console.log('[Logger] No existing queue found, ready for new calls');
     }
 })(window, document);
 
