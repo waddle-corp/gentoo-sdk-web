@@ -18,7 +18,7 @@ module.exports = (env, argv) => {
         { name: 'floating-godomall', entry: './src/floating-sdk-godomall.js', output: 'godomall' },
         { name: 'floating-imweb', entry: './src/floating-sdk-imweb.js', output: 'imweb' },
         { name: 'gentoo-logger', entry: './src/logger.js', output: 'logger' },
-        { name: 'gentoo-logger-shopify', entry: './src/logger-shopify.js', output: 'logger-shopify', globalName: 'GentooLogger' },
+        { name: 'gentoo-logger-shopify', entry: './src/logger-shopify.js', output: 'logger-shopify' },
         { name: 'floating-cafe24-modal', entry: './src/floating-sdk-cafe24-modal.js', output: 'cafe24-modal' },
     ];
 
@@ -29,7 +29,7 @@ module.exports = (env, argv) => {
         output: {
             path: path.resolve(__dirname, 'dist', t.output),
             filename: `${t.name}.js`,
-            library: { type: 'umd', name: t?.globalName ?? t.name },
+            library: { type: 'umd', name: t.name },
             clean: true,
         },
         plugins: [
