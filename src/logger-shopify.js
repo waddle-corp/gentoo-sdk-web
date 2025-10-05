@@ -32,10 +32,12 @@ class Logger {
         }
 
         this.bootPromise = async () => {
+            console.log('[Logger] bootPromise starting...', { partnerId: this.partnerId, authCode: this.authCode });
 
             try {
                 try {
                     const canProceed = await checkTrainingProgress(this.partnerId);
+                    console.log('[Logger] checkTrainingProgress result:', canProceed);
                     if (!canProceed) {
                         console.warn("GentooIO: Training not completed, skipping initialization");
                         window.__GentooInited = 'training_incomplete';
@@ -71,6 +73,7 @@ class Logger {
 
                 // send event log
                 const ref = document.referrer;
+                console.log('[Logger] Sending PageTransition event...', { ref, searchKeyword: this.searchKeyword });
                 if (ref && !ref.includes(window.location.host)) {
                     sendEventLogShopify("PageTransition", this.basicPayload, { referrerOrigin: ref });
                 } else if (this.searchKeyword) {
@@ -134,25 +137,23 @@ class Logger {
     }
 
     async init() {
-        if (window.__GentooLoggerInited !== null && window.__GentooLoggerInited !== undefined) {
-            console.warn("GentooIO init called twice, skipping second call.");
+        if (window.__GentooLoggerInited === 'init' || this.isInitialized) {
+            console.warn("GentooLogger init called twice, skipping second call.");
             return;
         }
+
+        console.log('[Logger] init() called, starting boot process...');
 
         try {
             // Wait for boot process to complete
             await this.bootPromise();
-
-            if (this.isInitialized) {
-                console.warn('GentooLogger is already initialized');
-                return;
-            }
 
             if (!this.chatUserId) {
                 throw new Error('Required data not yet loaded');
             }
 
             this.isInitialized = true;
+            console.log('[Logger] init() completed successfully');
 
         } catch (error) {
             console.error('Failed to initialize:', error);
