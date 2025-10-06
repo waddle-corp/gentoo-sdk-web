@@ -58,7 +58,6 @@ export async function sendEventLogShopify(event, basicPayload = {}, customPayloa
         url,
         JSON.stringify(payload)
     );
-    console.log('sendEventLogShopify payload', payload);
 }
 
 // floating button apis
