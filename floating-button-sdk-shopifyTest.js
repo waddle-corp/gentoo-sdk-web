@@ -947,7 +947,7 @@ class FloatingButton {
             externalKey: String(this.partnerId),
             userToken: convertedUserToken,
             udid: String(udid),
-            chatUserId: this.chatUserId && !userToken.includes('guest') ? String(this.chatUserId) : null
+            chatUserId: this.chatUserId ? String(this.chatUserId) : null
         }
 
         try {
