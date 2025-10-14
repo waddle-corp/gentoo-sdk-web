@@ -229,7 +229,7 @@ class FloatingButton {
                     this.availableComments = [
                         {
                             "floating": "Is the item you want sold out?",
-                            "greeting": "Want an email when it's back in stock?",
+                            "greeting": "Looking for a specific album or merch?  If it's sold out, just tell me the name and your email — I'll notify you.  (e.g. youremail@gmail.com, STRAY KIDS - KARMA - ACCORDION VERSION)",
                         },
                     ];
                     this.selectedCommentSet = this.availableComments[0];
