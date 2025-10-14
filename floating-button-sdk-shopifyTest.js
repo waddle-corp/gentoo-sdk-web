@@ -211,7 +211,7 @@ class FloatingButton {
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
                 const currentHref = window.location.href;
-                if (currentHref.includes('paper-tree.com') && 
+                if (currentHref.includes('paper-tree.com') &&
                     currentHref.includes('search') &&
                     document.body.textContent.includes('No results found for')) {
                     this.availableComments = [
@@ -220,8 +220,9 @@ class FloatingButton {
                             "greeting": "I'm here to help you find the perfect product. Can you tell me what you're looking for?",
                         },
                     ];
+                    this.selectedCommentSet = this.availableComments[0];
                 }
-                else if (currentHref.includes('saranghello.com') && 
+                else if (currentHref.includes('saranghello.com') &&
                         currentHref.includes('search') &&
                         document.querySelector('.grid-product__tag--sold-out')) {
                     this.availableComments = [
@@ -230,6 +231,7 @@ class FloatingButton {
                             "greeting": "Want an email when it's back in stock?",
                         },
                     ];
+                    this.selectedCommentSet = this.availableComments[0];
                 }
 
                 else if (this.displayLocation === 'PRODUCT_DETAIL') {
@@ -240,6 +242,7 @@ class FloatingButton {
                             "greeting": null,
                         },
                     ];
+                    this.selectedCommentSet = this.availableComments[0];
                 } else {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
 
@@ -432,7 +435,6 @@ class FloatingButton {
             }
 
             // Start repeating interval for experiment target (every 10 seconds)
-            console.log('ac-length', this.availableComments?.length, this.isExperimentTarget);
             if (this.isExperimentTarget && this.availableComments && this.availableComments?.length > 0) {
                 this.floatingMessageIntervalId = setInterval(() => {
                     this.showRandomFloatingMessage();
