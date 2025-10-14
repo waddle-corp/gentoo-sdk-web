@@ -221,6 +221,7 @@ class FloatingButton {
                         },
                     ];
                     this.selectedCommentSet = this.availableComments[0];
+                    this.floatingData.comment = this.selectedCommentSet.floating;
                 }
                 else if (currentHref.includes('saranghello.com') &&
                         currentHref.includes('search') &&
@@ -232,6 +233,7 @@ class FloatingButton {
                         },
                     ];
                     this.selectedCommentSet = this.availableComments[0];
+                    this.floatingData.comment = this.selectedCommentSet.floating;
                 }
 
                 else if (this.displayLocation === 'PRODUCT_DETAIL') {
