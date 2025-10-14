@@ -5,11 +5,9 @@ class FloatingButton {
         this.TYPING_ANIMATION_SPEED_MS = 800;
         this.MIN_TYPING_SPEED_MS = 50;
 
-        // 🛍️ Shopify 테스트용 - iframe 허용 도메인 확장
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
             '*.myshopify.com',
-            // 🧪 Shopify 테스트용 추가 도메인들
             'shopify-test.gentooai.com',
             '*.shopify-partners.com',
             'localhost',
@@ -212,7 +210,31 @@ class FloatingButton {
             }
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
-                if (this.displayLocation === 'PRODUCT_DETAIL') {
+                const currentHref = window.location.href;
+                if (currentHref.includes('paper-tree.com') &&
+                    currentHref.includes('search') &&
+                    document.body.textContent.includes('No results found for')) {
+                    this.availableComments = [
+                        {
+                            "floating": "Can't find what you're looking for?",
+                            "greeting": "I'm here to help you find the perfect product. Can you tell me what you're looking for?",
+                        },
+                    ];
+                    this.selectedCommentSet = this.availableComments[0];
+                }
+                else if (currentHref.includes('saranghello.com') &&
+                        currentHref.includes('search') &&
+                        document.querySelector('.grid-product__tag--sold-out')) {
+                    this.availableComments = [
+                        {
+                            "floating": "Is the item you want sold out?",
+                            "greeting": "Want an email when it's back in stock?",
+                        },
+                    ];
+                    this.selectedCommentSet = this.availableComments[0];
+                }
+
+                else if (this.displayLocation === 'PRODUCT_DETAIL') {
                     const pdpComment = this.floatingData?.comment;
                     this.availableComments = [
                         {
@@ -220,22 +242,12 @@ class FloatingButton {
                             "greeting": null,
                         },
                     ];
+                    this.selectedCommentSet = this.availableComments[0];
                 } else {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
 
                     if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
                         this.availableComments = this.experimentData.comments;
-                        // LOCAL_DEV_AVAILABLE_COMMENTS
-                        // this.availableComments = [
-                        //     {
-                        //         "floating": "Hello! What can I get for you?",
-                        //         "greeting": "Welcome 😊 What product are you looking for? I'd be happy to provide some recommendations."
-                        //     },
-                        //     {
-                        //         "floating": "Cooking, finishing or dipping? I’ll get it for you.",
-                        //         "greeting": "Looking for the perfect olive oil for your next dish? We have a curated selection for every culinary purpose. What's on your menu?"
-                        //     },
-                        // ];
 
                         if (this.availableComments && this.availableComments?.length > 0) {
                             const randomIndex = Math.floor(Math.random() * this.availableComments.length);
@@ -423,7 +435,6 @@ class FloatingButton {
             }
 
             // Start repeating interval for experiment target (every 10 seconds)
-            console.log('ac-length', this.availableComments?.length, this.isExperimentTarget);
             if (this.isExperimentTarget && this.availableComments && this.availableComments?.length > 0) {
                 this.floatingMessageIntervalId = setInterval(() => {
                     this.showRandomFloatingMessage();
