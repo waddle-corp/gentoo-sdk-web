@@ -536,7 +536,7 @@ class FloatingButton {
                 }px`;
             // custom branch for fastfive
             if (this.partnerId === '67615284c5ff44110dbc6613' && !this.isSmallResolution && this.browserWidth < 1200) {
-                const setUpPositionRightValue = this.floatingContainer.style.right 
+                const setUpPositionRightValue = position?.web?.right || this.chatbotData.position.right;
                 this.floatingContainer.style.right = Math.max(setUpPositionRightValue - 28, 0) + 'px';
             }
         }
