@@ -534,6 +534,10 @@ class FloatingButton {
                 ? (position?.mobile?.right || this.chatbotData.mobilePosition.right)
                 : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
+            // custom branch for fastfive
+            if (this.partnerId === '67615284c5ff44110dbc6613' && !this.isSmallResolution) {
+                this.browserWidth < 1200 ? this.floatingContainer.style.right = '20px' : this.floatingContainer.style.right = '48px';
+            }
         }
     }
 
