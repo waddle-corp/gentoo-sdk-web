@@ -220,7 +220,7 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+        if (this.floatingAvatar?.floatingAsset.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
         //if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
