@@ -291,6 +291,9 @@ class FloatingButton {
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
+            if (this.partnerId === '67615284c5ff44110dbc6613') {
+                this.floatingContainer.className = `floating-container-fastfive`;
+            }
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");

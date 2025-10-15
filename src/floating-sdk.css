@@ -55,6 +55,18 @@
     z-index: 9999999;
 }
 
+.floating-container-fastfive {
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    bottom: 66px;
+    right: 0;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    z-index: 10001;
+}
+
 .floating-button-common {
     /* position: fixed;
     bottom: 66px;
