@@ -299,7 +299,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common button-image`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+            this.button.style.backgroundImage = `url(${this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
@@ -443,7 +443,7 @@ class FloatingButton {
                     } else {
                         this.button.className = "floating-button-common button-image";
                     }
-                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl})`;
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
@@ -545,7 +545,7 @@ class FloatingButton {
             e.preventDefault();
             this.dimmedBackground.className = "dimmed-background hide";
             this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+            if (this.button) this.button.style.backgroundImage = `url(${this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl})`;
         });
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
@@ -871,7 +871,6 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        console.log("sendPostMessageHandler", payload);
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
