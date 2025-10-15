@@ -91,8 +91,10 @@ class FloatingButton {
                 this.chatbotData = res;
                 this.floatingAvatar = res?.avatar || null;
                 const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                const floatingZoom = this.chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
+                this.floatingZoom = floatingZoom?.activated;
             }),
             getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch boot config");
@@ -227,8 +229,8 @@ class FloatingButton {
             player.setAttribute('mode', 'normal');
             // bootConfig 우선 순위로 변경
             player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
-            player.style.width = this.isSmallResolution ? '68px' : '94px';
-            player.style.height = this.isSmallResolution ? '68px' : '94px';
+            player.style.width = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
+            player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
             
@@ -295,7 +297,7 @@ class FloatingButton {
             if (this.isSmallResolution) {
                 this.button.className = `floating-button-common button-image-md`;
             } else {
-                this.button.className = `floating-button-common button-image`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
@@ -332,7 +334,7 @@ class FloatingButton {
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
                         "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
                 this.expandedButton.appendChild(this.expandedText);
 
@@ -440,7 +442,7 @@ class FloatingButton {
                     if (this.isSmallResolution) {
                         this.button.className = "floating-button-common button-image-md";
                     } else {
-                        this.button.className = "floating-button-common button-image";
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
                     this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
                     if (this.dotLottiePlayer) {
@@ -858,7 +860,7 @@ class FloatingButton {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
             } else {
-                this.button.className = "floating-button-common button-image";
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
         }
         if (this.dotLottiePlayer) {

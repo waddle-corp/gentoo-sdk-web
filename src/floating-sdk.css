@@ -80,6 +80,13 @@
     background-repeat: no-repeat;
 }
 
+.button-image-zoom {
+    width: 120px;
+    height: 120px;
+    background-image: url('https://assets.gentooai.com/sdk/gentoo-anime-web-noloop.gif');
+    background-repeat: no-repeat;
+}
+
 .button-image-md {
     width: 68px;
     height: 68px;
@@ -189,6 +196,24 @@
     margin: 0;
     width: fit-content;
     max-width: 152px;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    white-space: pre-wrap;
+    -webkit-line-clamp: 3; 
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.expanded-area-text-zoom {
+    font-family: "pretendard";
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 19px;
+    letter-spacing: -0.025em;
+    margin: 0;
+    width: fit-content;
+    max-width: 180px;
     color: #fff;
     overflow: hidden;
     display: -webkit-box;
