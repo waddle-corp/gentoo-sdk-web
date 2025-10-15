@@ -323,7 +323,7 @@ class FloatingButton {
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
                         "expanded-area-md" :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-are-md expanded-area-neutral-md" :
+                        "expanded-area-md expanded-area-neutral-md" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area-md" :
                         "expanded-area-md expanded-area-neutral-md";
@@ -535,8 +535,9 @@ class FloatingButton {
                 : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
             // custom branch for fastfive
-            if (this.partnerId === '67615284c5ff44110dbc6613' && !this.isSmallResolution) {
-                this.browserWidth < 1200 ? this.floatingContainer.style.right = '20px' : this.floatingContainer.style.right = '48px';
+            if (this.partnerId === '67615284c5ff44110dbc6613' && !this.isSmallResolution && this.browserWidth < 1200) {
+                const setUpPositionRightValue = this.floatingContainer.style.right 
+                this.floatingContainer.style.right = Math.max(setUpPositionRightValue - 28, 0) + 'px';
             }
         }
     }
