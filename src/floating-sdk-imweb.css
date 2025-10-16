@@ -434,6 +434,7 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
+    margin-top: -8px;
 }
 
 .chat-footer-text {
