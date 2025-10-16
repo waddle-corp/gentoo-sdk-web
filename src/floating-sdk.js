@@ -229,8 +229,8 @@ class FloatingButton {
             player.setAttribute('mode', 'normal');
             // bootConfig 우선 순위로 변경
             player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
-            player.style.width = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
-            player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
+            player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+            player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
             
@@ -298,7 +298,7 @@ class FloatingButton {
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common button-image-md`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
             } else {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
@@ -321,13 +321,13 @@ class FloatingButton {
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
-                        "expanded-area-md" :
+                        `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-area-md expanded-area-neutral-md" :
+                        `expanded-area-md 'expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}` :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area-md" :
-                        "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
+                        `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
+                        `expanded-area-md expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}`;
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
                     this.expandedButton.className = 
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
@@ -443,7 +443,7 @@ class FloatingButton {
                 );
                 if (this.button) {
                     if (this.isSmallResolution) {
-                        this.button.className = "floating-button-common button-image-md";
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
                     } else {
                         this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
@@ -866,7 +866,7 @@ class FloatingButton {
 
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = "floating-button-common button-image-md";
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
             } else {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
