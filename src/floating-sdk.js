@@ -323,7 +323,7 @@ class FloatingButton {
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
                         `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        `expanded-area-md 'expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}` :
+                        `expanded-area-md expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}` :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
                         `expanded-area-md expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}`;
