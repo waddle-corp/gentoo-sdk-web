@@ -317,7 +317,7 @@ class FloatingButton {
                     return;
 
                 this.expandedButtonWrapper = document.createElement("div");
-                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.isSmallResolution ? 'expanded-area-wrapper-md' : this.floatingZoom ? 'expanded-area-wrapper-zoom' : ''}`;
+                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.floatingZoom ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
