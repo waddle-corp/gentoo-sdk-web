@@ -90,8 +90,8 @@ class FloatingButton {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
                 this.floatingAvatar = res?.avatar || null;
-                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                const floatingZoom = this.chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                const warningMessageData = this.chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
+                const floatingZoom = this.chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
                 this.floatingZoom = floatingZoom?.activated;

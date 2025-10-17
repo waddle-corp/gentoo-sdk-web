@@ -152,11 +152,11 @@ class FloatingButton {
                 .then(([chatbotData, bootConfig]) => {
                     this.chatbotData = chatbotData;
                     this.bootConfig = bootConfig;
-                    const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                    const warningMessageData = chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
                     this.floatingAvatar = chatbotData?.avatar;
-                    const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                    const floatingZoom = chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                     this.floatingZoom = floatingZoom?.activated;
                     resolve();
                 })
@@ -373,7 +373,7 @@ class FloatingButton {
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
                         "expanded-area-md" :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-are-md expanded-area-neutral-md" :
+                        "expanded-area-md expanded-area-neutral-md" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                             "expanded-area-md" :
                             "expanded-area-md expanded-area-neutral-md";

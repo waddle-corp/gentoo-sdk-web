@@ -169,8 +169,8 @@ class FloatingButton {
                     .then(([chatbotData, bootConfig]) => {
                         this.chatbotData = chatbotData;
                         this.bootConfig = bootConfig;
-                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                        const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                        const warningMessageData = chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
+                        const floatingZoom = chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                         this.warningMessage = warningMessageData?.extra?.message;
                         this.warningActivated = warningMessageData?.activated;
                         this.floatingZoom = floatingZoom?.activated;
