@@ -844,7 +844,7 @@ class FloatingButton {
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
-            if (this.expandedButtonWrapper) this.expandedButtonWrapper.className.add("hide");
+            if (this.expandedButtonWrapper) this.expandedButtonWrapper.classList.add("hide");
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
             if (this.customButton) this.customButton.classList.add('hide');
         }
