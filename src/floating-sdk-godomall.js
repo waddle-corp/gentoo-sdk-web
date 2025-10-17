@@ -156,6 +156,8 @@ class FloatingButton {
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
                     this.floatingAvatar = chatbotData?.avatar;
+                    const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                    this.floatingZoom = floatingZoom?.activated;
                     resolve();
                 })
                 .catch(error => {
@@ -270,16 +272,15 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('gentoo-anime-web-default.lottie')) {
-        //if (this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
+        if (this.floatingAvatar?.floatingAsset.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            // bootConfig 우선 순위로 변경 예정
-            player.setAttribute('src', this.floatingAvatar?.floatingAsset || this.bootConfig?.floating?.button?.imageUrl);
-            player.style.width = this.isSmallResolution ? '68px' : '94px';
-            player.style.height = this.isSmallResolution ? '68px' : '94px';
+            // bootConfig 우선 순위로 변경
+            player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
+            player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+            player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
             this.dotLottiePlayer = player;
         }
@@ -344,12 +345,12 @@ class FloatingButton {
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common button-image-md`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
             } else {
-                this.button.className = `floating-button-common button-image`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+            this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
@@ -357,48 +358,52 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
 
-            if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment.length > 0) {
+            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
+            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
 
+                this.expandedButtonWrapper = document.createElement("div");
+                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.floatingZoom ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className =
-                        /* this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
+                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
                         "expanded-area-md" :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-are-md expanded-area-neutral-md" : */
+                        "expanded-are-md expanded-area-neutral-md" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                             "expanded-area-md" :
                             "expanded-area-md expanded-area-neutral-md";
-                    this.expandedText.className = "expanded-area-text-md";
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
                     this.expandedButton.className =
-                       /*  this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
+                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
                         "expanded-area" :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-area expanded-area-neutral" : */
+                        "expanded-area expanded-area-neutral" :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                             "expanded-area" :
                             "expanded-area expanded-area-neutral";
-                    this.expandedText.className = "expanded-area-text";
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
+                this.expandedButtonWrapper.appendChild(this.expandedButton);
                 this.expandedButton.appendChild(this.expandedText);
 
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
+                    this.floatingContainer.appendChild(this.expandedButtonWrapper);
                     this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
 
                     setTimeout(() => {
                         if (
                             this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
+                            this.expandedButtonWrapper &&
+                            this.expandedButtonWrapper.parentNode === this.floatingContainer
                         ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
+                            this.floatingContainer.removeChild(this.expandedButtonWrapper);
                         }
                     }, 7000);
                 }
@@ -413,7 +418,7 @@ class FloatingButton {
             chatHeader: this.chatHeader,
             dimmedBackground: this.dimmedBackground,
             button: this.button,
-            expandedButton: this.expandedButton,
+            expandedButtonWrapper: this.expandedButtonWrapper,
             customButton: this.customButton,
         }
 
@@ -421,8 +426,8 @@ class FloatingButton {
         this.setupEventListeners(position, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
-                if (this.expandedButton)
-                    this.expandedButton.classList.add('hide');
+                if (this.expandedButtonWrapper)
+                    this.expandedButtonWrapper.classList.add('hide');
                 if (this.button) {
                     this.button.classList.add('hide');
                 }
@@ -447,8 +452,8 @@ class FloatingButton {
             this.floatingClicked = true;
 
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
-                if (this.expandedButton)
-                    this.expandedButton.classList.add('hide');
+                if (this.expandedButtonWrapper)
+                    this.expandedButtonWrapper.classList.add('hide');
                 if (this.button) {
                     if (this.isSmallResolution) {
                         this.button.className =
@@ -469,16 +474,16 @@ class FloatingButton {
                 this.hideChat(
                     this.elems.iframeContainer,
                     this.elems.button,
-                    this.elems.expandedButton,
+                    this.elems.expandedButtonWrapper,
                     this.elems.dimmedBackground
                 );
                 if (this.button) {
                     if (this.isSmallResolution) {
-                        this.button.className = "floating-button-common button-image-md";
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
                     } else {
-                        this.button.className = "floating-button-common button-image";
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
-                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
@@ -571,7 +576,7 @@ class FloatingButton {
             e.preventDefault();
             this.dimmedBackground.className = 'dimmed-background hide';
             this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl})`;
+            if (this.button) this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
         })
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
@@ -583,7 +588,7 @@ class FloatingButton {
                 e,
                 this.iframeContainer,
                 this.button,
-                this.expandedButton,
+                this.expandedButtonWrapper,
                 this.dimmedBackground
             );
         });
@@ -603,7 +608,7 @@ class FloatingButton {
                     this.iframeContainer,
                     this.iframe,
                     this.button,
-                    this.expandedButton,
+                    this.expandedButtonWrapper,
                     this.dimmedBackground,
                 );
                 document.removeEventListener("mousemove", onMouseMove);
@@ -615,18 +620,30 @@ class FloatingButton {
     }
 
     remove() {
-        if (this.button) {
-            document.body.removeChild(this.button);
+        if (this.floatingContainer) {
+            if (this.floatingContainer.parentNode) this.floatingContainer.parentNode.removeChild(this.floatingContainer);
         }
-        if (this.expandedButton) {
-            document.body.removeChild(this.expandedButton);
+        if (this.button) {
+            if (this.button.parentNode) this.button.parentNode.removeChild(this.button);
+        }
+        if (this.dotLottiePlayer) {
+            if (this.dotLottiePlayer.parentNode) this.dotLottiePlayer.parentNode.removeChild(this.dotLottiePlayer);
+        }
+        if (this.expandedButtonWrapper) {
+            if (this.expandedButtonWrapper.parentNode) this.expandedButtonWrapper.parentNode.removeChild(this.expandedButtonWrapper);
         }
         if (this.iframeContainer) {
-            document.body.removeChild(this.iframeContainer);
+            if (this.iframeContainer.parentNode) this.iframeContainer.parentNode.removeChild(this.iframeContainer);
         }
+        if (this.dimmedBackground) {
+            if (this.dimmedBackground.parentNode) this.dimmedBackground.parentNode.removeChild(this.dimmedBackground);
+        }
+        this.floatingContainer = null;
         this.button = null;
-        this.expandedButton = null;
+        this.dotLottiePlayer = null;
+        this.expandedButtonWrapper = null;
         this.iframeContainer = null;
+        this.dimmedBackground = null;
     }
 
     destroy() {
@@ -641,16 +658,25 @@ class FloatingButton {
         // Delete viewport meta tag
         this.deleteViewport();
 
+        // Remove all known DOM elements
+        const elemsToRemove = [
+            this.floatingContainer,
+            this.iframeContainer,
+            this.dimmedBackground,
+            this.button,
+            this.expandedButtonWrapper,
+            this.dotLottiePlayer,
+        ];
+        elemsToRemove.forEach((el) => {
+            if (el && el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
+
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
-        }
-        if (this.expandedButton) {
-            this.expandedButton.removeEventListener(
-                "click",
-                this.expandedButtonClickHandler
-            );
         }
 
         // Remove all DOM elements
@@ -666,6 +692,7 @@ class FloatingButton {
 
         // Reset all properties
         this.button = null;
+        this.expandedButtonWrapper = null;
         this.expandedButton = null;
         this.expandedText = null;
         this.iframeContainer = null;
@@ -835,11 +862,16 @@ class FloatingButton {
 
         this.sendPostMessageHandler({ enableMode: mode });
 
+        if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
+            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
+        }
+        
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
-            if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.expandedButtonWrapper) this.expandedButtonWrapper.classList.add("hide");
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
+            if (this.customButton) this.customButton.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
@@ -858,13 +890,14 @@ class FloatingButton {
 
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = "floating-button-common button-image-md";
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
             } else {
-                this.button.className = "floating-button-common button-image";
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
         }
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
-        if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+        if (this.expandedButtonWrapper) this.expandedButtonWrapper.classList.add("hide");
+        if (this.customButton) this.customButton.classList.remove('hide');
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
     }
