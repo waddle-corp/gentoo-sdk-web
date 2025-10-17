@@ -603,22 +603,22 @@ class FloatingButton {
 
     remove() {
         if (this.floatingContainer) {
-            document.body.removeChild(this.floatingContainer);
+            if (this.floatingContainer.parentNode) this.floatingContainer.parentNode.removeChild(this.floatingContainer);
         }
         if (this.button) {
-            document.body.removeChild(this.button);
+            if (this.button.parentNode) this.button.parentNode.removeChild(this.button);
         }
         if (this.dotLottiePlayer) {
-            document.body.removeChild(this.dotLottiePlayer);
+            if (this.dotLottiePlayer.parentNode) this.dotLottiePlayer.parentNode.removeChild(this.dotLottiePlayer);
         }
         if (this.expandedButtonWrapper) {
-            document.body.removeChild(this.expandedButtonWrapper);
+            if (this.expandedButtonWrapper.parentNode) this.expandedButtonWrapper.parentNode.removeChild(this.expandedButtonWrapper);
         }
         if (this.iframeContainer) {
-            document.body.removeChild(this.iframeContainer);
+            if (this.iframeContainer.parentNode) this.iframeContainer.parentNode.removeChild(this.iframeContainer);
         }
         if (this.dimmedBackground) {
-            document.body.removeChild(this.dimmedBackground);
+            if (this.dimmedBackground.parentNode) this.dimmedBackground.parentNode.removeChild(this.dimmedBackground);
         }
         this.floatingContainer = null;
         this.button = null;
