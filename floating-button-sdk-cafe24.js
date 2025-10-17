@@ -384,6 +384,8 @@ class FloatingButton {
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
 
+                this.expandedButtonWrapper = document.createElement("div");
+                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.isSmallResolution ? 'expanded-area-wrapper-md' : this.floatingZoom ? 'expanded-area-wrapper-zoom' : ''}`;
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
@@ -399,11 +401,12 @@ class FloatingButton {
                         "expanded-area expanded-area-neutral";
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
+                this.expandedButtonWrapper.appendChild(this.expandedButton);
                 this.expandedButton.appendChild(this.expandedText);
 
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButton);
+                    this.floatingContainer.appendChild(this.expandedButtonWrapper);
 
                     // Add text animation
                     let i = 0;
@@ -422,10 +425,10 @@ class FloatingButton {
                     setTimeout(() => {
                         if (
                             this.floatingContainer &&
-                            this.expandedButton &&
-                            this.expandedButton.parentNode === this.floatingContainer
+                            this.expandedButtonWrapper &&
+                            this.expandedButtonWrapper.parentNode === this.floatingContainer
                         ) {
-                            this.floatingContainer.removeChild(this.expandedButton);
+                            this.floatingContainer.removeChild(this.expandedButtonWrapper);
                         }
                     }, 7000);
                 }
@@ -440,7 +443,7 @@ class FloatingButton {
             chatHeader: this.chatHeader,
             dimmedBackground: this.dimmedBackground,
             button: this.button,
-            expandedButton: this.expandedButton,
+            expandedButtonWrapper: this.expandedButtonWrapper,
             customButton: this.customButton,
         }
 
@@ -448,8 +451,8 @@ class FloatingButton {
         this.setupEventListeners(position, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
-                if (this.expandedButton)
-                    this.expandedButton.classList.add('hide');
+                if (this.expandedButtonWrapper)
+                    this.expandedButtonWrapper.classList.add('hide');
                 if (this.button) {
                     this.button.classList.add('hide');
                 }
@@ -474,8 +477,8 @@ class FloatingButton {
             this.floatingClicked = true;
             
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
-                if (this.expandedButton)
-                    this.expandedButton.classList.add('hide');
+                if (this.expandedButtonWrapper)
+                    this.expandedButtonWrapper.classList.add('hide');
                 if (this.button) {
                     if (this.isSmallResolution) {
                         this.button.className =
@@ -496,7 +499,7 @@ class FloatingButton {
                 this.hideChat(
                     this.elems.iframeContainer,
                     this.elems.button,
-                    this.elems.expandedButton,
+                    this.elems.expandedButtonWrapper,
                     this.elems.dimmedBackground
                 );
                 if (this.button) {
@@ -613,7 +616,7 @@ class FloatingButton {
                 e,
                 this.iframeContainer,
                 this.button,
-                this.expandedButton,
+                this.expandedButtonWrapper,
                 this.dimmedBackground
             );
         });
@@ -633,7 +636,7 @@ class FloatingButton {
                     this.iframeContainer,
                     this.iframe,
                     this.button,
-                    this.expandedButton,
+                    this.expandedButtonWrapper,
                     this.dimmedBackground,
                 );
                 document.removeEventListener("mousemove", onMouseMove);
@@ -646,16 +649,16 @@ class FloatingButton {
 
     remove() {
         if (this.button) {
-            document.body.removeChild(this.button);
+            if (this.button.parentNode) this.button.parentNode.removeChild(this.button);
         }
-        if (this.expandedButton) {
-            document.body.removeChild(this.expandedButton);
+        if (this.expandedButtonWrapper) {
+            if (this.expandedButtonWrapper.parentNode) this.expandedButtonWrapper.parentNode.removeChild(this.expandedButtonWrapper);
         }
         if (this.iframeContainer) {
-            document.body.removeChild(this.iframeContainer);
+            if (this.iframeContainer.parentNode) this.iframeContainer.parentNode.removeChild(this.iframeContainer);
         }
         this.button = null;
-        this.expandedButton = null;
+        this.expandedButtonWrapper = null;
         this.iframeContainer = null;
     }
 
@@ -676,12 +679,6 @@ class FloatingButton {
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
-        if (this.expandedButton) {
-            this.expandedButton.removeEventListener(
-                "click",
-                this.expandedButtonClickHandler
-            );
-        }
 
         // Remove all DOM elements
         if (this.floatingContainer && this.floatingContainer.parentNode) {
@@ -696,6 +693,7 @@ class FloatingButton {
 
         // Reset all properties
         this.button = null;
+        this.expandedButtonWrapper = null;
         this.expandedButton = null;
         this.expandedText = null;
         this.iframeContainer = null;
@@ -1004,7 +1002,7 @@ class FloatingButton {
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";
-            if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+            if (this.expandedButtonWrapper) this.expandedButtonWrapper.classList.add("hide");
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
         }
         if (mode === "shrink") {
@@ -1030,7 +1028,7 @@ class FloatingButton {
             }
         }
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
-        if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
+        if (this.expandedButtonWrapper) this.expandedButtonWrapper.classList.add("hide");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.dimmedBackground.className = "dimmed-background hide";
     }
