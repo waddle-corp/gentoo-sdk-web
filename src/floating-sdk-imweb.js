@@ -242,7 +242,7 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
+        if (this.floatingAvatar?.floatingAsset?.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl?.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
@@ -328,7 +328,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
-            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment.length > 0) {
+            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
