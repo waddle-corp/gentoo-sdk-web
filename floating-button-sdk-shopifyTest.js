@@ -236,6 +236,36 @@ class FloatingButton {
                     this.floatingData.comment = this.selectedCommentSet.floating;
                 }
 
+                else if (currentHref.includes('olivethisolivethat.com') &&
+                        currentHref.includes('/collections/')) {
+
+                    const collectionMessages = {
+                        'extra-virgin-olive-oil': {
+                            floating: "Curious how these oils differ from each other?",
+                            greeting: "Are you looking for a spicy, grassy, or mild olive oil or vinegar? Or is there a specific product you'd like to learn more about?"
+                        },
+                        'infused-olive-oils': {
+                            floating: "Curious how these oils differ from each other?",
+                            greeting: "Are you looking for a spicy, grassy, or mild olive oil or vinegar? Or is there a specific product you'd like to learn more about?"
+                        },
+                        'balsamic-fruit-vinegars': {
+                            floating: "Curious how these vinegars differ from each other?",
+                            greeting: "Are you looking for a earthy sweet, or refreshing vinegar? Or is there a specific product you'd like to learn more about?"
+                        }
+                    };
+
+                    const matchedCollection = Object.keys(collectionMessages).find(
+                        slug => currentHref.includes(`/collections/${slug}`)
+                    );
+
+                    if (matchedCollection) {
+                        const messages = collectionMessages[matchedCollection];
+                        this.availableComments = [messages];
+                        this.selectedCommentSet = this.availableComments[0];
+                        this.floatingData.comment = this.selectedCommentSet.floating;
+                    }
+                }
+
                 else if (this.displayLocation === 'PRODUCT_DETAIL') {
                     const pdpComment = this.floatingData?.comment;
                     this.availableComments = [
