@@ -90,8 +90,8 @@ class FloatingButton {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
                 this.floatingAvatar = res?.avatar || null;
-                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                const floatingZoom = this.chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
+                const warningMessageData = this.chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
+                const floatingZoom = this.chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
                 this.floatingZoom = floatingZoom?.activated;
@@ -222,7 +222,7 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl.includes('lottie')) {
+        if (this.floatingAvatar?.floatingAsset?.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl?.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
@@ -311,7 +311,7 @@ class FloatingButton {
                 this.floatingContainer.appendChild(this.button);
             }
             if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
-            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment.length > 0) {
+            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
                 // Check if component is destroyed or clicked
                 if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
                     return;
@@ -323,12 +323,12 @@ class FloatingButton {
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
                         this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
-                        `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
+                        `expanded-area-md` :
                         this.bootConfig?.floating?.button?.imageUrl ?
-                        `expanded-area-md expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}` :
+                        `expanded-area-md expanded-area-neutral-md` :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        `expanded-area-md ${this.floatingZoom ? 'expanded-area-zoom-md' : ''}` :
-                        `expanded-area-md expanded-area-neutral-md ${this.floatingZoom ? 'expanded-area-neutral-zoom-md' : ''}`;
+                        `expanded-area-md` :
+                        `expanded-area-md expanded-area-neutral-md`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
                     this.expandedButton.className = 
