@@ -1,9 +1,9 @@
 import './floating-sdk.css';
-import { 
-    getChatbotData, 
-    postChatUserId, 
-    getBootConfig, 
-    postChatEventLog 
+import {
+    getChatbotData,
+    postChatUserId,
+    getBootConfig,
+    postChatEventLog
 } from './apis/chatConfig';
 
 
@@ -12,28 +12,28 @@ class FloatingButton {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
-            '*.myshopify.com',  
+            '*.myshopify.com',
         ];
-        
+
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
-        
+
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
-        
+
         if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
         }
-        
+
         // Check for existing SDK elements
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created'; 
+            window.__GentooInited = 'created';
             return;
         }
         if (!props.partnerId || !props.authCode) {
@@ -83,9 +83,9 @@ class FloatingButton {
                 this.gentooSessionData.cuid = res;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             })
-            .catch(() => {
-                this.chatUserId = 'test';
-            }),
+                .catch(() => {
+                    this.chatUserId = 'test';
+                }),
             getChatbotData(this.partnerId, this.chatUserId).then((res) => {
                 if (!res) throw new Error("Failed to fetch chatbot data");
                 this.chatbotData = res;
@@ -111,7 +111,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        
+
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
         if (isInIframe && !isAllowedDomain) {
@@ -119,18 +119,19 @@ class FloatingButton {
             window.__GentooInited = 'iframe_blocked';
             return;
         }
-        
+
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
             window.__GentooInited = 'created';
             return;
         }
-        
+
         // this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
-        const { position, showGentooButton = true, isCustomButton = false } = params;
-        
+        const { position, showGentooButton = true, isCustomButton = false, parentClassName = '' } = params;
+        // const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document;
+        const parentElem = document.getElementsByClassName('floating-container-fastfive');
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -158,7 +159,8 @@ class FloatingButton {
             else if (!this.bootConfig?.floating?.isVisible) {
                 // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
-                this.createUIElements(position, showGentooButton, isCustomButton);
+                if (window.location.hostname.includes('dev.fastfive')) this.createUIElementsFF(position, showGentooButton, isCustomButton, parentElem);
+                else {this.createUIElements(position, showGentooButton, isCustomButton);}
             }
 
         } catch (error) {
@@ -205,11 +207,11 @@ class FloatingButton {
         this.dimmedBackground.className = "dimmed-background hide";
         this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
         this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
-        
+
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
-        
+
         this.chatHeader = document.createElement("div");
         this.chatHandler = document.createElement("div");
         this.chatHeaderText = document.createElement("p");
@@ -241,7 +243,7 @@ class FloatingButton {
             player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
-            
+
             this.dotLottiePlayer = player;
         }
 
@@ -287,7 +289,7 @@ class FloatingButton {
         }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
-        
+
         postChatEventLog({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
@@ -329,20 +331,20 @@ class FloatingButton {
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
-                    this.expandedButton.className = 
+                    this.expandedButton.className =
                         this.useBootConfigFloatingImage ?
-                        `expanded-area-md expanded-area-neutral-md` :
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        `expanded-area-md` :
-                        `expanded-area-md expanded-area-neutral-md`;
+                            `expanded-area-md expanded-area-neutral-md` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                `expanded-area-md` :
+                                `expanded-area-md expanded-area-neutral-md`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
-                    this.expandedButton.className = 
+                    this.expandedButton.className =
                         this.useBootConfigFloatingImage ?
-                        `expanded-area expanded-area-neutral` :
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area" :
-                        `expanded-area expanded-area-neutral`;
+                            `expanded-area expanded-area-neutral` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area" :
+                                `expanded-area expanded-area-neutral`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
 
@@ -352,7 +354,246 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButtonWrapper);
-                    this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
+                    this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
+
+                    // Remove expanded button after delay
+                    setTimeout(() => {
+                        if (
+                            this.floatingContainer &&
+                            this.expandedButtonWrapper &&
+                            this.expandedButtonWrapper.parentNode === this.floatingContainer
+                        ) {
+                            this.floatingContainer.removeChild(this.expandedButtonWrapper);
+                        }
+                    }, 7000);
+                }
+            }
+        } else {
+            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
+        }
+
+        this.elems = {
+            iframeContainer: this.iframeContainer,
+            iframe: this.iframe,
+            chatHeader: this.chatHeader,
+            dimmedBackground: this.dimmedBackground,
+            button: this.button,
+            expandedButtonWrapper: this.expandedButtonWrapper,
+            customButton: this.customButton,
+        };
+
+        // Add event listeners
+        this.setupEventListeners(position, isCustomButton);
+        if (this.gentooSessionData?.redirectState) {
+            setTimeout(() => {
+                if (this.expandedButtonWrapper)
+                    this.expandedButtonWrapper.classList.add('hide');
+                if (this.button) {
+                    this.button.classList.add('hide');
+                }
+                if (this.dotLottiePlayer) {
+                    this.dotLottiePlayer.classList.add('hide');
+                }
+                if (this.customButton) {
+                    this.customButton.classList.add('hide');
+                }
+            }, 100);
+            setTimeout(() => {
+                this.openChat();
+                this.gentooSessionData.redirectState = false;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            }, 500);
+        }
+        window.__GentooInited = 'created';
+    }
+
+    // Separate UI creation into its own method for clarity
+    createUIElementsFF(position, showGentooButton, isCustomButton = false, parentElem) {
+        console.log('[GENTOO] dev test', parentElem)
+        // Check if any SDK elements exist in document
+        if (this.checkSDKExists()) {
+            console.warn("GentooIO UI elements already exist in the document, skipping creation.");
+            window.__GentooInited = 'created';
+            return;
+        }
+
+        window.__GentooInited = 'creating';
+        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
+        // Add null checks before accessing properties
+        if (
+            !this.chatbotData ||
+            !this.chatbotData.position ||
+            !this.chatbotData.mobilePosition
+        ) {
+            console.error("Chatbot data is incomplete");
+            return;
+        }
+
+        if (
+            !this.bootConfig?.floating ||
+            (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+        ) {
+            console.error("Floating data is incomplete");
+            return;
+        }
+
+        if (this.eventCallback.show !== null) {
+            this.eventCallback.show();
+        }
+
+        // Create iframe elements
+        this.dimmedBackground = document.createElement("div");
+        this.dimmedBackground.className = "dimmed-background hide";
+        this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+        this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
+
+        this.iframeContainer = document.createElement("div");
+        this.iframeContainer.className = "iframe-container iframe-container-hide";
+        this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
+
+        this.chatHeader = document.createElement("div");
+        this.chatHandler = document.createElement("div");
+        this.chatHeaderText = document.createElement("p");
+        this.closeButtonContainer = document.createElement("div");
+        this.closeButtonIcon = document.createElement("div");
+        this.closeButtonText = document.createElement("p");
+        this.chatHeaderText.innerText = "Gentoo";
+        this.footer = document.createElement("div");
+        this.footer.className = "chat-footer";
+        this.footerText = document.createElement("p");
+        this.footerText.className = "chat-footer-text";
+        this.footer.appendChild(this.footerText);
+        this.iframe = document.createElement("iframe");
+        this.iframe.src = this.chatUrl;
+
+        // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+        const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+        const avatarAsset = this.floatingAvatar?.floatingAsset;
+        this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+        const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+        if (selectedAsset?.includes('lottie')) {
+            const player = document.createElement('dotlottie-player');
+            player.setAttribute('autoplay', '');
+            player.setAttribute('loop', '');
+            player.setAttribute('mode', 'normal');
+            // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+            player.setAttribute('src', selectedAsset);
+            player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+            player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+            player.style.cursor = 'pointer';
+            player.appendChild(document.createTextNode('\u200B'));
+
+            this.dotLottiePlayer = player;
+        }
+
+        if (this.isSmallResolution) {
+            this.chatHeader.className = "chat-header-md";
+            this.chatHandler.className = "chat-handler-md";
+            this.chatHandler.appendChild(document.createTextNode('\u200B'));
+            this.chatHeaderText.className = "chat-header-text-md";
+            this.closeButtonContainer.className = "chat-close-button-container-md";
+            this.closeButtonIcon.className = "chat-close-button-icon-md";
+            this.closeButtonIcon.appendChild(document.createTextNode('\u200B'));
+            this.closeButtonText.className = "chat-close-button-text-md";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
+            this.closeActionArea = document.createElement("div");
+            this.closeActionArea.className = "chat-close-action-area-md";
+            this.closeActionArea.appendChild(document.createTextNode('\u200B'));
+            this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.chatHeaderText);
+            this.chatHeader.appendChild(this.chatHandler);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+            this.iframeContainer.appendChild(this.closeActionArea);
+        } else {
+            this.chatHeader.className = "chat-header";
+            this.chatHeaderText.className = "chat-header-text";
+            this.closeButtonContainer.className = "chat-close-button-container";
+            this.closeButtonIcon.className = "chat-close-button-icon";
+            this.closeButtonText.className = "chat-close-button-text";
+            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Minimize" : "채팅창 축소";
+            this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
+            this.closeButtonContainer.appendChild(this.closeButtonIcon);
+            this.closeButtonContainer.appendChild(this.closeButtonText);
+            this.chatHeader.appendChild(this.chatHeaderText);
+            this.chatHeader.appendChild(this.closeButtonContainer);
+        }
+
+        this.iframeContainer.appendChild(this.chatHeader);
+        this.iframeContainer.appendChild(this.iframe);
+        if (this.warningActivated) {
+            this.footerText.innerText = this.warningMessage;
+            this.iframeContainer.appendChild(this.footer);
+        }
+        parentElem.appendChild(this.dimmedBackground);
+        parentElem.appendChild(this.iframeContainer);
+
+        postChatEventLog({
+            eventCategory: "SDKFloatingRendered",
+            partnerId: this.partnerId,
+            chatUserId: this.chatUserId,
+            products: [],
+        }, this.isMobileDevice);
+
+        // Create floating button
+        if (showGentooButton) {
+            this.floatingContainer = document.createElement("div");
+            this.floatingContainer.className = `floating-container`;
+            if (this.partnerId === '67615284c5ff44110dbc6613') {
+                this.floatingContainer.className = `floating-container-fastfive`;
+            }
+            this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
+            this.updateFloatingContainerPosition(position); // Set initial position
+            this.button = document.createElement("div");
+            if (this.isSmallResolution) {
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
+            } else {
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
+            }
+            this.button.type = "button";
+            this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
+            parentElem.appendChild(this.floatingContainer);
+            if (this.dotLottiePlayer) {
+                this.floatingContainer.appendChild(this.dotLottiePlayer);
+            } else {
+                this.floatingContainer.appendChild(this.button);
+            }
+            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
+            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
+                // Check if component is destroyed or clicked
+                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+                    return;
+
+                this.expandedButtonWrapper = document.createElement("div");
+                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.floatingZoom ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+                this.expandedButton = document.createElement("div");
+                this.expandedText = document.createElement("p");
+                if (this.isSmallResolution) {
+                    this.expandedButton.className =
+                        this.useBootConfigFloatingImage ?
+                            `expanded-area-md expanded-area-neutral-md` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                `expanded-area-md` :
+                                `expanded-area-md expanded-area-neutral-md`;
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                } else {
+                    this.expandedButton.className =
+                        this.useBootConfigFloatingImage ?
+                            `expanded-area expanded-area-neutral` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area" :
+                                `expanded-area expanded-area-neutral`;
+                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+                }
+
+                this.expandedButtonWrapper.appendChild(this.expandedButton);
+                this.expandedButton.appendChild(this.expandedText);
+
+                // Double check if floatingContainer still exists before appending
+                if (this.floatingContainer && this.floatingContainer.parentNode) {
+                    this.floatingContainer.appendChild(this.expandedButtonWrapper);
+                    this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
 
                     // Remove expanded button after delay
                     setTimeout(() => {
@@ -419,7 +660,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            
+
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButtonWrapper)
                     this.expandedButtonWrapper.classList.add('hide');
@@ -472,7 +713,7 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl });
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -484,9 +725,9 @@ class FloatingButton {
             if (e.data.preInputSubmittedState) {
                 if (this.eventCallback.preInputSubmitted !== null) {
                     if (e.data.step1) {
-                        this.eventCallback?.preInputSubmitted({step1: e.data.step1});
+                        this.eventCallback?.preInputSubmitted({ step1: e.data.step1 });
                     } else if (e.data.step2) {
-                        this.eventCallback?.preInputSubmitted({step2: e.data.step2});
+                        this.eventCallback?.preInputSubmitted({ step2: e.data.step2 });
                     }
                 }
             }
@@ -509,14 +750,14 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
+        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -555,7 +796,7 @@ class FloatingButton {
         this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
-        if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
+        if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -691,12 +932,12 @@ class FloatingButton {
         this.closeButtonIcon = null;
         this.closeButtonText = null;
         this.dotLottiePlayer = null;
-    
+
         this.chatUserId = null;
         // this.floatingData = null;
         this.chatbotData = null;
         this.chatUrl = null;
-    
+
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
@@ -721,7 +962,7 @@ class FloatingButton {
     // Function to inject viewport meta tag
     injectViewport() {
         if (this.viewportInjected) return;
-        
+
         try {
             // Check for existing viewport meta tag
             const existingViewport = document.querySelector('meta[name="viewport"]');
@@ -744,7 +985,7 @@ class FloatingButton {
     // Function to delete viewport meta tag
     deleteViewport() {
         if (!this.viewportInjected) return;
-        
+
         try {
             const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
             if (meta) {
@@ -839,10 +1080,10 @@ class FloatingButton {
             products: [],
         }, this.isMobileDevice);
 
-        this.sendPostMessageHandler({enableMode: mode});
+        this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
-            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
+            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment });
         }
 
         if (this.isSmallResolution) {
@@ -951,35 +1192,35 @@ class FloatingButton {
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
         const isInIframe = window !== window.top;
-        
+
         // 현재 document의 SDK set 
         const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-        
+
         if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
             return true;
         }
-        
+
         if (isInIframe) {
             try {
                 if (window.top.document) {
                     if (window.top.__GentooInited !== null && window.top.__GentooInited !== undefined) {
                         return true;
                     }
-                    
+
                     // 부모 document의 SDK set 
                     const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
                     const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
                     const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-                    
+
                     return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");
             }
         }
-        
+
         return false;
     }
 
@@ -987,17 +1228,17 @@ class FloatingButton {
         if (this.allowedDomainsForIframe.includes(hostname)) {
             return true;
         }
-        
+
         // Check wildcard patterns
         for (const pattern of this.allowedDomainsForIframe) {
             if (pattern.startsWith('*.')) {
-                const domain = pattern.substring(2); 
+                const domain = pattern.substring(2);
                 if (hostname.endsWith('.' + domain) || hostname === domain) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -1005,7 +1246,7 @@ class FloatingButton {
         if (this.isAllowedDomainPattern(window.location.hostname)) {
             return true;
         }
-        
+
         if (window !== window.top) {
             try {
                 const parentDomain = window.top.location.hostname;
