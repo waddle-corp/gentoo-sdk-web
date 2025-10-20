@@ -264,7 +264,10 @@ class FloatingButton {
             return;
         }
 
-        if (!this.bootConfig?.floating || !this.bootConfig?.floating?.button?.imageUrl || !this.floatingAvatar?.floatingAsset) {
+        if (
+          !this.bootConfig?.floating ||
+          (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+        ) {
             console.error('Floating data is incomplete');
             return;
         }
@@ -294,14 +297,17 @@ class FloatingButton {
         this.iframe.src = this.chatUrl;
 
         // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
-        this.useBootConfigFloatingImage = this.bootConfig?.floating?.button?.imageUrl && !this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie');
-        if (this.floatingAvatar?.floatingAsset?.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl?.includes('lottie')) {
+        const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+        const avatarAsset = this.floatingAvatar?.floatingAsset;
+        this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+        const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+        if (selectedAsset?.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
             // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-            player.setAttribute('src', this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset);
+            player.setAttribute('src', selectedAsset);
             player.style.width = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.cursor = 'pointer';
