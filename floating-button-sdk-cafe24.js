@@ -264,7 +264,10 @@ class FloatingButton {
             return;
         }
 
-        if (!this.bootConfig?.floating || !this.bootConfig?.floating?.button?.imageUrl) {
+        if (
+          !this.bootConfig?.floating ||
+          (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+        ) {
             console.error('Floating data is incomplete');
             return;
         }
@@ -292,13 +295,19 @@ class FloatingButton {
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
-        if (this.floatingAvatar?.floatingAsset?.includes('lottie') || this.bootConfig?.floating?.button?.imageUrl?.includes('lottie')) {
+
+        // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+        const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+        const avatarAsset = this.floatingAvatar?.floatingAsset;
+        this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+        const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+        if (selectedAsset?.includes('lottie')) {
             const player = document.createElement('dotlottie-player');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
-            // bootConfig 우선 순위로 변경
-            player.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset);
+            // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+            player.setAttribute('src', selectedAsset);
             player.style.width = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.cursor = 'pointer';
@@ -370,7 +379,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
+            this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
@@ -390,9 +399,7 @@ class FloatingButton {
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
                     this.expandedButton.className = 
-                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
-                        `expanded-area-md` :
-                        this.bootConfig?.floating?.button?.imageUrl ?
+                        this.useBootConfigFloatingImage ?
                         `expanded-area-md expanded-area-neutral-md` :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         `expanded-area-md` :
@@ -400,13 +407,11 @@ class FloatingButton {
                     this.expandedText.className = "expanded-area-text-md"; // 추후 아가방 노티 후에 다른 SDK들과 동일하게 업데이트 필요
                 } else {
                     this.expandedButton.className = 
-                        this.bootConfig?.floating?.button?.imageUrl && this.bootConfig?.floating?.button?.imageUrl.includes('default.lottie') ?
-                        "expanded-area" :
-                        this.bootConfig?.floating?.button?.imageUrl ?
-                        "expanded-area expanded-area-neutral" :
+                        this.useBootConfigFloatingImage ?
+                        `expanded-area expanded-area-neutral` :
                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                         "expanded-area" :
-                        "expanded-area expanded-area-neutral";
+                        `expanded-area expanded-area-neutral`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
                 this.expandedButtonWrapper.appendChild(this.expandedButton);
@@ -516,7 +521,7 @@ class FloatingButton {
                     } else {
                         this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
-                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
+                    this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
@@ -612,7 +617,7 @@ class FloatingButton {
             e.preventDefault();
             this.dimmedBackground.className = 'dimmed-background hide';
             this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingAvatar?.floatingAsset})`;
+            if (this.button) this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
         })
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
