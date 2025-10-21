@@ -130,8 +130,7 @@ class FloatingButton {
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false, parentClassName = '' } = params;
-        // const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document;
-        const parentElem = document.getElementsByClassName('floating-container-fastfive')[0] || document.body;
+        const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document.body;
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -159,8 +158,7 @@ class FloatingButton {
             else if (!this.bootConfig?.floating?.isVisible) {
                 // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
-                if (window.location.hostname.includes('dev.fastfive')) this.createUIElementsFF(position, showGentooButton, isCustomButton, parentElem);
-                else {this.createUIElements(position, showGentooButton, isCustomButton);}
+                this.createUIElements(position, showGentooButton, isCustomButton, parentElem);
             }
 
         } catch (error) {
@@ -170,246 +168,245 @@ class FloatingButton {
     }
 
     // Separate UI creation into its own method for clarity
-    createUIElements(position, showGentooButton, isCustomButton = false) {
-        // Check if any SDK elements exist in document
-        if (this.checkSDKExists()) {
-            console.warn("GentooIO UI elements already exist in the document, skipping creation.");
-            window.__GentooInited = 'created';
-            return;
-        }
+    // createUIElements(position, showGentooButton, isCustomButton = false) {
+    //     // Check if any SDK elements exist in document
+    //     if (this.checkSDKExists()) {
+    //         console.warn("GentooIO UI elements already exist in the document, skipping creation.");
+    //         window.__GentooInited = 'created';
+    //         return;
+    //     }
 
-        window.__GentooInited = 'creating';
-        this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
-        // Add null checks before accessing properties
-        if (
-            !this.chatbotData ||
-            !this.chatbotData.position ||
-            !this.chatbotData.mobilePosition
-        ) {
-            console.error("Chatbot data is incomplete");
-            return;
-        }
+    //     window.__GentooInited = 'creating';
+    //     this.customButton = isCustomButton ? document.getElementsByClassName("gentoo-custom-button")[0] : null;
+    //     // Add null checks before accessing properties
+    //     if (
+    //         !this.chatbotData ||
+    //         !this.chatbotData.position ||
+    //         !this.chatbotData.mobilePosition
+    //     ) {
+    //         console.error("Chatbot data is incomplete");
+    //         return;
+    //     }
 
-        if (
-            !this.bootConfig?.floating ||
-            (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
-        ) {
-            console.error("Floating data is incomplete");
-            return;
-        }
+    //     if (
+    //         !this.bootConfig?.floating ||
+    //         (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+    //     ) {
+    //         console.error("Floating data is incomplete");
+    //         return;
+    //     }
 
-        if (this.eventCallback.show !== null) {
-            this.eventCallback.show();
-        }
+    //     if (this.eventCallback.show !== null) {
+    //         this.eventCallback.show();
+    //     }
 
-        // Create iframe elements
-        this.dimmedBackground = document.createElement("div");
-        this.dimmedBackground.className = "dimmed-background hide";
-        this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
-        this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
+    //     // Create iframe elements
+    //     this.dimmedBackground = document.createElement("div");
+    //     this.dimmedBackground.className = "dimmed-background hide";
+    //     this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+    //     this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
 
-        this.iframeContainer = document.createElement("div");
-        this.iframeContainer.className = "iframe-container iframe-container-hide";
-        this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
+    //     this.iframeContainer = document.createElement("div");
+    //     this.iframeContainer.className = "iframe-container iframe-container-hide";
+    //     this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
 
-        this.chatHeader = document.createElement("div");
-        this.chatHandler = document.createElement("div");
-        this.chatHeaderText = document.createElement("p");
-        this.closeButtonContainer = document.createElement("div");
-        this.closeButtonIcon = document.createElement("div");
-        this.closeButtonText = document.createElement("p");
-        this.chatHeaderText.innerText = "Gentoo";
-        this.footer = document.createElement("div");
-        this.footer.className = "chat-footer";
-        this.footerText = document.createElement("p");
-        this.footerText.className = "chat-footer-text";
-        this.footer.appendChild(this.footerText);
-        this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+    //     this.chatHeader = document.createElement("div");
+    //     this.chatHandler = document.createElement("div");
+    //     this.chatHeaderText = document.createElement("p");
+    //     this.closeButtonContainer = document.createElement("div");
+    //     this.closeButtonIcon = document.createElement("div");
+    //     this.closeButtonText = document.createElement("p");
+    //     this.chatHeaderText.innerText = "Gentoo";
+    //     this.footer = document.createElement("div");
+    //     this.footer.className = "chat-footer";
+    //     this.footerText = document.createElement("p");
+    //     this.footerText.className = "chat-footer-text";
+    //     this.footer.appendChild(this.footerText);
+    //     this.iframe = document.createElement("iframe");
+    //     this.iframe.src = this.chatUrl;
 
-        // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
-        const bootImage = this.bootConfig?.floating?.button?.imageUrl;
-        const avatarAsset = this.floatingAvatar?.floatingAsset;
-        this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
-        const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
-        if (selectedAsset?.includes('lottie')) {
-            const player = document.createElement('dotlottie-player');
-            player.setAttribute('autoplay', '');
-            player.setAttribute('loop', '');
-            player.setAttribute('mode', 'normal');
-            // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-            player.setAttribute('src', selectedAsset);
-            player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-            player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-            player.style.cursor = 'pointer';
-            player.appendChild(document.createTextNode('\u200B'));
+    //     // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+    //     const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+    //     const avatarAsset = this.floatingAvatar?.floatingAsset;
+    //     this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+    //     const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+    //     if (selectedAsset?.includes('lottie')) {
+    //         const player = document.createElement('dotlottie-player');
+    //         player.setAttribute('autoplay', '');
+    //         player.setAttribute('loop', '');
+    //         player.setAttribute('mode', 'normal');
+    //         // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+    //         player.setAttribute('src', selectedAsset);
+    //         player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+    //         player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+    //         player.style.cursor = 'pointer';
+    //         player.appendChild(document.createTextNode('\u200B'));
 
-            this.dotLottiePlayer = player;
-        }
+    //         this.dotLottiePlayer = player;
+    //     }
 
-        if (this.isSmallResolution) {
-            this.chatHeader.className = "chat-header-md";
-            this.chatHandler.className = "chat-handler-md";
-            this.chatHandler.appendChild(document.createTextNode('\u200B'));
-            this.chatHeaderText.className = "chat-header-text-md";
-            this.closeButtonContainer.className = "chat-close-button-container-md";
-            this.closeButtonIcon.className = "chat-close-button-icon-md";
-            this.closeButtonIcon.appendChild(document.createTextNode('\u200B'));
-            this.closeButtonText.className = "chat-close-button-text-md";
-            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
-            this.closeActionArea = document.createElement("div");
-            this.closeActionArea.className = "chat-close-action-area-md";
-            this.closeActionArea.appendChild(document.createTextNode('\u200B'));
-            this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
-            this.closeButtonContainer.appendChild(this.closeButtonIcon);
-            this.closeButtonContainer.appendChild(this.closeButtonText);
-            this.chatHeader.appendChild(this.chatHeaderText);
-            this.chatHeader.appendChild(this.chatHandler);
-            this.chatHeader.appendChild(this.closeButtonContainer);
-            this.iframeContainer.appendChild(this.closeActionArea);
-        } else {
-            this.chatHeader.className = "chat-header";
-            this.chatHeaderText.className = "chat-header-text";
-            this.closeButtonContainer.className = "chat-close-button-container";
-            this.closeButtonIcon.className = "chat-close-button-icon";
-            this.closeButtonText.className = "chat-close-button-text";
-            this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Minimize" : "채팅창 축소";
-            this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
-            this.closeButtonContainer.appendChild(this.closeButtonIcon);
-            this.closeButtonContainer.appendChild(this.closeButtonText);
-            this.chatHeader.appendChild(this.chatHeaderText);
-            this.chatHeader.appendChild(this.closeButtonContainer);
-        }
+    //     if (this.isSmallResolution) {
+    //         this.chatHeader.className = "chat-header-md";
+    //         this.chatHandler.className = "chat-handler-md";
+    //         this.chatHandler.appendChild(document.createTextNode('\u200B'));
+    //         this.chatHeaderText.className = "chat-header-text-md";
+    //         this.closeButtonContainer.className = "chat-close-button-container-md";
+    //         this.closeButtonIcon.className = "chat-close-button-icon-md";
+    //         this.closeButtonIcon.appendChild(document.createTextNode('\u200B'));
+    //         this.closeButtonText.className = "chat-close-button-text-md";
+    //         this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Collapse" : "접기";
+    //         this.closeActionArea = document.createElement("div");
+    //         this.closeActionArea.className = "chat-close-action-area-md";
+    //         this.closeActionArea.appendChild(document.createTextNode('\u200B'));
+    //         this.iframe.className = `chat-iframe-md ${this.warningActivated ? 'footer-add-height-md' : ''}`;
+    //         this.closeButtonContainer.appendChild(this.closeButtonIcon);
+    //         this.closeButtonContainer.appendChild(this.closeButtonText);
+    //         this.chatHeader.appendChild(this.chatHeaderText);
+    //         this.chatHeader.appendChild(this.chatHandler);
+    //         this.chatHeader.appendChild(this.closeButtonContainer);
+    //         this.iframeContainer.appendChild(this.closeActionArea);
+    //     } else {
+    //         this.chatHeader.className = "chat-header";
+    //         this.chatHeaderText.className = "chat-header-text";
+    //         this.closeButtonContainer.className = "chat-close-button-container";
+    //         this.closeButtonIcon.className = "chat-close-button-icon";
+    //         this.closeButtonText.className = "chat-close-button-text";
+    //         this.closeButtonText.innerText = this.partnerType === 'shopify' ? "Minimize" : "채팅창 축소";
+    //         this.iframe.className = `chat-iframe ${this.warningActivated ? 'footer-add-height' : ''}`;
+    //         this.closeButtonContainer.appendChild(this.closeButtonIcon);
+    //         this.closeButtonContainer.appendChild(this.closeButtonText);
+    //         this.chatHeader.appendChild(this.chatHeaderText);
+    //         this.chatHeader.appendChild(this.closeButtonContainer);
+    //     }
 
-        this.iframeContainer.appendChild(this.chatHeader);
-        this.iframeContainer.appendChild(this.iframe);
-        if (this.warningActivated) {
-            this.footerText.innerText = this.warningMessage;
-            this.iframeContainer.appendChild(this.footer);
-        }
-        document.body.appendChild(this.dimmedBackground);
-        document.body.appendChild(this.iframeContainer);
+    //     this.iframeContainer.appendChild(this.chatHeader);
+    //     this.iframeContainer.appendChild(this.iframe);
+    //     if (this.warningActivated) {
+    //         this.footerText.innerText = this.warningMessage;
+    //         this.iframeContainer.appendChild(this.footer);
+    //     }
+    //     document.body.appendChild(this.dimmedBackground);
+    //     document.body.appendChild(this.iframeContainer);
 
-        postChatEventLog({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
+    //     postChatEventLog({
+    //         eventCategory: "SDKFloatingRendered",
+    //         partnerId: this.partnerId,
+    //         chatUserId: this.chatUserId,
+    //         products: [],
+    //     }, this.isMobileDevice);
 
-        // Create floating button
-        if (showGentooButton) {
-            this.floatingContainer = document.createElement("div");
-            this.floatingContainer.className = `floating-container`;
-            if (this.partnerId === '67615284c5ff44110dbc6613') {
-                this.floatingContainer.className = `floating-container-fastfive`;
-            }
-            this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
-            this.updateFloatingContainerPosition(position); // Set initial position
-            this.button = document.createElement("div");
-            if (this.isSmallResolution) {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
-            } else {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
-            }
-            this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
-            document.body.appendChild(this.floatingContainer);
-            if (this.dotLottiePlayer) {
-                this.floatingContainer.appendChild(this.dotLottiePlayer);
-            } else {
-                this.floatingContainer.appendChild(this.button);
-            }
-            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
-            else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
-                // Check if component is destroyed or clicked
-                if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
-                    return;
+    //     // Create floating button
+    //     if (showGentooButton) {
+    //         this.floatingContainer = document.createElement("div");
+    //         this.floatingContainer.className = `floating-container`;
+    //         if (this.partnerId === '67615284c5ff44110dbc6613') {
+    //             this.floatingContainer.className = `floating-container-fastfive`;
+    //         }
+    //         this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
+    //         this.updateFloatingContainerPosition(position); // Set initial position
+    //         this.button = document.createElement("div");
+    //         if (this.isSmallResolution) {
+    //             this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
+    //         } else {
+    //             this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
+    //         }
+    //         this.button.type = "button";
+    //         this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
+    //         document.body.appendChild(this.floatingContainer);
+    //         if (this.dotLottiePlayer) {
+    //             this.floatingContainer.appendChild(this.dotLottiePlayer);
+    //         } else {
+    //             this.floatingContainer.appendChild(this.button);
+    //         }
+    //         if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
+    //         else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
+    //             // Check if component is destroyed or clicked
+    //             if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+    //                 return;
 
-                this.expandedButtonWrapper = document.createElement("div");
-                this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.floatingZoom ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
-                this.expandedButton = document.createElement("div");
-                this.expandedText = document.createElement("p");
-                if (this.isSmallResolution) {
-                    this.expandedButton.className =
-                        this.useBootConfigFloatingImage ?
-                            `expanded-area-md expanded-area-neutral-md` :
-                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                                `expanded-area-md` :
-                                `expanded-area-md expanded-area-neutral-md`;
-                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
-                } else {
-                    this.expandedButton.className =
-                        this.useBootConfigFloatingImage ?
-                            `expanded-area expanded-area-neutral` :
-                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                                "expanded-area" :
-                                `expanded-area expanded-area-neutral`;
-                    this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
-                }
+    //             this.expandedButtonWrapper = document.createElement("div");
+    //             this.expandedButtonWrapper.className = `expanded-area-wrapper ${this.floatingZoom ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+    //             this.expandedButton = document.createElement("div");
+    //             this.expandedText = document.createElement("p");
+    //             if (this.isSmallResolution) {
+    //                 this.expandedButton.className =
+    //                     this.useBootConfigFloatingImage ?
+    //                         `expanded-area-md expanded-area-neutral-md` :
+    //                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+    //                             `expanded-area-md` :
+    //                             `expanded-area-md expanded-area-neutral-md`;
+    //                 this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+    //             } else {
+    //                 this.expandedButton.className =
+    //                     this.useBootConfigFloatingImage ?
+    //                         `expanded-area expanded-area-neutral` :
+    //                         !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+    //                             "expanded-area" :
+    //                             `expanded-area expanded-area-neutral`;
+    //                 this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+    //             }
 
-                this.expandedButtonWrapper.appendChild(this.expandedButton);
-                this.expandedButton.appendChild(this.expandedText);
+    //             this.expandedButtonWrapper.appendChild(this.expandedButton);
+    //             this.expandedButton.appendChild(this.expandedText);
 
-                // Double check if floatingContainer still exists before appending
-                if (this.floatingContainer && this.floatingContainer.parentNode) {
-                    this.floatingContainer.appendChild(this.expandedButtonWrapper);
-                    this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
+    //             // Double check if floatingContainer still exists before appending
+    //             if (this.floatingContainer && this.floatingContainer.parentNode) {
+    //                 this.floatingContainer.appendChild(this.expandedButtonWrapper);
+    //                 this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
 
-                    // Remove expanded button after delay
-                    setTimeout(() => {
-                        if (
-                            this.floatingContainer &&
-                            this.expandedButtonWrapper &&
-                            this.expandedButtonWrapper.parentNode === this.floatingContainer
-                        ) {
-                            this.floatingContainer.removeChild(this.expandedButtonWrapper);
-                        }
-                    }, 7000);
-                }
-            }
-        } else {
-            if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
-        }
+    //                 // Remove expanded button after delay
+    //                 setTimeout(() => {
+    //                     if (
+    //                         this.floatingContainer &&
+    //                         this.expandedButtonWrapper &&
+    //                         this.expandedButtonWrapper.parentNode === this.floatingContainer
+    //                     ) {
+    //                         this.floatingContainer.removeChild(this.expandedButtonWrapper);
+    //                     }
+    //                 }, 7000);
+    //             }
+    //         }
+    //     } else {
+    //         if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
+    //     }
 
-        this.elems = {
-            iframeContainer: this.iframeContainer,
-            iframe: this.iframe,
-            chatHeader: this.chatHeader,
-            dimmedBackground: this.dimmedBackground,
-            button: this.button,
-            expandedButtonWrapper: this.expandedButtonWrapper,
-            customButton: this.customButton,
-        };
+    //     this.elems = {
+    //         iframeContainer: this.iframeContainer,
+    //         iframe: this.iframe,
+    //         chatHeader: this.chatHeader,
+    //         dimmedBackground: this.dimmedBackground,
+    //         button: this.button,
+    //         expandedButtonWrapper: this.expandedButtonWrapper,
+    //         customButton: this.customButton,
+    //     };
 
-        // Add event listeners
-        this.setupEventListeners(position, isCustomButton);
-        if (this.gentooSessionData?.redirectState) {
-            setTimeout(() => {
-                if (this.expandedButtonWrapper)
-                    this.expandedButtonWrapper.classList.add('hide');
-                if (this.button) {
-                    this.button.classList.add('hide');
-                }
-                if (this.dotLottiePlayer) {
-                    this.dotLottiePlayer.classList.add('hide');
-                }
-                if (this.customButton) {
-                    this.customButton.classList.add('hide');
-                }
-            }, 100);
-            setTimeout(() => {
-                this.openChat();
-                this.gentooSessionData.redirectState = false;
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-            }, 500);
-        }
-        window.__GentooInited = 'created';
-    }
+    //     // Add event listeners
+    //     this.setupEventListeners(position, isCustomButton);
+    //     if (this.gentooSessionData?.redirectState) {
+    //         setTimeout(() => {
+    //             if (this.expandedButtonWrapper)
+    //                 this.expandedButtonWrapper.classList.add('hide');
+    //             if (this.button) {
+    //                 this.button.classList.add('hide');
+    //             }
+    //             if (this.dotLottiePlayer) {
+    //                 this.dotLottiePlayer.classList.add('hide');
+    //             }
+    //             if (this.customButton) {
+    //                 this.customButton.classList.add('hide');
+    //             }
+    //         }, 100);
+    //         setTimeout(() => {
+    //             this.openChat();
+    //             this.gentooSessionData.redirectState = false;
+    //             sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+    //         }, 500);
+    //     }
+    //     window.__GentooInited = 'created';
+    // }
 
     // Separate UI creation into its own method for clarity
-    createUIElementsFF(position, showGentooButton, isCustomButton = false, parentElem) {
-        console.log('[GENTOO] dev test', parentElem)
+    createUIElements(position, showGentooButton, isCustomButton = false, parentElem) {
         // Check if any SDK elements exist in document
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping creation.");
@@ -540,9 +537,6 @@ class FloatingButton {
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container`;
-            if (this.partnerId === '67615284c5ff44110dbc6613') {
-                this.floatingContainer.className = `floating-container-fastfive`;
-            }
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
             this.updateFloatingContainerPosition(position); // Set initial position
             this.button = document.createElement("div");
