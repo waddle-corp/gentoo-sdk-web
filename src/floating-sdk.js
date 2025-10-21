@@ -131,7 +131,7 @@ class FloatingButton {
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false, parentClassName = '' } = params;
         // const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document;
-        const parentElem = document.getElementsByClassName('floating-container-fastfive');
+        const parentElem = document.getElementsByClassName('floating-container-fastfive')[0] || document.body;
         try {
             // Wait for boot process to complete
             await this.bootPromise;
