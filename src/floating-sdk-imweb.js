@@ -972,43 +972,35 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/goods_view')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/goods_list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
-
-            // 1. 쿼리 파라미터에서 goodsNo 추출 시도
-            const productNoFromQuery = url.searchParams.get('goodsNo');
-            if (productNoFromQuery) {
-                return productNoFromQuery;
-            }
-
-            // 2. 경로 기반 URL에서 product_no 추출 시도
             const path = url.pathname;
 
             /**
-             * 고려가 필요한 고도몰 경로 패턴
-                /goods/goods_view.php?goodsNo={goodsNo}
+             * Imweb URL 패턴:
+             * - Product Detail: {shopdomain}/{list_id}/?idx={product_id}
+             * - Product List: {shopdomain}/{list_id}
              */
 
-            /**
-             * 정규 표현식 설명:
-                (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
-                \/product\/	/product/ 고정
-                [^\/]+	product_name
-                \/([^\/]+)	✅ 캡처할 product_no
-                (?:\/category/...)?	🔹 optional category/display path
-             */
-            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-
-            const match = path.match(regex);
-            if (match && match[1]) {
-                return match[1]; // product_no
+            // 1. 쿼리 파라미터에서 idx 추출 시도 (Product Detail Page)
+            const productIdFromQuery = url.searchParams.get('idx');
+            if (productIdFromQuery) {
+                this.displayLocation = 'PRODUCT_DETAIL';
+                return productIdFromQuery;
             }
 
-            // 3. 찾을 수 없는 경우 null 반환
+            // 2. 경로만 있고 idx가 없으면 Product List Page
+            // 경로가 /{list_id} 형식인지 확인 (최소 1개 세그먼트: list_id)
+            const pathSegments = path.split('/').filter(segment => segment.length > 0);
+            /* if (pathSegments.length >= 1) {
+                this.displayLocation = 'PRODUCT_LIST';
+            } else {
+                this.displayLocation = 'HOME';
+            } */
+           this.displayLocation = 'HOME';
+
+            // Product list page or home에서는 product_no 없음
             return null;
         } catch (error) {
             console.error('Invalid URL:', error);
