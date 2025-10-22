@@ -979,8 +979,8 @@ class FloatingButton {
 
             /**
              * Imweb URL 패턴:
-             * - Product Detail: {shopdomain}/{list_id}/?idx={product_id}
-             * - Product List: {shopdomain}/{list_id}
+             * - Product Detail: {shopdomain}/{list_id_OR_custom_string}/?idx={product_id}
+             * - Product List: {shopdomain}/{list_id_OR_custom_string}
              */
 
             // 1. 쿼리 파라미터에서 idx 추출 시도 (Product Detail Page)
@@ -990,15 +990,8 @@ class FloatingButton {
                 return productIdFromQuery;
             }
 
-            // 2. 경로만 있고 idx가 없으면 Product List Page
-            // 경로가 /{list_id} 형식인지 확인 (최소 1개 세그먼트: list_id)
-            const pathSegments = path.split('/').filter(segment => segment.length > 0);
-            /* if (pathSegments.length >= 1) {
-                this.displayLocation = 'PRODUCT_LIST';
-            } else {
-                this.displayLocation = 'HOME';
-            } */
-           this.displayLocation = 'HOME';
+            // 현재 imweb url parsing 으로 PLP를 구분할 수 없음
+            this.displayLocation = 'HOME';
 
             // Product list page or home에서는 product_no 없음
             return null;
