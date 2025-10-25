@@ -222,6 +222,9 @@ class FloatingButton {
                     case 'boostedusa.com':
                         customMessage = this.getBoostedUSAMessage(currentHref);
                         break;
+                    case 'vomfassghirardellisquare.com':
+                        customMessage = this.getVomfassMessage(currentHref);
+                        break;
                     // 새 스토어 추가 시 여기에 case 추가
                 }
 
@@ -1360,6 +1363,81 @@ class FloatingButton {
         return null; // 매칭 실패
     }
 
+    // 🎯 Vomfass - 레시피 재료 추출 헬퍼
+    extractRecipeIngredients() {
+        try {
+            // DOM 로드 확인
+            if (document.readyState === 'loading') return null;
+
+            // 1. INGREDIENTS 텍스트가 있는 <p> 찾기
+            const paragraphs = document.querySelectorAll('p');
+            let ingredientsP = null;
+
+            for (const p of paragraphs) {
+                if (p.textContent.includes('INGREDIENTS')) {
+                    ingredientsP = p;
+                    break;
+                }
+            }
+
+            if (!ingredientsP) return null;
+
+            // 2. 다음 <ul> 요소 찾기 (최대 5번 시도)
+            let ul = ingredientsP.nextElementSibling;
+            let attempts = 0;
+
+            while (ul && ul.tagName !== 'UL' && attempts < 5) {
+                ul = ul.nextElementSibling;
+                attempts++;
+            }
+
+            if (!ul || ul.tagName !== 'UL') return null;
+
+            // 3. <a> 태그 있는 <li>만 추출
+            const items = Array.from(ul.querySelectorAll('li'))
+                .filter(li => li.querySelector('a'))
+                .map(li => {
+                    const link = li.querySelector('a');
+                    return link.textContent.trim();
+                })
+                .filter(text => text.length > 0);
+
+            return items.length > 0 ? items : null;
+
+        } catch (error) {
+            console.warn('Vomfass ingredient extraction failed:', error);
+            return null;
+        }
+    }
+
+    // 🎯 Vomfass 전용 메시지 매칭
+    getVomfassMessage(currentUrl) {
+        if (currentUrl.includes('/blogs/recipes/')) {
+            // Floating은 항상 고정
+            const fixedFloating = "Wonder which products you need to make this recipe?";
+
+            // 재료 추출 시도
+            const ingredients = this.extractRecipeIngredients();
+
+            if (ingredients && ingredients.length > 0) {
+                // 재료 추출 성공 → 첫 번째 재료로 개인화 그리팅
+                const firstIngredient = ingredients[0];
+
+                return {
+                    floating: fixedFloating,
+                    greeting: `Is there anything you'd like to know about ${firstIngredient}?`
+                };
+            } else {
+                // 재료 추출 실패 → Fallback 그리팅
+                return {
+                    floating: fixedFloating,
+                    greeting: "I can help you find the perfect oils and vinegars for this recipe!"
+                };
+            }
+        }
+        return null;
+    }
+
     // 🎯 BoostedUSA 전용 메시지 매칭
     getBoostedUSAMessage(currentUrl) {
         if (currentUrl.includes('/collections/electric-bikes')) {
@@ -1553,10 +1631,10 @@ class FloatingButton {
             'olivethisolivethat.com',
             'dualtronusa.com',
             'boostedusa.com',
+            'vomfassghirardellisquare.com',
             'paper-tree.com',
             'saranghello.com',
             'sftequilashop.com',
-            'vomfassghirardellisquare.com',
             'biondivino.com',
             // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
             // '127.0.0.1',
