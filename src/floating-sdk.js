@@ -633,6 +633,7 @@ class FloatingButton {
             }, 100);
             setTimeout(() => {
                 this.openChat();
+                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: window?.location?.href});
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);

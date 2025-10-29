@@ -475,6 +475,7 @@ class FloatingButton {
             }, 100);
             setTimeout(() => {
                 this.openChat();
+                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: window?.location?.href});
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);
@@ -535,7 +536,6 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
