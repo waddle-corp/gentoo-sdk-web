@@ -128,37 +128,25 @@ class FloatingButton {
         }
 
         // Add a promise to track initialization status
-        this.bootPromise = this.checkTrainingProgress(this.partnerId).then((canProceed) => {
-            if (!canProceed) {
-                console.warn("GentooIO: Training not completed, skipping initialization");
-                window.__GentooInited = 'training_incomplete';
-                return Promise.reject(new Error("Training not completed"));
-            }
-
-            return Promise.all([
-                this.fetchChatUserId(this.authCode, this.udid).then((res) => {
-                    if (!res) throw new Error("Failed to fetch chat user ID");
-                    this.chatUserId = res;
-                    this.gentooSessionData.cuid = res;
-                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-                })
-                .catch(() => {
-                    this.chatUserId = 'test';
-                }),
-                this.fetchChatbotData(this.partnerId).then((res) => {
-                    if (!res) throw new Error("Failed to fetch chatbot data");
-                    this.chatbotData = res;
-                    this.floatingAvatar = res?.avatar || null;
-                    const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                    this.warningMessage = warningMessageData?.extra?.message;
-                    this.warningActivated = warningMessageData?.activated;
-                }),
-            ]);
-        }).catch((error) => {
-            if (error.message === "Training not completed") {
-                console.log("GentooIO: Training incomplete, stopping initialization");
-                return; // 학습 미완료는 정상적인 중단이므로 에러로 처리하지 않음
-            }
+        this.bootPromise = Promise.all([
+            this.fetchChatUserId(this.authCode, this.udid).then((res) => {
+                if (!res) throw new Error("Failed to fetch chat user ID");
+                this.chatUserId = res;
+                this.gentooSessionData.cuid = res;
+                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+            })
+            .catch(() => {
+                this.chatUserId = 'test';
+            }),
+            this.fetchChatbotData(this.partnerId).then((res) => {
+                if (!res) throw new Error("Failed to fetch chatbot data");
+                this.chatbotData = res;
+                this.floatingAvatar = res?.avatar || null;
+                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                this.warningMessage = warningMessageData?.extra?.message;
+                this.warningActivated = warningMessageData?.activated;
+            }),
+        ]).catch((error) => {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
@@ -211,7 +199,31 @@ class FloatingButton {
 
             if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
                 const currentHref = window.location.href;
-                if (currentHref.includes('paper-tree.com') &&
+                const hostname = window.location.hostname;
+                let customMessage = null;
+
+                // 🎯 도메인별 커스텀 메시지 매칭
+                switch(hostname) {
+                    case 'dualtronusa.com':
+                        customMessage = this.getDualtronUSAMessage(currentHref);
+                        break;
+                    case 'boostedusa.com':
+                        customMessage = this.getBoostedUSAMessage(currentHref);
+                        break;
+                    case 'vomfassghirardellisquare.com':
+                        customMessage = this.getVomfassMessage(currentHref);
+                        break;
+                    // 새 스토어 추가 시 여기에 case 추가
+                }
+
+                // 커스텀 메시지가 매칭되었으면 적용
+                if (customMessage) {
+                    this.availableComments = [customMessage];
+                    this.selectedCommentSet = customMessage;
+                    this.floatingData.comment = customMessage.floating;
+                }
+                // 기존 실험 대상 스토어 로직 (paper-tree, saranghello, olivethisolivethat)
+                else if (currentHref.includes('paper-tree.com') &&
                     currentHref.includes('search') &&
                     document.body.textContent.includes('No results found for')) {
                     this.availableComments = [
@@ -235,7 +247,6 @@ class FloatingButton {
                     this.selectedCommentSet = this.availableComments[0];
                     this.floatingData.comment = this.selectedCommentSet.floating;
                 }
-
                 else if (currentHref.includes('olivethisolivethat.com') &&
                         currentHref.includes('/collections/')) {
 
@@ -265,7 +276,6 @@ class FloatingButton {
                         this.floatingData.comment = this.selectedCommentSet.floating;
                     }
                 }
-
                 else if (this.displayLocation === 'PRODUCT_DETAIL') {
                     const pdpComment = this.floatingData?.comment;
                     this.availableComments = [
@@ -275,7 +285,9 @@ class FloatingButton {
                         },
                     ];
                     this.selectedCommentSet = this.availableComments[0];
-                } else {
+                }
+                // Fallback: 기존 실험 API 호출
+                else {
                     this.experimentData = await this.fetchShopifyExperimentData(this.partnerId);
 
                     if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
@@ -284,7 +296,7 @@ class FloatingButton {
                         if (this.availableComments && this.availableComments?.length > 0) {
                             const randomIndex = Math.floor(Math.random() * this.availableComments.length);
                             this.selectedCommentSet = this.availableComments[randomIndex];
-                            
+
                             if (this.selectedCommentSet && this.selectedCommentSet?.floating) {
                                 this.floatingData.comment = this.selectedCommentSet.floating;
                             }
@@ -1298,6 +1310,229 @@ class FloatingButton {
         }
     }
 
+    // 🎯 DualtronUSA 전용 메시지 매칭
+    getDualtronUSAMessage(currentUrl) {
+        if (currentUrl.includes('/collections/electric-scooters')) {
+            return {
+                floating: "Curious about the details or what comes with each scooter? Ask me!",
+                greeting: "Thinking about scooters? I can tell you which one's trending, what it includes, and all the specs — just ask."
+            };
+        }
+        if (currentUrl.includes('/collections/spare-parts')) {
+            return {
+                floating: "Need a repair or replacement? I can help you out!",
+                greeting: "Let me know your scooter model and what spare you're looking for.\nHit us up at [415-273-9870](tel:4152739870) or [support@dualtronusa.com](mailto:support@dualtronusa.com) — we'll get you sorted fast."
+            };
+        }
+        if (currentUrl.includes('/collections/minimotors-accessories')) {
+            return {
+                floating: "Want to upgrade your scooter? I got you!",
+                greeting: "Let's make your scooter stand out!\nI can also show you the accessories everyone's loving — just ask me!"
+            };
+        }
+        if (currentUrl.includes('/collections/sale')) {
+            return {
+                floating: "This sale's a great chance for you!\nCurious about anything?",
+                greeting: "Feel free to ask me anything!\nWant to see what's on sale? Just ask **What's on sale?** I'll walk you through everything!"
+            };
+        }
+        if (currentUrl.includes('/search')) {
+            return {
+                floating: "Searching for something? I can also help you with it.",
+                greeting: "Tell me what you have in mind — the vibe, how it looks, or your situation. I'll find the right one for you."
+            };
+        }
+        if (currentUrl.includes('/cart')) {
+            return {
+                floating: "Ready to make it yours? Your cart's looking good.",
+                greeting: "If you'd like to know more, or find something that pairs well with this, just tell me — I'll show you."
+            };
+        }
+        return null; // 매칭 실패
+    }
+
+    // 🎯 Vomfass - 레시피 재료 추출 헬퍼
+    extractRecipeIngredients() {
+        try {
+            // DOM 로드 확인
+            if (document.readyState === 'loading') return null;
+
+            // 1. INGREDIENTS 텍스트가 있는 <p> 찾기
+            const paragraphs = document.querySelectorAll('p');
+            let ingredientsP = null;
+
+            for (const p of paragraphs) {
+                if (p.textContent.includes('INGREDIENTS')) {
+                    ingredientsP = p;
+                    break;
+                }
+            }
+
+            if (!ingredientsP) return null;
+
+            // 2. 다음 <ul> 요소 찾기 (최대 5번 시도)
+            let ul = ingredientsP.nextElementSibling;
+            let attempts = 0;
+
+            while (ul && ul.tagName !== 'UL' && attempts < 5) {
+                ul = ul.nextElementSibling;
+                attempts++;
+            }
+
+            if (!ul || ul.tagName !== 'UL') return null;
+
+            // 3. <a> 태그 있는 <li>만 추출
+            const items = Array.from(ul.querySelectorAll('li'))
+                .filter(li => li.querySelector('a'))
+                .map(li => {
+                    const link = li.querySelector('a');
+                    return link.textContent.trim();
+                })
+                .filter(text => text.length > 0);
+
+            return items.length > 0 ? items : null;
+
+        } catch (error) {
+            console.warn('Vomfass ingredient extraction failed:', error);
+            return null;
+        }
+    }
+
+    // 🎯 Vomfass 전용 메시지 매칭
+    getVomfassMessage(currentUrl) {
+        if (currentUrl.includes('/blogs/recipes/')) {
+            // Floating은 항상 고정
+            const fixedFloating = "Wonder which products you need to make this recipe?";
+
+            // 재료 추출 시도
+            const ingredients = this.extractRecipeIngredients();
+
+            if (ingredients && ingredients.length > 0) {
+                // 재료 추출 성공 → 첫 번째 재료로 개인화 그리팅
+                const firstIngredient = ingredients[0];
+
+                return {
+                    floating: fixedFloating,
+                    greeting: `Is there anything you'd like to know about ${firstIngredient}?`
+                };
+            } else {
+                // 재료 추출 실패 → Fallback 그리팅
+                return {
+                    floating: fixedFloating,
+                    greeting: "I can help you find the perfect oils and vinegars for this recipe!"
+                };
+            }
+        }
+        return null;
+    }
+
+    // 🎯 BoostedUSA 전용 메시지 매칭
+    getBoostedUSAMessage(currentUrl) {
+        if (currentUrl.includes('/collections/electric-bikes')) {
+            return {
+                floating: "Curious about the details about e-bikes? Ask me!",
+                greeting: "Thinking about e-bikes? I can tell you which one's trending, what it includes, and all the specs — just ask."
+            };
+        }
+        if (currentUrl.includes('/collections/evolve-skateboards')) {
+            return {
+                floating: "Want to know what makes each Evolve skateboard special?",
+                greeting: "Let's find out together — we can talk about your performance needs or budget preferences."
+            };
+        }
+        if (currentUrl.includes('/collections/onewheel-1')) {
+            return {
+                floating: "Wanna know what makes our Onewheels stand out?",
+                greeting: "What kind of specs and parts are you looking for? I can tell you based on the product details."
+            };
+        }
+        if (currentUrl.includes('/collections/electric-scooters')) {
+            return {
+                floating: "Curious about the details or what comes with each scooter? Ask me!",
+                greeting: "Thinking about scooters? I can tell you which one's trending, what it includes, and all the specs — just ask."
+            };
+        }
+        if (currentUrl.includes('/collections/kingsong-electric-unicycles')) {
+            return {
+                floating: "Wanna check out some amazing unicycles?",
+                greeting: "They've got awesome specs and features. If there's anything you'd like to know more about, just tell me!"
+            };
+        }
+        if (currentUrl.includes('/collections/protective-gear')) {
+            return {
+                floating: "Maximum safety means maximum confidence. Got any gear in mind?",
+                greeting: "For a confident ride, protection is a must! What kind of gear are you looking for — helmet, wrist guards, or gloves?"
+            };
+        }
+        if (currentUrl.includes('/pages/accessories')) {
+            return {
+                floating: "Want to upgrade your vehicle? I got you!",
+                greeting: "Let's make your scooter stand out!\nI can also show you the accessories everyone's loving — just ask me!"
+            };
+        }
+        if (currentUrl.includes('/collections/boosted-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/evolve-skateboard-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/minimotors-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/onewheel')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/segway-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/super73-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/collections/zooz-accessories')) {
+            return {
+                floating: "Need an upgrade or replacement? Tell me which vehicle it's for.",
+                greeting: "What kind of accessory are you looking for?\nTell me about your vehicle and how you'll use it — I'll find the perfect match for you."
+            };
+        }
+        if (currentUrl.includes('/cart')) {
+            return {
+                floating: "Ready to make it yours? Your cart's looking good.",
+                greeting: "If you'd like to know more, or find something that pairs well with this, just tell me — I'll show you."
+            };
+        }
+        if (currentUrl.includes('/search')) {
+            return {
+                floating: "Searching for something? I can also help you with it.",
+                greeting: "Tell me what you have in mind — the vibe, how it looks, or your situation. I'll find the right one for you."
+            };
+        }
+        if (currentUrl.includes('/products/boosted-usa-gift-card')) {
+            return {
+                floating: "Great pick — They'll definitely love it!",
+                greeting: "Giving it as a gift? That's really thoughtful. I'm sure they'll love it! Feel free to ask if you have any questions."
+            };
+        }
+        return null;
+    }
+
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
         const isInIframe = window !== window.top;
@@ -1383,10 +1618,11 @@ class FloatingButton {
             '0qjyz1-uj.myshopify.com',
             'olivethisolivethat.com',
             'dualtronusa.com',
+            'boostedusa.com',
+            'vomfassghirardellisquare.com',
             'paper-tree.com',
             'saranghello.com',
             'sftequilashop.com',
-            'vomfassghirardellisquare.com',
             'biondivino.com',
             // LOCAL_DEV_SKIP_EXPERIMENT_CHECK
             // '127.0.0.1',
