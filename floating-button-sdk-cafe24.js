@@ -536,8 +536,6 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.gentooSessionData.carouselRedirectState = {redirectState: true, currentPage: e.data.redirectUrl}
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
@@ -1053,7 +1051,6 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        console.log('sendPostMessageHandler', payload);
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
