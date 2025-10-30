@@ -213,6 +213,9 @@ class FloatingButton {
                     case 'vomfassghirardellisquare.com':
                         customMessage = this.getVomfassMessage(currentHref);
                         break;
+                    case 'paper-tree.com':
+                        customMessage = this.getPaperTreeMessage(currentHref);
+                        break;
                     // 새 스토어 추가 시 여기에 case 추가
                 }
 
@@ -1531,6 +1534,103 @@ class FloatingButton {
             };
         }
         return null;
+    }
+
+    // 🎯 Paper Tree 전용 메시지 매칭
+    getPaperTreeMessage(currentUrl) {
+        const messages = {
+            '/blogs/blog': {
+                floating: 'Curious about our half-century legacy and history?',
+                greeting: 'We\'re a legacy origami brand founded in 1968 in Japantown. Want to know more about our story and products?'
+            },
+            '/collections/origami-paper': {
+                floating: 'What kind of origami paper are you looking for?',
+                greeting: 'Tell me about what you\'re trying to make — telling us the model that you are working on or folding level might help me find the right one.'
+            },
+            '/collections/books-origami': {
+                floating: 'Tell me about your origami level — I\'ll get you the right one!',
+                greeting: 'Share your folding experience or the model you want to make (ask me like: "books for Jack-in-the-Box"). I\'ll find the ones that fit your level.'
+            },
+            '/collections/origami-supplies': {
+                floating: 'Great folding sometimes needs great supplies!',
+                greeting: 'Looking for a specific supply? Ask me first if you\'d like help choosing the right one.'
+            },
+            '/collections/hand-cut-large-origami': {
+                floating: 'This collection is our specialty — ask me about it!',
+                greeting: 'These hand-cut large origami papers are our exclusives. Tell me what you\'re working on and what size you need.'
+            },
+            '/collections/yuzen-chiyogami': {
+                floating: 'Looking for special patterns? These are pieces of art.',
+                greeting: 'Are you looking for something bold and colorful, or soft and traditional? Ask me, like "colorful Yuzen Chiyogami."'
+            },
+            '/collections/nature-paper': {
+                floating: 'Looking for natural papers? These are pieces of art.',
+                greeting: 'These sheets are special. Are you looking for a specific paper? Ask me, like "natural paper with bamboo."'
+            },
+            '/collections/marbled-papers': {
+                floating: 'All sheets are unique — discover these amazing papers.',
+                greeting: 'All marbled, ombre, and tie-dye papers are one-of-a-kind. If you have something specific in mind, ask me, like "marbled paper with gold marbling."'
+            },
+            '/collections/unryu': {
+                floating: 'Looking for something soft and natural? Unryu papers are the ones!',
+                greeting: 'Unryu papers have a unique, airy texture. Ask me anything — I can help you find the right one.'
+            },
+            '/collections/solid-color-kozo': {
+                floating: 'Curious about our kozo papers and treatments?',
+                greeting: 'These papers can be treated with methyl cellulose. Ask me if the kozo type can be treated — I\'ll explain more.'
+            },
+            '/collections/metallic-papers': {
+                floating: 'Looking for Tissue Foils? These are great for folding.',
+                greeting: 'Ask me about the metallic paper type and size — I can help you find the right one.'
+            },
+            '/collections/scenery': {
+                floating: 'These are real art pieces — look around and hit me up anytime.',
+                greeting: 'Crafting, decoration, thoughtful gifts… what kind of Scenery paper are you looking for? Tell me what you want to make, and I\'ll guide you.'
+            },
+            '/collections/books-other': {
+                floating: 'These books are our selection — want to explore them?',
+                greeting: 'Looking for a specific title or theme? Tell me roughly what you\'re after, and I\'ll find it for you.'
+            },
+            '/collections/calligraphy': {
+                floating: 'Looking for calligraphy supplies? Take a look around!',
+                greeting: 'Let me know your level or style — I\'ll match you with the right brush and ink.'
+            },
+            '/collections/writing-drawing': {
+                floating: 'Do you like drawing? I\'ll find you the perfect match!',
+                greeting: 'Are you looking for a specific brand or utensil? Tell me what you have in mind — I can find it for you. Feel free to ask about any details, too.'
+            },
+            '/collections/gifts': {
+                floating: 'Looking for a gift with the spirit of Japan and San Francisco?',
+                greeting: 'Looking for something special?\nThese are our collections — each piece carries the charm of Japan and the heart of San Francisco. It\'ll make a wonderful gift.'
+            },
+            '/collections/cards-mikis-signature-cards': {
+                floating: 'Looking for something heartfelt? Check out Miki\'s Cards.',
+                greeting: 'Each card is hand-designed — simple, elegant, and full of warmth. Want to find one that fits your message?'
+            },
+            '/collections/sale': {
+                floating: 'Love a great find? You might spot something special here.',
+                greeting: 'Some of our signature pieces are marked down — great for gifting or collecting. Want to take a look?'
+            },
+            '/collections/frontpage': {
+                floating: 'Love a great find? You might spot something special here.',
+                greeting: 'Some of our signature pieces are here — great for gifting or collecting. Want to take a look?'
+            },
+            '/pages/services': {
+                floating: 'Curious about classes with Origami expert Linda?',
+                greeting: 'Linda and her team teach everyone from beginners to advanced folders — even artists and companies. Whether for fun or something special, we have classes for you. Want to see what\'s available?'
+            },
+            '/pages/events-page': {
+                floating: 'Curious about origami events with Paper Tree?',
+                greeting: 'From our annual Palooza to live demos and community gatherings — come explore the world of origami with us! Want me to tell you about the upcoming events?'
+            }
+        };
+
+        // 매칭되는 경로 찾기 (olivethisolivethat과 동일 방식)
+        const matchedPath = Object.keys(messages).find(
+            path => currentUrl.includes(path)
+        );
+
+        return matchedPath ? messages[matchedPath] : null;
     }
 
     // SDK가 이미 존재하는지 확인
