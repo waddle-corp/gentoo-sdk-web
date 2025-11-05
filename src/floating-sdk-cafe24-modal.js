@@ -435,8 +435,8 @@ class FloatingButton {
             // }
             if (this.messageExistence || this.displayLocation === 'PRODUCT_DETAIL') {
                 this.openChat();
-            } else if (this.inputContainer.classList.contains("visibility-hide")) {
-                this.inputContainer.classList.remove("visibility-hide");
+            } else if (this.inputContainer.classList.contains("hide")) {
+                this.inputContainer.classList.remove("hide");
                 this.inputWrapper.classList.remove("shrink-hide");
                 this.input.classList.remove("shrink-hide");
                 this.examFloatingGroup.classList.add("slide-up");
@@ -483,7 +483,7 @@ class FloatingButton {
         };
 
         const performInputBlur = () => {
-            this.inputContainer.classList.add("visibility-hide");
+            this.inputContainer.classList.add("hide");
             this.inputWrapper.classList.add("shrink-hide");
             this.input.classList.add("shrink-hide");
             this.examFloatingGroup.classList.remove("slide-up");
@@ -541,8 +541,8 @@ class FloatingButton {
                 if (this.isMobileDevice && this.iframeContainer) {
                     this.hideChat();
                     // open modal 로 묶어야 됨
-                    if (this.inputContainer.classList.contains("visibility-hide")) {
-                        this.inputContainer.classList.remove("visibility-hide");
+                    if (this.inputContainer.classList.contains("hide")) {
+                        this.inputContainer.classList.remove("hide");
                         this.inputWrapper.classList.remove("shrink-hide");
                         this.input.classList.remove("shrink-hide");
                         this.examFloatingGroup.classList.add("slide-up");
