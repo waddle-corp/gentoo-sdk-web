@@ -486,6 +486,7 @@
     align-items: center;
     justify-content: flex-end;
     transition: width 0.5s ease;
+    z-index: 9999999;
 }
 
 .chat-input-wrapper {
@@ -504,6 +505,7 @@
     align-items: center;
     justify-content: space-between;
     transition: width 0.5s ease;
+    z-index: 9999999;
 }
 
 .chat-input {

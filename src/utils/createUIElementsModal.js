@@ -108,7 +108,7 @@ export const createUIElementsModal = (
         context.inputWrapper.appendChild(context.profileImage);
         context.inputWrapper.appendChild(context.input);
         context.inputWrapper.appendChild(context.sendButton);
-        context.inputContainer.className = "chat-input-container visibility-hide";
+        context.inputContainer.className = "chat-input-container hide";
         context.inputContainer.appendChild(context.inputWrapper);
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
