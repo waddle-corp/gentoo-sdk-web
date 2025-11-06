@@ -128,25 +128,37 @@ class FloatingButton {
         }
 
         // Add a promise to track initialization status
-        this.bootPromise = Promise.all([
-            this.fetchChatUserId(this.authCode, this.udid).then((res) => {
-                if (!res) throw new Error("Failed to fetch chat user ID");
-                this.chatUserId = res;
-                this.gentooSessionData.cuid = res;
-                sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-            })
-            .catch(() => {
-                this.chatUserId = 'test';
-            }),
-            this.fetchChatbotData(this.partnerId).then((res) => {
-                if (!res) throw new Error("Failed to fetch chatbot data");
-                this.chatbotData = res;
-                this.floatingAvatar = res?.avatar || null;
-                const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                this.warningMessage = warningMessageData?.extra?.message;
-                this.warningActivated = warningMessageData?.activated;
-            }),
-        ]).catch((error) => {
+        this.bootPromise = this.checkTrainingProgress(this.partnerId).then((canProceed) => {
+            if (!canProceed) {
+                console.warn("GentooIO: Training not completed, skipping initialization");
+                window.__GentooInited = 'training_incomplete';
+                return Promise.reject(new Error("Training not completed"));
+            }
+
+            return Promise.all([
+                this.fetchChatUserId(this.authCode, this.udid).then((res) => {
+                    if (!res) throw new Error("Failed to fetch chat user ID");
+                    this.chatUserId = res;
+                    this.gentooSessionData.cuid = res;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                })
+                .catch(() => {
+                    this.chatUserId = 'test';
+                }),
+                this.fetchChatbotData(this.partnerId).then((res) => {
+                    if (!res) throw new Error("Failed to fetch chatbot data");
+                    this.chatbotData = res;
+                    this.floatingAvatar = res?.avatar || null;
+                    const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                    this.warningMessage = warningMessageData?.extra?.message;
+                    this.warningActivated = warningMessageData?.activated;
+                }),
+            ]);
+        }).catch((error) => {
+            if (error.message === "Training not completed") {
+                console.log("GentooIO: Training incomplete, stopping initialization");
+                return; // 학습 미완료는 정상적인 중단이므로 에러로 처리하지 않음
+            }
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
