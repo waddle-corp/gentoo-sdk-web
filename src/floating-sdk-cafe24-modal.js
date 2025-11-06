@@ -484,6 +484,7 @@ class FloatingButton {
         };
 
         const performInputBlur = () => {
+            if (this.dimmedBackground) this.dimmedBackground.classList.add('hide');
             this.inputContainer.classList.add("hide");
             this.inputWrapper.classList.add("shrink-hide");
             this.input.classList.add("shrink-hide");
@@ -1049,6 +1050,7 @@ class FloatingButton {
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
+            if (this.dimmedBackground) this.dimmedBackground.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
