@@ -436,6 +436,7 @@ class FloatingButton {
             if (this.messageExistence || this.displayLocation === 'PRODUCT_DETAIL') {
                 this.openChat();
             } else if (this.inputContainer.classList.contains("hide")) {
+                this.dimmedBackground.classList.remove("hide");
                 this.inputContainer.classList.remove("hide");
                 this.inputWrapper.classList.remove("shrink-hide");
                 this.input.classList.remove("shrink-hide");
