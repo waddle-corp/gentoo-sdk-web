@@ -145,6 +145,7 @@ export const createUIElementsModal = (
         context.footerText.innerText = context.warningMessage;
         context.iframeContainer.appendChild(context.footer);
     }
+    document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
     postChatEventLog({
