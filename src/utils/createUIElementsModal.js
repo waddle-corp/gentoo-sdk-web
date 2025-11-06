@@ -36,6 +36,11 @@ export const createUIElementsModal = (
         return;
     }
 
+    context.dimmedBackground = document.createElement("div");
+    context.dimmedBackground.className = "dimmed-background hide";
+    context.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+    context.dimmedBackground.appendChild(document.createTextNode('\u200B'));
+
     // Create iframe elements
     context.iframeContainer = document.createElement("div");
     context.iframeContainer.className = "iframe-container iframe-container-hide";
