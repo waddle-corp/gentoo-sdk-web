@@ -577,6 +577,9 @@ class FloatingButton {
             if (e.data.addProductToCart) {
                 this.addProductToCart(e.data.addProductToCart);
             }
+            if (e.data.addProductWithOptionsToCart) {
+                this.addProductWithOptionsToCart(e.data.addProductWithOptionsToCart);
+            }
 
             if (e.data.floatingMessage) {
                 if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && e.data.floatingMessage?.length > 0) {
@@ -902,6 +905,45 @@ class FloatingButton {
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
+                        resolve(res);
+                    }
+                }
+            );
+        });
+    }
+
+    async addProductWithOptionsToCart(productBulkObject) {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+
+        console.log('[sdk] productBulkObject', productBulkObject);
+        /* 
+        const addProductWithOptionsToCart = {
+            productNo: productInfo.itemId,
+            prepaidShippingFee: prepaidShippingFee,
+            productList: productList,
+        }
+        */
+
+        const productListFull = productBulkObject.productList.map(product => ({
+            ...product,
+            product_no: productBulkObject.productNo,
+        }));
+
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCart(
+                'A0000',
+                productBulkObject.prepaidShippingFee,
+                productListFull,
+                (err, res) => {
+                    if (err) {
+                        console.error('Failed to add product to cart:', err);
+                        reject(err);
+                    } else {
+                        this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
                         resolve(res);
                     }
                 }
