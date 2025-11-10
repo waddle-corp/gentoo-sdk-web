@@ -192,15 +192,15 @@ export const createUIElementsModal = (
         } else {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
         }
-        this.button.type = "button";
-        this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
-        document.body.appendChild(this.floatingContainer);
-        if (this.dotLottiePlayer) {
-            this.floatingContainer.appendChild(this.dotLottiePlayer);
+        context.button.type = "button";
+        context.button.style.backgroundImage = `url(${context.useBootConfigFloatingImage ? context.bootConfig?.floating?.button?.imageUrl : context.floatingAvatar?.floatingAsset})`;
+        document.body.appendChild(context.floatingContainer);
+        if (context.dotLottiePlayer) {
+            context.floatingContainer.appendChild(context.dotLottiePlayer);
         } else {
-            this.floatingContainer.appendChild(this.button);
+            context.floatingContainer.appendChild(context.button);
         }
-        
+
         if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
         else if (!context.gentooSessionData?.redirectState && context.floatingCount < 2 && context.bootConfig?.floating?.button?.comment?.length > 0) {
             // Check if component is destroyed or clicked
