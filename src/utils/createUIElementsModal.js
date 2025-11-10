@@ -33,8 +33,8 @@ export const createUIElementsModal = (
     }
 
     if (
-        !this.bootConfig?.floating ||
-        (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+        !context.bootConfig?.floating ||
+        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
     ) {
         console.error("Floating data is incomplete");
         return;
@@ -66,16 +66,16 @@ export const createUIElementsModal = (
     context.iframe.src = context.chatUrl;
 
     if (
-        !this.bootConfig?.floating ||
-        (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+        !context.bootConfig?.floating ||
+        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
     ) {
         console.error("Floating data is incomplete");
         return;
     }
 
     // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
-    const bootImage = this.bootConfig?.floating?.button?.imageUrl;
-    const avatarAsset = this.floatingAvatar?.floatingAsset;
+    const bootImage = context.bootConfig?.floating?.button?.imageUrl;
+    const avatarAsset = context.floatingAvatar?.floatingAsset;
     context.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
     const selectedAsset = context.useBootConfigFloatingImage ? bootImage : avatarAsset;
     console.log('selectedAsset', selectedAsset);
