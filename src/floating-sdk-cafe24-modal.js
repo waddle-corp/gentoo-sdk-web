@@ -578,6 +578,7 @@ class FloatingButton {
                 this.addProductToCart(e.data.addProductToCart);
             }
             if (e.data.addProductWithOptionsToCart) {
+                console.log('[sdk] Received addProductWithOptionsToCart event:', e.data.addProductWithOptionsToCart);
                 this.addProductWithOptionsToCart(e.data.addProductWithOptionsToCart);
             }
 
