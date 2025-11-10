@@ -202,6 +202,9 @@ export const createUIElementsModal = (
         if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
         else if (!context.gentooSessionData?.redirectState && context.floatingCount < 2 && context.bootConfig?.floating?.button?.comment?.length > 0) {
             // Check if component is destroyed or clicked
+            console.log('context.floatingClicked', context.floatingClicked);
+            console.log('context.isDestroyed', context.isDestroyed);
+            console.log('context.floatingContainer', context.floatingContainer);
             if (context.floatingClicked || context.isDestroyed || !context.floatingContainer)
                 return;
 
@@ -226,11 +229,16 @@ export const createUIElementsModal = (
                             `expanded-area expanded-area-neutral`;
                 context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
             }
+            console.log('context.expandedButtonWrapper', context.expandedButtonWrapper);
+            console.log('context.expandedButton', context.expandedButton);
+            console.log('context.expandedText', context.expandedText);
 
             context.expandedButtonWrapper.appendChild(context.expandedButton);
             context.expandedButton.appendChild(context.expandedText);
 
             // Double check if floatingContainer still exists before appending
+            console.log('context.floatingContainer', context.floatingContainer);
+            console.log('context.floatingContainer.parentNode', context.floatingContainer.parentNode);
             if (context.floatingContainer && context.floatingContainer.parentNode) {
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
                 context.addLetter(context.bootConfig, context.expandedText, () => context.isDestroyed);
