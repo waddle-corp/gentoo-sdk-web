@@ -1,6 +1,6 @@
 import '../global.css'
 import './floating-sdk-cafe24-modal.css';
-import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 
 class FloatingButton {
@@ -129,12 +129,15 @@ class FloatingButton {
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
                             getChatbotData(this.partnerId, chatUserId),
-                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId),
+                            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId),
                         ]);
                     })
-                    .then(([chatbotData, floatingData]) => {
+                    .then(([chatbotData, floatingData, bootConfig]) => {
                         console.log('chatbotData', chatbotData);
                         console.log('floatingData', floatingData);
+                        console.log('bootConfig', bootConfig);
+                        this.bootConfig = bootConfig;
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
@@ -501,10 +504,11 @@ class FloatingButton {
                     } else {
                         this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
-                    this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingData.imageUrl})`;
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
+                    this.dotLottiePlayer.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingData.imageUrl);
                 }
             }, 100);
             this.inputContainerTimeout = null;
@@ -609,7 +613,7 @@ class FloatingButton {
                     if (this.floatingContainer && this.floatingContainer.parentNode) {
                         this.floatingContainer.appendChild(this.expandedButton);
 
-                        this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
+                        this.addLetter(this.bootConfig?.floating?.button?.comment || this.floatingData.comment, this.expandedText, () => this.isDestroyed);
                         this.floatingCount += 1;
 
                         setTimeout(() => {
@@ -863,6 +867,7 @@ class FloatingButton {
         this.chatUserId = null;
         this.floatingData = null;
         this.chatbotData = null;
+        this.bootConfig = null;
         this.chatUrl = null;
 
         // Reset state flags
