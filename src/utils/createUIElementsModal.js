@@ -10,8 +10,6 @@ export const createUIElementsModal = (
     checkSDKExists = false,
     customButton,
     chatbotData,
-    floatingData,
-    bootConfig,
 ) => {
     // Check if any SDK elements exist in document
     if (checkSDKExists) {
