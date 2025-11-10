@@ -204,18 +204,23 @@ class FloatingButton {
 
             // Create UI elements after data is ready
 
-            if (!this.isDestroyed) createUIElementsModal(
-                this, // this 객체를 첫 번째 인자로 전달
-                position,
-                showGentooButton,
-                isCustomButton,
-                this.checkSDKExists(),
-                this.customButton,
-                this.chatbotData,
-                this.floatingData,
-                this.bootConfig
-            );
-            else this.destroy();
+            // Create UI elements after data is ready
+            if (this.isDestroyed) this.destroy();
+            else if (!this.bootConfig?.floating?.isVisible) {
+                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+            } else { 
+                createUIElementsModal(
+                    this, // this 객체를 첫 번째 인자로 전달
+                    position,
+                    showGentooButton,
+                    isCustomButton,
+                    this.checkSDKExists(),
+                    this.customButton,
+                    this.chatbotData,
+                    this.floatingData,
+                    this.bootConfig
+                );
+            }
 
         } catch (error) {
             console.error('Failed to initialize:', error);

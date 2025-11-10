@@ -32,8 +32,11 @@ export const createUIElementsModal = (
         return;
     }
 
-    if (!floatingData || !floatingData.imageUrl) {
-        console.error('Floating data is incomplete');
+    if (
+        !this.bootConfig?.floating ||
+        (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+    ) {
+        console.error("Floating data is incomplete");
         return;
     }
 
@@ -61,15 +64,33 @@ export const createUIElementsModal = (
     context.footer.appendChild(context.footerText);
     context.iframe = document.createElement("iframe");
     context.iframe.src = context.chatUrl;
-    if (context.floatingAvatar?.floatingAsset || context.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+
+    if (
+        !this.bootConfig?.floating ||
+        (!this.bootConfig?.floating?.button?.imageUrl && !this.floatingAvatar?.floatingAsset)
+    ) {
+        console.error("Floating data is incomplete");
+        return;
+    }
+
+    // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+    const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+    const avatarAsset = this.floatingAvatar?.floatingAsset;
+    context.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+    const selectedAsset = context.useBootConfigFloatingImage ? bootImage : avatarAsset;
+    console.log('selectedAsset', selectedAsset);
+    if (selectedAsset?.includes('lottie')) {
         const player = document.createElement('dotlottie-player');
         player.setAttribute('autoplay', '');
         player.setAttribute('loop', '');
         player.setAttribute('mode', 'normal');
-        player.setAttribute('src', context.floatingAvatar?.floatingAsset || context.floatingData.imageUrl);
-        player.style.width = context.isSmallResolution ? '68px' : context.floatingZoom ? '120px' : '94px';
-        player.style.height = context.isSmallResolution ? '68px' : context.floatingZoom ? '120px' : '94px';
+        // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+        player.setAttribute('src', selectedAsset);
+        player.style.width = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
+        player.style.height = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
         player.style.cursor = 'pointer';
+        player.appendChild(document.createTextNode('\u200B'));
+
         context.dotLottiePlayer = player;
     }
 
@@ -159,6 +180,7 @@ export const createUIElementsModal = (
 
     // Create floating button
     if (showGentooButton) {
+        console.log('showGentooButton', showGentooButton);
         context.floatingContainer = document.createElement("div");
         context.floatingContainer.className = `floating-container`;
         context.floatingContainer.setAttribute("data-gentoo-sdk", "true");
