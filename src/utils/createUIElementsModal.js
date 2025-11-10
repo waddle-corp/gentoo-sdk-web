@@ -241,7 +241,7 @@ export const createUIElementsModal = (
             console.log('context.floatingContainer.parentNode', context.floatingContainer.parentNode);
             if (context.floatingContainer && context.floatingContainer.parentNode) {
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
-                context.addLetter(context.bootConfig, context.expandedText, () => context.isDestroyed);
+                context.addLetter(context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
 
                 // Remove expanded button after delay
                 setTimeout(() => {
