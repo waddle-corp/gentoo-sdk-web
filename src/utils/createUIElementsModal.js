@@ -11,6 +11,7 @@ export const createUIElementsModal = (
     customButton,
     chatbotData,
     floatingData,
+    bootConfig,
 ) => {
     // Check if any SDK elements exist in document
     if (checkSDKExists) {
@@ -165,18 +166,60 @@ export const createUIElementsModal = (
         context.updateFloatingContainerPosition(position); // Set initial position
         context.button = document.createElement("div");
         if (context.isSmallResolution) {
-            context.button.className = `floating-button-common button-image-md`;
+            context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
         } else {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
         }
-        context.button.type = "button";
-        context.button.style.backgroundImage = `url(${context.floatingData.imageUrl})`;
-        document.body.appendChild(context.floatingContainer);
-        if (context.dotLottiePlayer) {
-            context.floatingContainer.appendChild(context.dotLottiePlayer);
-        } else {
-            context.floatingContainer.appendChild(context.button);
+        if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
+        else if (!context.gentooSessionData?.redirectState && context.floatingCount < 2 && context.bootConfig?.floating?.button?.comment?.length > 0) {
+            // Check if component is destroyed or clicked
+            if (context.floatingClicked || context.isDestroyed || !context.floatingContainer)
+                return;
+
+            context.expandedButtonWrapper = document.createElement("div");
+            context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+            context.expandedButton = document.createElement("div");
+            context.expandedText = document.createElement("p");
+            if (context.isSmallResolution) {
+                context.expandedButton.className =
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area-md expanded-area-neutral-md` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            `expanded-area-md` :
+                            `expanded-area-md expanded-area-neutral-md`;
+                context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+            } else {
+                context.expandedButton.className =
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area expanded-area-neutral` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            "expanded-area" :
+                            `expanded-area expanded-area-neutral`;
+                context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+            }
+
+            context.expandedButtonWrapper.appendChild(context.expandedButton);
+            context.expandedButton.appendChild(context.expandedText);
+
+            // Double check if floatingContainer still exists before appending
+            if (context.floatingContainer && context.floatingContainer.parentNode) {
+                context.floatingContainer.appendChild(context.expandedButtonWrapper);
+                context.addLetter(context.bootConfig, context.expandedText, () => context.isDestroyed);
+
+                // Remove expanded button after delay
+                setTimeout(() => {
+                    if (
+                        context.floatingContainer &&
+                        context.expandedButtonWrapper &&
+                        context.expandedButtonWrapper.parentNode === context.floatingContainer
+                    ) {
+                        context.floatingContainer.removeChild(context.expandedButtonWrapper);
+                    }
+                }, 7000);
+            }
         }
+    } else {
+        if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
     }
 
     context.elems = {

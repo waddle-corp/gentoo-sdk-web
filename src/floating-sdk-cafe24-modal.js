@@ -212,7 +212,8 @@ class FloatingButton {
                 this.checkSDKExists(),
                 this.customButton,
                 this.chatbotData,
-                this.floatingData
+                this.floatingData,
+                this.bootConfig
             );
             else this.destroy();
 
