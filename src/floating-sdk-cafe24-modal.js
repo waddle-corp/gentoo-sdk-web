@@ -1142,7 +1142,7 @@ class FloatingButton {
     redirectToCartPage() {
         if (String(sessionStorage.getItem('gentoo_cart_added')) === 'true') {
             sessionStorage.removeItem('gentoo_cart_added');
-            window.location.href = 'order/basket.html';
+            window.location.href = '/order/basket.html';
         }
     }
 
