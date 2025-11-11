@@ -653,6 +653,7 @@ class FloatingButton {
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
             this.hideChat();
+            this.redirectToCartPage();
             // add letter 관련 묶어야 됨
             setTimeout(() => {
                 this.floatingMessage = '궁금한 게 있으시면 언제든 다시 눌러주세요!';
@@ -952,8 +953,13 @@ class FloatingButton {
                     if (err) {
                         console.error('Failed to add product to cart:', err);
                         reject(err);
+                        this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
                         this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
+                        // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
+                        if (!sessionStorage.getItem('gentoo_cart_added')) {
+                            sessionStorage.setItem('gentoo_cart_added', 'true');
+                        }
                         resolve(res);
                     }
                 }
@@ -1131,6 +1137,13 @@ class FloatingButton {
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
+    }
+
+    redirectToCartPage() {
+        if (String(sessionStorage.getItem('gentoo_cart_added')) === 'true') {
+            sessionStorage.removeItem('gentoo_cart_added');
+            window.location.href = 'order/basket.html';
+        }
     }
 
     sendPostMessageHandler(payload) {
