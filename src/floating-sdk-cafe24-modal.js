@@ -952,7 +952,7 @@ class FloatingButton {
                 (err, res) => {
                     if (err) {
                         console.error('Failed to add product to cart:', err, res);
-                        reject(err);
+                        resolve(err);
                         this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
                         this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
