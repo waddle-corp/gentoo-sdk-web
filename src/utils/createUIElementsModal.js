@@ -10,7 +10,6 @@ export const createUIElementsModal = (
     checkSDKExists = false,
     customButton,
     chatbotData,
-    floatingData,
 ) => {
     // Check if any SDK elements exist in document
     if (checkSDKExists) {
@@ -31,10 +30,18 @@ export const createUIElementsModal = (
         return;
     }
 
-    if (!floatingData || !floatingData.imageUrl) {
-        console.error('Floating data is incomplete');
+    if (
+        !context.bootConfig?.floating ||
+        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
+    ) {
+        console.error("Floating data is incomplete");
         return;
     }
+
+    context.dimmedBackground = document.createElement("div");
+    context.dimmedBackground.className = "dimmed-background hide";
+    context.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
+    context.dimmedBackground.appendChild(document.createTextNode('\u200B'));
 
     // Create iframe elements
     context.iframeContainer = document.createElement("div");
@@ -55,15 +62,32 @@ export const createUIElementsModal = (
     context.footer.appendChild(context.footerText);
     context.iframe = document.createElement("iframe");
     context.iframe.src = context.chatUrl;
-    if (context.floatingAvatar?.floatingAsset || context.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
-        const player = document.createElement('dotlottie-player');
+
+    if (
+        !context.bootConfig?.floating ||
+        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
+    ) {
+        console.error("Floating data is incomplete");
+        return;
+    }
+
+    // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+    const bootImage = context.bootConfig?.floating?.button?.imageUrl;
+    const avatarAsset = context.floatingAvatar?.floatingAsset;
+    context.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+    const selectedAsset = context.useBootConfigFloatingImage ? bootImage : avatarAsset;
+    if (selectedAsset?.includes('lottie')) {
+        const player = document.createElement('dotlottie-wc');
         player.setAttribute('autoplay', '');
         player.setAttribute('loop', '');
         player.setAttribute('mode', 'normal');
-        player.setAttribute('src', context.floatingAvatar?.floatingAsset || context.floatingData.imageUrl);
-        player.style.width = context.isSmallResolution ? '68px' : context.floatingZoom ? '120px' : '94px';
-        player.style.height = context.isSmallResolution ? '68px' : context.floatingZoom ? '120px' : '94px';
+        // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+        player.setAttribute('src', selectedAsset);
+        player.style.width = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
+        player.style.height = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
         player.style.cursor = 'pointer';
+        player.appendChild(document.createTextNode('\u200B'));
+
         context.dotLottiePlayer = player;
     }
 
@@ -96,7 +120,7 @@ export const createUIElementsModal = (
         context.sendButton = document.createElement("div");
         context.sendButton.className = "chat-send-button chat-send-button-active hide";
         context.input.className = "chat-input shrink-hide";
-        context.input.placeholder = "메시지를 입력하세요";
+        context.input.placeholder = "상품 추천, 문의도 — 무엇이든 물어보세요";
         context.input.name = "gentoo-chat-input";
         context.input.type = "text";
         context.input.autocomplete = "off";
@@ -108,7 +132,7 @@ export const createUIElementsModal = (
         context.inputWrapper.appendChild(context.profileImage);
         context.inputWrapper.appendChild(context.input);
         context.inputWrapper.appendChild(context.sendButton);
-        context.inputContainer.className = "chat-input-container visibility-hide";
+        context.inputContainer.className = "chat-input-container hide";
         context.inputContainer.appendChild(context.inputWrapper);
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
@@ -140,6 +164,7 @@ export const createUIElementsModal = (
         context.footerText.innerText = context.warningMessage;
         context.iframeContainer.appendChild(context.footer);
     }
+    document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
     postChatEventLog({
@@ -159,18 +184,69 @@ export const createUIElementsModal = (
         context.updateFloatingContainerPosition(position); // Set initial position
         context.button = document.createElement("div");
         if (context.isSmallResolution) {
-            context.button.className = `floating-button-common button-image-md`;
+            context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
         } else {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
         }
         context.button.type = "button";
-        context.button.style.backgroundImage = `url(${context.floatingData.imageUrl})`;
+        context.button.style.backgroundImage = `url(${context.useBootConfigFloatingImage ? context.bootConfig?.floating?.button?.imageUrl : context.floatingAvatar?.floatingAsset})`;
         document.body.appendChild(context.floatingContainer);
         if (context.dotLottiePlayer) {
             context.floatingContainer.appendChild(context.dotLottiePlayer);
         } else {
             context.floatingContainer.appendChild(context.button);
         }
+
+        if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
+        else if (!context.gentooSessionData?.redirectState && context.floatingCount < 2 && context.bootConfig?.floating?.button?.comment?.length > 0) {
+            // Check if component is destroyed or clicked
+            if (context.floatingClicked || context.isDestroyed || !context.floatingContainer)
+                return;
+
+            context.expandedButtonWrapper = document.createElement("div");
+            context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+            context.expandedButton = document.createElement("div");
+            context.expandedText = document.createElement("p");
+            if (context.isSmallResolution) {
+                context.expandedButton.className =
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area-md expanded-area-neutral-md` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            `expanded-area-md` :
+                            `expanded-area-md expanded-area-neutral-md`;
+                context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+            } else {
+                context.expandedButton.className =
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area expanded-area-neutral` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            "expanded-area" :
+                            `expanded-area expanded-area-neutral`;
+                context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+            }
+
+            context.expandedButtonWrapper.appendChild(context.expandedButton);
+            context.expandedButton.appendChild(context.expandedText);
+
+            // Double check if floatingContainer still exists before appending
+            if (context.floatingContainer && context.floatingContainer.parentNode) {
+                context.floatingContainer.appendChild(context.expandedButtonWrapper);
+                context.addLetter(context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
+
+                // Remove expanded button after delay
+                setTimeout(() => {
+                    if (
+                        context.floatingContainer &&
+                        context.expandedButtonWrapper &&
+                        context.expandedButtonWrapper.parentNode === context.floatingContainer
+                    ) {
+                        context.floatingContainer.removeChild(context.expandedButtonWrapper);
+                    }
+                }, 7000);
+            }
+        }
+    } else {
+        if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
     }
 
     context.elems = {

@@ -1,6 +1,6 @@
 import '../global.css'
 import './floating-sdk-cafe24-modal.css';
-import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 
 class FloatingButton {
@@ -54,6 +54,9 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
         this.isInteractingWithSend = false;
+
+        // FlowLift Project: 장바구니 담기 UX 결정 -> Variant B(one-click add to cart), Variant C (option selectable add to cart)
+        this.addProductToCartVariant = this.getOrSetAddToCartVariant(); 
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -129,12 +132,15 @@ class FloatingButton {
                         // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
                         return Promise.all([
                             getChatbotData(this.partnerId, chatUserId),
-                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId)
+                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId),
+                            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId),
                         ]);
                     })
-                    .then(([chatbotData, floatingData]) => {
+                    .then(([chatbotData, floatingData, bootConfig]) => {
                         console.log('chatbotData', chatbotData);
                         console.log('floatingData', floatingData);
+                        console.log('bootConfig', bootConfig);
+                        this.bootConfig = bootConfig;
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
                         const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
@@ -197,21 +203,25 @@ class FloatingButton {
             this.isInitialized = true;
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://accio-webclient-git-prod-4275-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
-            if (!this.isDestroyed) createUIElementsModal(
-                this, // this 객체를 첫 번째 인자로 전달
-                position,
-                showGentooButton,
-                isCustomButton,
-                this.checkSDKExists(),
-                this.customButton,
-                this.chatbotData,
-                this.floatingData
-            );
-            else this.destroy();
+            // Create UI elements after data is ready
+            if (this.isDestroyed) this.destroy();
+            else if (!this.bootConfig?.floating?.isVisible) {
+                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
+            } else { 
+                createUIElementsModal(
+                    this, // this 객체를 첫 번째 인자로 전달
+                    position,
+                    showGentooButton,
+                    isCustomButton,
+                    this.checkSDKExists(),
+                    this.customButton,
+                    this.chatbotData,
+                );
+            }
 
         } catch (error) {
             console.error('Failed to initialize:', error);
@@ -435,8 +445,9 @@ class FloatingButton {
             // }
             if (this.messageExistence || this.displayLocation === 'PRODUCT_DETAIL') {
                 this.openChat();
-            } else if (this.inputContainer.classList.contains("visibility-hide")) {
-                this.inputContainer.classList.remove("visibility-hide");
+            } else if (this.inputContainer.classList.contains("hide")) {
+                this.dimmedBackground.classList.remove("hide");
+                this.inputContainer.classList.remove("hide");
                 this.inputWrapper.classList.remove("shrink-hide");
                 this.input.classList.remove("shrink-hide");
                 this.examFloatingGroup.classList.add("slide-up");
@@ -483,7 +494,8 @@ class FloatingButton {
         };
 
         const performInputBlur = () => {
-            this.inputContainer.classList.add("visibility-hide");
+            if (this.dimmedBackground) this.dimmedBackground.classList.add('hide');
+            this.inputContainer.classList.add("hide");
             this.inputWrapper.classList.add("shrink-hide");
             this.input.classList.add("shrink-hide");
             this.examFloatingGroup.classList.remove("slide-up");
@@ -499,10 +511,11 @@ class FloatingButton {
                     } else {
                         this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                     }
-                    this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.bootConfig?.floating?.button?.imageUrl || this.floatingData.imageUrl})`;
                 }
                 if (this.dotLottiePlayer) {
                     this.dotLottiePlayer.classList.remove('hide');
+                    this.dotLottiePlayer.setAttribute('src', this.bootConfig?.floating?.button?.imageUrl || this.floatingData.imageUrl);
                 }
             }, 100);
             this.inputContainerTimeout = null;
@@ -541,8 +554,8 @@ class FloatingButton {
                 if (this.isMobileDevice && this.iframeContainer) {
                     this.hideChat();
                     // open modal 로 묶어야 됨
-                    if (this.inputContainer.classList.contains("visibility-hide")) {
-                        this.inputContainer.classList.remove("visibility-hide");
+                    if (this.inputContainer.classList.contains("hide")) {
+                        this.inputContainer.classList.remove("hide");
                         this.inputWrapper.classList.remove("shrink-hide");
                         this.input.classList.remove("shrink-hide");
                         this.examFloatingGroup.classList.add("slide-up");
@@ -551,6 +564,7 @@ class FloatingButton {
                         // this.examFloatingButton.classList.remove("hide");
                         this.sendButton.classList.remove("hide");
                         this.profileImage.classList.remove("hide");
+                        if (this.dimmedBackground) this.dimmedBackground.classList.remove('hide');
                         if (this.expandedButton)
                             this.expandedButton.classList.add('hide');
                         if (this.button) {
@@ -574,6 +588,10 @@ class FloatingButton {
             }
             if (e.data.addProductToCart) {
                 this.addProductToCart(e.data.addProductToCart);
+            }
+            if (e.data.addProductWithOptionsToCart) {
+                console.log('[sdk] Received addProductWithOptionsToCart event:', e.data.addProductWithOptionsToCart);
+                this.addProductWithOptionsToCart(e.data.addProductWithOptionsToCart);
             }
 
             if (e.data.floatingMessage) {
@@ -603,7 +621,7 @@ class FloatingButton {
                     if (this.floatingContainer && this.floatingContainer.parentNode) {
                         this.floatingContainer.appendChild(this.expandedButton);
 
-                        this.addLetter(e.data.floatingMessage, this.expandedText, () => this.isDestroyed);
+                        this.addLetter(this.bootConfig?.floating?.button?.comment || this.floatingData.comment, this.expandedText, () => this.isDestroyed);
                         this.floatingCount += 1;
 
                         setTimeout(() => {
@@ -639,6 +657,7 @@ class FloatingButton {
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
             this.hideChat();
+            this.redirectToCartPage();
             // add letter 관련 묶어야 됨
             setTimeout(() => {
                 this.floatingMessage = '궁금한 게 있으시면 언제든 다시 눌러주세요!';
@@ -857,6 +876,7 @@ class FloatingButton {
         this.chatUserId = null;
         this.floatingData = null;
         this.chatbotData = null;
+        this.bootConfig = null;
         this.chatUrl = null;
 
         // Reset state flags
@@ -900,6 +920,50 @@ class FloatingButton {
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
+                        resolve(res);
+                    }
+                }
+            );
+        });
+    }
+
+    async addProductWithOptionsToCart(productBulkObject) {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+
+        console.log('[sdk] productBulkObject', productBulkObject);
+        /* 
+        const addProductWithOptionsToCart = {
+            productNo: productInfo.itemId,
+            prepaidShippingFee: prepaidShippingFee,
+            productList: productList,
+        }
+        */
+
+        const productListFull = productBulkObject.productList.map(product => ({
+            ...product,
+            product_no: productBulkObject.productNo,
+        }));
+
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCart(
+                'A0000',
+                productBulkObject.prepaidShippingFee,
+                productListFull,
+                (err, res) => {
+                    if (err) {
+                        console.error('Failed to add product to cart:', err, res);
+                        resolve(err);
+                        this.sendPostMessageHandler({ addProductToCartFailed: true });
+                    } else {
+                        this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
+                        // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
+                        if (!sessionStorage.getItem('gentoo_cart_added')) {
+                            sessionStorage.setItem('gentoo_cart_added', 'true');
+                        }
                         resolve(res);
                     }
                 }
@@ -1048,12 +1112,15 @@ class FloatingButton {
             if (this.button) this.button.className = "floating-button-common hide";
             if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
             if (this.dotLottiePlayer) this.dotLottiePlayer.classList.add('hide');
+            if (this.dimmedBackground) this.dimmedBackground.classList.add('hide');
         }
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
+            if (this.chatHandler) this.chatHandler.classList.remove('visibility-hidden');
             if (this.isMobileDevice) this.iframeContainer.style.height = "400px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
+            if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
             if (this.isMobileDevice) this.iframeContainer.style.height = "99%";
         } else {
             return;
@@ -1074,6 +1141,13 @@ class FloatingButton {
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
+    }
+
+    redirectToCartPage() {
+        if (String(sessionStorage.getItem('gentoo_cart_added')) === 'true') {
+            sessionStorage.removeItem('gentoo_cart_added');
+            window.location.href = '/order/basket.html';
+        }
     }
 
     sendPostMessageHandler(payload) {
@@ -1219,6 +1293,39 @@ class FloatingButton {
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
+        }
+    }
+
+    /**
+     * 장바구니 담기 Variant를 가져오거나 설정합니다.
+     * Session Storage에 저장된 값이 있으면 사용하고,
+     * 없으면 50% 확률로 'B' 또는 'C'를 할당하여 저장합니다.
+     * 
+     * @returns {string} 'B' 또는 'C' variant 값
+     */
+    getOrSetAddToCartVariant() {
+        const STORAGE_KEY = 'gentoo_addToCartVariant';
+        
+        try {
+            // 1. Session Storage에서 기존 값 확인
+            const storedVariant = sessionStorage.getItem(STORAGE_KEY);
+            
+            if (storedVariant === 'B' || storedVariant === 'C') {
+                console.log(`[FlowLift] Using stored variant: ${storedVariant}`);
+                return storedVariant;
+            }
+            
+            // 2. 저장된 값이 없으면 50% 확률로 B 또는 C 할당
+            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
+            sessionStorage.setItem(STORAGE_KEY, randomVariant);
+            console.log(`[FlowLift] Assigned new variant: ${randomVariant}`);
+            
+            return randomVariant;
+        } catch (error) {
+            // Session Storage 접근 실패 시 새로 부여
+            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
+            sessionStorage.setItem(STORAGE_KEY, randomVariant);
+            return randomVariant;
         }
     }
 }
