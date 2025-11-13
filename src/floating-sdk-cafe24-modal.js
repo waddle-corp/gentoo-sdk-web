@@ -564,6 +564,7 @@ class FloatingButton {
                         // this.examFloatingButton.classList.remove("hide");
                         this.sendButton.classList.remove("hide");
                         this.profileImage.classList.remove("hide");
+                        if (this.dimmedBackground) this.dimmedBackground.classList.remove('hide');
                         if (this.expandedButton)
                             this.expandedButton.classList.add('hide');
                         if (this.button) {
