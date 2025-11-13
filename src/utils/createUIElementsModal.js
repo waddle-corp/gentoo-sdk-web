@@ -77,7 +77,7 @@ export const createUIElementsModal = (
     context.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
     const selectedAsset = context.useBootConfigFloatingImage ? bootImage : avatarAsset;
     if (selectedAsset?.includes('lottie')) {
-        const player = document.createElement('dotlottie-player');
+        const player = document.createElement('dotlottie-wc');
         player.setAttribute('autoplay', '');
         player.setAttribute('loop', '');
         player.setAttribute('mode', 'normal');
