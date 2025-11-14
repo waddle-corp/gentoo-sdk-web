@@ -1294,6 +1294,7 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
+        console.log('sendPostMessageHandler', payload);
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 

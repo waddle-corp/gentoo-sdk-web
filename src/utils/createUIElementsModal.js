@@ -179,7 +179,7 @@ export const createUIElementsModal = (
         displayLocation: context.displayLocation,
         deviceType: context.isMobileDevice ? "mobile" : "web",
     });
-    context.iframe.contentWindow.postMessage({
+    context.sendPostMessageHandler({
         messageType: "gentoo-statics",
         contentData: {
             experimentId: "flowlift_abctest_v1",
@@ -191,7 +191,7 @@ export const createUIElementsModal = (
             displayLocation: context.displayLocation,
             deviceType: context.isMobileDevice ? "mobile" : "web",
         }
-    }, "*");
+    });
 
     postChatEventLog({
         experimentId: "flowlift_abctest_v1",
@@ -216,8 +216,6 @@ export const createUIElementsModal = (
         products: [],
     }, context.isMobileDevice);
     window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
-
-    console.log('showGentooButton', showGentooButton);
 
     // Create floating button
     if (showGentooButton) {
