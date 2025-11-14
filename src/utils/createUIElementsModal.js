@@ -86,7 +86,7 @@ export const createUIElementsModal = (
         player.style.width = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
         player.style.height = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
         player.style.cursor = 'pointer';
-        player.appendChild(document.createTextNode('\u200B'));
+        // player.appendChild(document.createTextNode('\u200B'));
 
         context.dotLottiePlayer = player;
     }
