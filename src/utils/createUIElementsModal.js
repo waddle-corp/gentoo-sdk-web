@@ -1,4 +1,4 @@
-import { postChatEventLog } from "../apis/chatConfig";
+import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
 import '../floating-sdk-cafe24-modal.css';
 
 // Separate UI creation into its own method for clarity
@@ -167,7 +167,39 @@ export const createUIElementsModal = (
     document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
+
+    // gentoo static parameters to iframe
+    context.iframe.contentWindow.postMessage({
+        type: "gentoo-statics",
+        contentData: {
+            experimentId: "flowlift_abctest_v1",
+            partnerId: context.partnerId,
+            variantId: "control",
+            sessionId: context.sessionId || "sess-test",
+            chatUserId: context.chatUserId,
+            userType: context.userType,
+            displayLocation: context.displayLocation,
+            deviceType: context.isMobileDevice ? "mobile" : "web",
+        }
+    }, "*");
+
     postChatEventLog({
+        experimentId: "flowlift_abctest_v1",
+        partnerId: context.partnerId,
+        variantId: "control",
+        sessionId: context.sessionId || "sess-test",
+        chatUserId: context.chatUserId,
+        userType: context.userType,
+        displayLocation: context.displayLocation,
+        deviceType: context.isMobileDevice ? "mobile" : "web",
+        timestamp: String(Date.now()),
+        eventCategory: "gentoo_displayed",
+        context: {
+            autoChatOpen: Boolean(context.bootConfig?.floating?.autoChatOpen),
+        },
+    });
+
+    postChatEventLogLegacy({
         eventCategory: "SDKFloatingRendered",
         partnerId: context.partnerId,
         chatUserId: context.chatUserId,

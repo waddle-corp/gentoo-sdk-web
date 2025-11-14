@@ -1,10 +1,11 @@
 import './floating-sdk-godomall.css';
-import { 
-    getChatbotData, 
-    postChatUserId, 
-    getBootConfig, 
-    getGodomallPartnerId, 
+import {
+    getChatbotData,
+    postChatUserId,
+    getBootConfig,
+    getGodomallPartnerId,
     postChatEventLog,
+    postChatEventLogLegacy,
     generateGuestUserToken
 } from './apis/chatConfig';
 
@@ -40,6 +41,7 @@ class FloatingButton {
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
+        this.userType;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -85,7 +87,7 @@ class FloatingButton {
                     window.removeEventListener('scroll', onScroll);
                 };
             })();
-            
+
             /* 고도몰 init process */
 
             this.godomallAPI = window.GodomallSDK.init(process.env.GODOMALL_SYSTEMKEY);
@@ -123,6 +125,7 @@ class FloatingButton {
 
                     // Handle both member and guest users
                     this.godomallUserId = memberProfile?.id || null;
+                    this.userType = memberProfile?.id ? "member" : "guest";
 
                     // 비회원이면 난수로 대체
                     if (!this.godomallUserId || this.godomallUserId.length === 0) {
@@ -338,7 +341,38 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
+        // gentoo static parameters to iframe
+        this.sendPostMessageHandler({
+            type: "gentoo-statics",
+            contentData: {
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: "control",
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+            }
+        });
+
         postChatEventLog({
+            experimentId: "flowlift_abctest_v1",
+            partnerId: this.partnerId,
+            variantId: "control",
+            sessionId: this.sessionId || "sess-test",
+            chatUserId: this.chatUserId,
+            userType: this.userType,
+            displayLocation: this.displayLocation,
+            deviceType: this.isMobileDevice ? "mobile" : "web",
+            timestamp: String(Date.now()),
+            eventCategory: "gentoo_displayed",
+            context: {
+                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+            },
+        });
+
+        postChatEventLogLegacy({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -380,18 +414,18 @@ class FloatingButton {
                 if (this.isSmallResolution) {
                     this.expandedButton.className =
                         this.useBootConfigFloatingImage ?
-                        `expanded-area-md expanded-area-neutral-md` :
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        `expanded-area-md` :
-                        `expanded-area-md expanded-area-neutral-md`;
+                            `expanded-area-md expanded-area-neutral-md` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                `expanded-area-md` :
+                                `expanded-area-md expanded-area-neutral-md`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
                     this.expandedButton.className =
                         this.useBootConfigFloatingImage ?
-                        `expanded-area expanded-area-neutral` :
-                        !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        `expanded-area` :
-                        `expanded-area expanded-area-neutral`;
+                            `expanded-area expanded-area-neutral` :
+                            !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                `expanded-area` :
+                                `expanded-area expanded-area-neutral`;
                     this.expandedText.className = `${this.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
                 this.expandedButtonWrapper.appendChild(this.expandedButton);
@@ -400,7 +434,7 @@ class FloatingButton {
                 // Double check if floatingContainer still exists before appending
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButtonWrapper);
-                    this.addLetter(this.bootConfig, this.expandedText, () =>this.isDestroyed);
+                    this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
 
                     setTimeout(() => {
                         if (
@@ -442,7 +476,7 @@ class FloatingButton {
             }, 100);
             setTimeout(() => {
                 this.openChat();
-                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: window?.location?.href});
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: window?.location?.href });
                 this.gentooSessionData.redirectState = false;
                 sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
             }, 500);
@@ -859,6 +893,23 @@ class FloatingButton {
 
     enableChat(mode) {
         postChatEventLog({
+            experimentId: "flowlift_abctest_v1",
+            partnerId: this.partnerId,
+            variantId: "control",
+            sessionId: this.sessionId || "sess-test",
+            chatUserId: this.chatUserId,
+            userType: this.userType,
+            displayLocation: this.displayLocation,
+            deviceType: this.isMobileDevice ? "mobile" : "web",
+            timestamp: String(Date.now()),
+            eventCategory: "gentoo_clicked",
+            context: {
+                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                floatingText: this.bootConfig?.floating?.button?.comment,
+            },
+        });
+
+        postChatEventLogLegacy({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -868,9 +919,9 @@ class FloatingButton {
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.bootConfig?.greeting?.comment && this.bootConfig.greeting.comment.length > 0) {
-            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment});
+            this.sendPostMessageHandler({ bootConfigGreetingComment: this.bootConfig.greeting.comment });
         }
-        
+
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
             if (this.button) this.button.className = "floating-button-common hide";

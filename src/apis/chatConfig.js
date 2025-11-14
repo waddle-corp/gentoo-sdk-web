@@ -122,11 +122,17 @@ export async function getGodomallPartnerId(mallId) {
 export async function postChatEventLog(payload, isMobileDevice) {
     try {
         const params = {
-            eventCategory: String(payload.eventCategory),
-            chatUserId: String(payload.chatUserId),
-            partnerId: String(payload.partnerId),
-            channelId: isMobileDevice ? "mobile" : "web",
-            products: payload?.products,
+            "experiment_id": String(payload.experimentId),
+            "partner_id": String(payload.partnerId),
+            "variant": String(payload.variantId) || 'control',
+            "session_id": String(payload.sessionId),
+            "user_id": String(payload.chatUserId),
+            "user_type": String(payload.userType) || 'guest',
+            "display_location": String(payload.displayLocation) || undefined,
+            "device_type": String(payload.deviceType) || undefined,
+            "timestamp": String(payload.timestamp),
+            "event_name": String(payload.eventCategory),
+            "context": payload?.context || undefined,
         };
 
         const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_CHATEVENT_ENDPOINT}/${payload.partnerId}`, {
@@ -140,7 +146,33 @@ export async function postChatEventLog(payload, isMobileDevice) {
         const res = await response.json(); // JSON 형태의 응답 데이터 파싱
         return res;
     } catch (error) {
-        console.error(`Error while calling logEvent API: ${error}`);
+        console.error(`Error while calling postChatEventLog API: ${error}`);
+    }
+}
+
+const postChatEventLogLegacy = async (payload) => {
+    try {
+        const params = {
+            eventCategory: String(payload.eventCategory),
+            chatUserId: String(payload.chatUserId),
+            partnerId: String(payload.partnerId),
+            channelId: isMobileDevice ? "mobile" : "web",
+            products: payload?.products,
+        }
+
+        const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_CHATEVENT_LEGACY_ENDPOINT}/${payload.partnerId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params),
+        });
+
+        const res = await response.json(); // JSON 형태의 응답 데이태 파싱
+        return res;
+    }
+    catch (error) {
+        console.error(`Error while calling postChatEventLogLegacy API: ${error}`);
     }
 }
 

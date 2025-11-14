@@ -35,6 +35,7 @@ class FloatingButton {
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.chatUserId = this.gentooSessionData?.cuid || null;
+        this.userType;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -48,7 +49,6 @@ class FloatingButton {
         this.warningActivated;
         this.floatingAvatar;
         this.floatingMessage;
-
         this.itemId = this.getProductNo();
         this.iframeHeightState;
         this.viewportInjected = false;
@@ -115,8 +115,10 @@ class FloatingButton {
                     .then(res => {
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
+                            this.userType = "member";
                         } else {
                             this.cafe24UserId = res.id['guest_id'];
+                            this.userType = "guest";
                         }
                         console.log('this.cafe24UserId', this.cafe24UserId);
 
@@ -203,7 +205,8 @@ class FloatingButton {
             this.isInitialized = true;
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-feat-seo-4727-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
@@ -703,6 +706,24 @@ class FloatingButton {
         this.sendButton?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
         this.sendButton?.addEventListener("click", (e) => {
             this.iframeContainer.style.height = "400px";
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: "control",
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_input_started",
+                context: {
+                    dialogueId: this.dialogueId,
+                    inputType: "manual_input",
+                    messageText: this.input.value,
+                    messageLength: this.input.value.length,
+                },
+            });
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
             this.openChat();
             this.input.value = "";
@@ -710,16 +731,31 @@ class FloatingButton {
         });
 
         // 예시 버튼 클릭 이벤트 추가
-        console.log('examFloatingGroup', this.examFloatingGroup);
         this.examFloatingGroup?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
         this.examFloatingGroup?.addEventListener("mousedown", () => { this.isInteractingWithSend = true; });
         this.examFloatingGroup?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
         this.examFloatingGroup.addEventListener("click", (e) => {
             const button = e.target.closest('.exam-floating-button');
-            console.log('button', button);
             if (button) {
-                console.log('button innerText', button.innerText);
                 this.iframeContainer.style.height = "400px";
+                postChatEventLog({
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: "control",
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    timestamp: String(Date.now()),
+                    eventCategory: "chat_input_started",
+                    context: {
+                        dialogueId: this.dialogueId,
+                        inputType: "example_click",
+                        messageText: button.innerText,
+                        messageLength: button.innerText.length,
+                    },
+                });
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: button.innerText });
                 this.openChat();
                 this.input.blur();
@@ -731,6 +767,24 @@ class FloatingButton {
             if (e.key === "Enter" || e.keyCode === 13) {
                 e.preventDefault(); // 기본 엔터 동작 방지
                 this.iframeContainer.style.height = "400px";
+                postChatEventLog({
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: "control",
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    timestamp: String(Date.now()),
+                    eventCategory: "chat_input_started",
+                    context: {
+                        dialogueId: this.dialogueId,
+                        inputType: "manual_input",
+                        messageText: this.input.value,
+                        messageLength: this.input.value.length,
+                    },
+                });
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
                 this.openChat();
                 this.input.value = "";
@@ -916,10 +970,46 @@ class FloatingButton {
                 [productObject],
                 (err, res) => {
                     if (err) {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: "control",
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: false,
+                                errorCode: err.code,
+                                path: "direct",
+                            }
+                        });
                         console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: "control",
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
                         resolve(res);
                     }
                 }
@@ -957,8 +1047,44 @@ class FloatingButton {
                     if (err) {
                         console.error('Failed to add product to cart:', err, res);
                         resolve(err);
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: "control",
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: false,
+                                errorCode: err.code,
+                                path: "with_options",
+                            }
+                        });
                         this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: "control",
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
                         this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
                         // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
                         if (!sessionStorage.getItem('gentoo_cart_added')) {
@@ -1100,6 +1226,23 @@ class FloatingButton {
 
     enableChat(mode) {
         postChatEventLog({
+            experimentId: "flowlift_abctest_v1",
+            partnerId: this.partnerId,
+            variantId: "control",
+            sessionId: this.sessionId || "sess-test",
+            chatUserId: this.chatUserId,
+            userType: this.userType,
+            displayLocation: this.displayLocation,
+            deviceType: this.isMobileDevice ? "mobile" : "web",
+            timestamp: String(Date.now()),
+            eventCategory: "gentoo_clicked",
+            context: {
+                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                floatingText: this.bootConfig?.floating?.button?.comment,
+            },
+        }, this.isMobileDevice);
+
+        postChatEventLogLegacy({
             eventCategory: 'SDKFloatingClicked',
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
