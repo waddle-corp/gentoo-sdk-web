@@ -150,7 +150,7 @@ export async function postChatEventLog(payload, isMobileDevice) {
     }
 }
 
-export const postChatEventLogLegacy = async (payload) => {
+export const postChatEventLogLegacy = async (payload, isMobileDevice) => {
     try {
         const params = {
             eventCategory: String(payload.eventCategory),

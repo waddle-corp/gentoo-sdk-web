@@ -1,6 +1,6 @@
 import '../global.css'
 import './floating-sdk-cafe24-modal.css';
-import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig, postChatEventLogLegacy } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 
 class FloatingButton {
