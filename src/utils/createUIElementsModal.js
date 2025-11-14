@@ -169,6 +169,16 @@ export const createUIElementsModal = (
 
 
     // gentoo static parameters to iframe
+    console.log('gentoo-statics', {
+        experimentId: "flowlift_abctest_v1",
+        partnerId: context.partnerId,
+        variantId: "control",
+        sessionId: context.sessionId || "sess-test",
+        chatUserId: context.chatUserId,
+        userType: context.userType,
+        displayLocation: context.displayLocation,
+        deviceType: context.isMobileDevice ? "mobile" : "web",
+    });
     context.iframe.contentWindow.postMessage({
         type: "gentoo-statics",
         contentData: {
