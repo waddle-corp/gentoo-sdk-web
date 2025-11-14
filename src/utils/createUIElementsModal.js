@@ -296,19 +296,21 @@ export const createUIElementsModal = (
     window.__GentooInited = 'created';
 
     // post message to iframe after all elements are created
-    context.sendPostMessageHandler({
-        messageType: "gentoo-statics",
-        contentData: {
-            experimentId: "flowlift_abctest_v1",
-            partnerId: context.partnerId,
-            variantId: "control",
-            sessionId: context.sessionId || "sess-test",
-            chatUserId: context.chatUserId,
-            userType: context.userType,
-            displayLocation: context.displayLocation,
-            deviceType: context.isMobileDevice ? "mobile" : "web",
-        }
-    });
+    setTimeout(() => {
+        context.sendPostMessageHandler({
+            messageType: "gentoo-statics",
+            contentData: {
+                experimentId: "flowlift_abctest_v1",
+                partnerId: context.partnerId,
+                variantId: "control",
+                sessionId: context.sessionId || "sess-test",
+                chatUserId: context.chatUserId,
+                userType: context.userType,
+                displayLocation: context.displayLocation,
+                deviceType: context.isMobileDevice ? "mobile" : "web",
+            }
+        });
+    }, 1000);
 }
 
 export const postMessageToIframe = (iframe, payload) => {
