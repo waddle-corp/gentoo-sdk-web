@@ -167,32 +167,6 @@ export const createUIElementsModal = (
     document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
-
-    // gentoo static parameters to iframe
-    console.log('gentoo-statics', {
-        experimentId: "flowlift_abctest_v1",
-        partnerId: context.partnerId,
-        variantId: "control",
-        sessionId: context.sessionId || "sess-test",
-        chatUserId: context.chatUserId,
-        userType: context.userType,
-        displayLocation: context.displayLocation,
-        deviceType: context.isMobileDevice ? "mobile" : "web",
-    });
-    context.sendPostMessageHandler({
-        messageType: "gentoo-statics",
-        contentData: {
-            experimentId: "flowlift_abctest_v1",
-            partnerId: context.partnerId,
-            variantId: "control",
-            sessionId: context.sessionId || "sess-test",
-            chatUserId: context.chatUserId,
-            userType: context.userType,
-            displayLocation: context.displayLocation,
-            deviceType: context.isMobileDevice ? "mobile" : "web",
-        }
-    });
-
     postChatEventLog({
         experimentId: "flowlift_abctest_v1",
         partnerId: context.partnerId,
@@ -320,6 +294,21 @@ export const createUIElementsModal = (
         }, 500);
     }
     window.__GentooInited = 'created';
+
+    // post message to iframe after all elements are created
+    context.sendPostMessageHandler({
+        messageType: "gentoo-statics",
+        contentData: {
+            experimentId: "flowlift_abctest_v1",
+            partnerId: context.partnerId,
+            variantId: "control",
+            sessionId: context.sessionId || "sess-test",
+            chatUserId: context.chatUserId,
+            userType: context.userType,
+            displayLocation: context.displayLocation,
+            deviceType: context.isMobileDevice ? "mobile" : "web",
+        }
+    });
 }
 
 export const postMessageToIframe = (iframe, payload) => {
