@@ -20,6 +20,7 @@ jobs:
           FILENAME=".env.${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
           echo "API_AUTH_CAFE24_ENDPOINT=${{ secrets.API_AUTH_CAFE24_ENDPOINT }}" >> $FILENAME
           echo "API_CHATEVENT_ENDPOINT=${{ secrets.API_CHATEVENT_ENDPOINT }}" >> $FILENAME
+          echo "API_CHATEVENT_LEGACY_ENDPOINT=${{ secrets.API_CHATEVENT_LEGACY_ENDPOINT }}" >> $FILENAME
           echo "API_CHATBOT_ENDPOINT=${{ secrets.API_CHATBOT_ENDPOINT }}" >> $FILENAME
           echo "API_FLOATING_ENDPOINT=${{ secrets.API_FLOATING_ENDPOINT }}" >> $FILENAME
           echo "API_PARTNERID_ENDPOINT=${{ secrets.API_PARTNERID_ENDPOINT }}" >> $FILENAME
