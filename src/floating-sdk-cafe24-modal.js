@@ -537,6 +537,7 @@ class FloatingButton {
 
         window?.addEventListener("message", (e) => {
             if (e.data.redirectState) {
+                console.log('[DEBUG] redirectState', e.data.redirectState);
                 if (!this.isSmallResolution) {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -554,6 +555,7 @@ class FloatingButton {
                 // this.enableChat("full");
             }
             if (e.data.resetState) {
+                console.log('[DEBUG] resetState', e.data.resetState);
                 if (this.isMobileDevice && this.iframeContainer) {
                     this.hideChat();
                     // open modal 로 묶어야 됨
@@ -567,6 +569,7 @@ class FloatingButton {
                         // this.examFloatingButton.classList.remove("hide");
                         this.sendButton.classList.remove("hide");
                         this.profileImage.classList.remove("hide");
+                        console.log('[DEBUG] dimmedBackground', this.dimmedBackground, this.dimmedBackground.classList);
                         if (this.dimmedBackground) this.dimmedBackground.classList.remove('hide');
                         if (this.expandedButton)
                             this.expandedButton.classList.add('hide');
@@ -1189,7 +1192,7 @@ class FloatingButton {
 
     handleMouseDown(e, iframe) {
         e.preventDefault();
-        iframe.classList.add("event-disabled");
+        // iframe.classList.add("event-disabled");
         const clientY = e.clientY; // Use clientY from mouse event
         if (!this.prevPosition) {
             this.prevPosition = clientY;
@@ -1211,7 +1214,7 @@ class FloatingButton {
 
     handleMouseUp(e, iframeContainer, iframe) {
         e.preventDefault();
-        iframe.classList.remove("event-disabled");
+        // iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
             iframeContainer.style.height = "99%";
             this.enableChat("shrink");

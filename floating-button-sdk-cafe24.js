@@ -316,7 +316,7 @@ class FloatingButton {
             player.style.height = this.isSmallResolution ? '68px' : this.floatingZoom ? '120px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
-            
+
             this.dotLottiePlayer = player;
         }
 
@@ -366,7 +366,7 @@ class FloatingButton {
 
         // gentoo static parameters to iframe
         this.sendPostMessageHandler({
-            type: "gentoo-statics",
+            messageType: "gentoo-statics",
             contentData: {
                 experimentId: "flowlift_abctest_v1",
                 partnerId: this.partnerId,
