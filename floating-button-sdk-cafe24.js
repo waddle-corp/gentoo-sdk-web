@@ -617,7 +617,21 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
+        this.closeActionArea?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href });
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_close_requested",
+            });
+        });
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         // this.testButton?.addEventListener("click", testButtonClickHandler);
@@ -963,10 +977,46 @@ class FloatingButton {
                 [productObject],
                 (err, res) => {
                     if (err) {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: false,
+                                errorCode: err.code,
+                                path: "direct",
+                            }
+                        });
                         console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
                         resolve(res);
                     }
                 }
