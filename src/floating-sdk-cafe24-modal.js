@@ -30,7 +30,13 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
-        this.variant = new URLSearchParams(window.location.search).get('variant');
+        this.variant = sessionStorage.getItem('gentoo-cafe24-variant');
+        if (!this.variant) {
+            var r = Math.floor(Math.random() * 2);
+            if (r === 0) this.variant = 'variantB';
+            else this.variant = 'variantC';
+            sessionStorage.setItem('gentoo-cafe24-variant', this.variant);
+        }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;

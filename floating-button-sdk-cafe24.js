@@ -25,7 +25,7 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
-        this.variant = new URLSearchParams(window.location.search).get('variant');
+        this.variant = 'control';
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
