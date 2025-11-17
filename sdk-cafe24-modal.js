@@ -20,7 +20,7 @@
             s.async = true; 
             // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
-            s.src = isMobile ? 'https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js' : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
+            s.src = isMobile ? 'https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js?variant=variantB' : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js'; // dev
             // s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})

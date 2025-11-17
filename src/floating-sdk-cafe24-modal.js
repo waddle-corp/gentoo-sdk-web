@@ -30,10 +30,17 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
+        this.variant = new URLSearchParams(window.location.search).get('variant');
+        console.log('this.variant', this.variant);
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        if (!this.gentooSessionData?.sessionId) {
+            this.gentooSessionData.sessionId = this.sessionId;
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        }
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.userType;
         this.displayLocation;
@@ -120,13 +127,11 @@ class FloatingButton {
                             this.cafe24UserId = res.id['guest_id'];
                             this.userType = "guest";
                         }
-                        console.log('this.cafe24UserId', this.cafe24UserId);
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
                         return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
                     })
                     .then(chatUserId => {
-                        console.log('chatUserId', chatUserId);
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -536,6 +541,7 @@ class FloatingButton {
         });
 
         window?.addEventListener("message", (e) => {
+            console.log('[DEBUG] message', e.data);
             if (e.data.redirectState) {
                 console.log('[DEBUG] redirectState', e.data.redirectState);
                 if (!this.isSmallResolution) {
@@ -555,7 +561,6 @@ class FloatingButton {
                 // this.enableChat("full");
             }
             if (e.data.resetState) {
-                console.log('[DEBUG] resetState', e.data.resetState);
                 if (this.isMobileDevice && this.iframeContainer) {
                     this.hideChat();
                     // open modal 로 묶어야 됨
@@ -569,7 +574,6 @@ class FloatingButton {
                         // this.examFloatingButton.classList.remove("hide");
                         this.sendButton.classList.remove("hide");
                         this.profileImage.classList.remove("hide");
-                        console.log('[DEBUG] dimmedBackground', this.dimmedBackground, this.dimmedBackground.classList);
                         if (this.dimmedBackground) this.dimmedBackground.classList.remove('hide');
                         if (this.expandedButton)
                             this.expandedButton.classList.add('hide');
@@ -596,7 +600,6 @@ class FloatingButton {
                 this.addProductToCart(e.data.addProductToCart);
             }
             if (e.data.addProductWithOptionsToCart) {
-                console.log('[sdk] Received addProductWithOptionsToCart event:', e.data.addProductWithOptionsToCart);
                 this.addProductWithOptionsToCart(e.data.addProductWithOptionsToCart);
             }
 
@@ -662,6 +665,18 @@ class FloatingButton {
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: "control",
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_close_requested",
+            });
             this.hideChat();
             this.redirectToCartPage();
             // add letter 관련 묶어야 됨
