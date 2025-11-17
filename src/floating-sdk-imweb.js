@@ -544,7 +544,32 @@ class FloatingButton {
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.floatingContainer?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href })
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "gentoo_clicked",
+                context: {
+                    autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                    floatingText: this.bootConfig?.floating?.button?.comment,
+                },
+            }, this.isMobileDevice);
+    
+            postChatEventLogLegacy({
+                eventCategory: 'SDKFloatingClicked',
+                partnerId: this.partnerId,
+                chatUserId: this.chatUserId,
+                products: [],
+            }, this.isMobileDevice);
+        });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
@@ -869,29 +894,6 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        postChatEventLog({
-            experimentId: "flowlift_abctest_v1",
-            partnerId: this.partnerId,
-            variantId: this.variant,
-            sessionId: this.sessionId || "sess-test",
-            chatUserId: this.chatUserId,
-            userType: this.userType,
-            displayLocation: this.displayLocation,
-            deviceType: this.isMobileDevice ? "mobile" : "web",
-            timestamp: String(Date.now()),
-            eventCategory: "gentoo_clicked",
-            context: {
-                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
-                floatingText: this.bootConfig?.floating?.button?.comment,
-            },
-        }, this.isMobileDevice);
-
-        postChatEventLogLegacy({
-            eventCategory: 'SDKFloatingClicked',
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
 
         this.sendPostMessageHandler({ enableMode: mode });
 
