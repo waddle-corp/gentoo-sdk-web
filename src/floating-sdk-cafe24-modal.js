@@ -1124,6 +1124,7 @@ class FloatingButton {
                         if (!sessionStorage.getItem('gentoo_cart_added')) {
                             sessionStorage.setItem('gentoo_cart_added', 'true');
                         }
+                        console.log('addedProductWithOptionsToCart', res);
                         resolve(res);
                     }
                 }
