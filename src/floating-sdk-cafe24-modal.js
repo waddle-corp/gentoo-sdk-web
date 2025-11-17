@@ -146,9 +146,6 @@ class FloatingButton {
                         ]);
                     })
                     .then(([chatbotData, floatingData, bootConfig]) => {
-                        console.log('chatbotData', chatbotData);
-                        console.log('floatingData', floatingData);
-                        console.log('bootConfig', bootConfig);
                         this.bootConfig = bootConfig;
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
@@ -413,7 +410,6 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            console.log('clicked element', e.target);
 
             // if (this.iframeContainer.classList.contains("iframe-container-hide")) {
             //     if (this.expandedButton)
@@ -543,9 +539,7 @@ class FloatingButton {
         });
 
         window?.addEventListener("message", (e) => {
-            console.log('[DEBUG] message', e.data);
             if (e.data.redirectState) {
-                console.log('[DEBUG] redirectState', e.data.redirectState);
                 if (!this.isSmallResolution) {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -652,7 +646,6 @@ class FloatingButton {
                 window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
             }
             if (e.data.type === 'messageExistence') {
-                console.log('messageExistence', e.data.messageExistenceState);
                 this.messageExistence = e.data.messageExistenceState;
                 sessionStorage.setItem('gentoo', JSON.stringify({ ...this.gentooSessionData, messageExistence: e.data.messageExistenceState }));
             }
@@ -1065,8 +1058,6 @@ class FloatingButton {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-
-        console.log('[sdk] productBulkObject', productBulkObject);
         /* 
         const addProductWithOptionsToCart = {
             productNo: productInfo.itemId,
@@ -1313,7 +1304,6 @@ class FloatingButton {
     }
 
     sendPostMessageHandler(payload) {
-        console.log('sendPostMessageHandler', payload);
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
