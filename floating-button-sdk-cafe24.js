@@ -373,21 +373,6 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        // gentoo static parameters to iframe
-        this.sendPostMessageHandler({
-            messageType: "gentoo-statics",
-            contentData: {
-                experimentId: "flowlift_abctest_v1",
-                partnerId: this.partnerId,
-                variantId: this.variant,
-                sessionId: this.sessionId || "sess-test",
-                chatUserId: this.chatUserId,
-                userType: this.userType,
-                displayLocation: this.displayLocation,
-                deviceType: this.isMobileDevice ? "mobile" : "web",
-            }
-        });
-
         this.logEventLegacy({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
@@ -527,6 +512,23 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+
+        setTimeout(() => {
+            // gentoo static parameters to iframe
+            this.sendPostMessageHandler({
+                messageType: "gentoo-statics",
+                contentData: {
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                }
+            });
+        }, 1000);
     }
 
     setupEventListeners(position) {
