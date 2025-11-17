@@ -75,7 +75,7 @@ class FloatingButton {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                logLegacy: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
             };
@@ -86,7 +86,7 @@ class FloatingButton {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
                 auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
+                logLegacy: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
             };
@@ -94,7 +94,7 @@ class FloatingButton {
             this.hostSrc = "https://demo.gentooai.com";
             this.domains = {
                 auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                logLegacy: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
             };
@@ -304,7 +304,7 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
         
-        this.logEvent({
+        this.logEventLegacy({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -712,7 +712,7 @@ class FloatingButton {
         this.pageList = pageList;
     }
 
-    async logEvent(payload) {
+    async logEventLegacy(payload) {
         try {
             const params = {
                 eventCategory: String(payload.eventCategory),
@@ -722,7 +722,7 @@ class FloatingButton {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${this.domains.logLegacy}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -921,7 +921,7 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        this.logEvent({
+        this.logEventLegacy({
             eventCategory: "SDKFloatingClicked",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -991,7 +991,7 @@ class FloatingButton {
                 products: input.products,
             };
 
-            return this.logEvent(payload);
+            return this.logEventLegacy(payload);
         } catch (error) {
             console.error("Failed to send log:", error);
             throw error;

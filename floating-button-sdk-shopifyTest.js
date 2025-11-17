@@ -401,7 +401,7 @@ class FloatingButton {
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
         
         if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
-            const player = document.createElement('dotlottie-player');
+            const player = document.createElement('dotlottie-wc');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
             player.setAttribute('mode', 'normal');
@@ -1089,7 +1089,7 @@ class FloatingButton {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.type = 'module';
-            script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
+            script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js';
             script.onload = () => {
                 resolve();
             };

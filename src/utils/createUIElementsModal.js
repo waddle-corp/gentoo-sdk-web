@@ -1,4 +1,4 @@
-import { postChatEventLog } from "../apis/chatConfig";
+import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
 import '../floating-sdk-cafe24-modal.css';
 
 // Separate UI creation into its own method for clarity
@@ -168,6 +168,22 @@ export const createUIElementsModal = (
     document.body.appendChild(context.iframeContainer);
 
     postChatEventLog({
+        experimentId: "flowlift_abctest_v1",
+        partnerId: context.partnerId,
+        variantId: context.variant,
+        sessionId: context.sessionId || "sess-test",
+        chatUserId: context.chatUserId,
+        userType: context.userType,
+        displayLocation: context.displayLocation,
+        deviceType: context.isMobileDevice ? "mobile" : "web",
+        timestamp: String(Date.now()),
+        eventCategory: "gentoo_displayed",
+        context: {
+            autoChatOpen: Boolean(context.bootConfig?.floating?.autoChatOpen),
+        },
+    });
+
+    postChatEventLogLegacy({
         eventCategory: "SDKFloatingRendered",
         partnerId: context.partnerId,
         chatUserId: context.chatUserId,
@@ -278,6 +294,23 @@ export const createUIElementsModal = (
         }, 500);
     }
     window.__GentooInited = 'created';
+
+    // post message to iframe after all elements are created
+    setTimeout(() => {
+        context.sendPostMessageHandler({
+            messageType: "gentoo-statics",
+            contentData: {
+                experimentId: "flowlift_abctest_v1",
+                partnerId: context.partnerId,
+                variantId: context.variant,
+                sessionId: context.sessionId || "sess-test",
+                chatUserId: context.chatUserId,
+                userType: context.userType,
+                displayLocation: context.displayLocation,
+                deviceType: context.isMobileDevice ? "mobile" : "web",
+            }
+        });
+    }, 1000);
 }
 
 export const postMessageToIframe = (iframe, payload) => {

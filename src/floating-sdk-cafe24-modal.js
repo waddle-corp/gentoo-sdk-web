@@ -1,6 +1,6 @@
 import '../global.css'
 import './floating-sdk-cafe24-modal.css';
-import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig } from './apis/chatConfig';
+import { getChatbotData, postChatUserId, getFloatingData, getPartnerId, postChatEventLog, getBootConfig, postChatEventLogLegacy } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 
 class FloatingButton {
@@ -30,11 +30,24 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
+        this.variant = sessionStorage.getItem('gentoo-cafe24-variant');
+        if (!this.variant) {
+            var r = Math.floor(Math.random() * 2);
+            if (r === 0) this.variant = 'variantB';
+            else this.variant = 'variantC';
+            sessionStorage.setItem('gentoo-cafe24-variant', this.variant);
+        }
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        if (!this.gentooSessionData?.sessionId) {
+            this.gentooSessionData.sessionId = this.sessionId;
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        }
         this.chatUserId = this.gentooSessionData?.cuid || null;
+        this.userType;
         this.displayLocation;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
@@ -48,15 +61,11 @@ class FloatingButton {
         this.warningActivated;
         this.floatingAvatar;
         this.floatingMessage;
-
         this.itemId = this.getProductNo();
         this.iframeHeightState;
         this.viewportInjected = false;
         this.originalViewport = null;
         this.isInteractingWithSend = false;
-
-        // FlowLift Project: 장바구니 담기 UX 결정 -> Variant B(one-click add to cart), Variant C (option selectable add to cart)
-        this.addProductToCartVariant = this.getOrSetAddToCartVariant(); 
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -115,16 +124,16 @@ class FloatingButton {
                     .then(res => {
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
+                            this.userType = "member";
                         } else {
                             this.cafe24UserId = res.id['guest_id'];
+                            this.userType = "guest";
                         }
-                        console.log('this.cafe24UserId', this.cafe24UserId);
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
                         return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
                     })
                     .then(chatUserId => {
-                        console.log('chatUserId', chatUserId);
                         this.chatUserId = chatUserId;
                         this.gentooSessionData.cuid = chatUserId;
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
@@ -137,9 +146,6 @@ class FloatingButton {
                         ]);
                     })
                     .then(([chatbotData, floatingData, bootConfig]) => {
-                        console.log('chatbotData', chatbotData);
-                        console.log('floatingData', floatingData);
-                        console.log('bootConfig', bootConfig);
                         this.bootConfig = bootConfig;
                         this.chatbotData = chatbotData;
                         this.floatingData = floatingData;
@@ -203,7 +209,8 @@ class FloatingButton {
             this.isInitialized = true;
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `https://accio-webclient-git-feat-seo-4727-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
@@ -403,7 +410,6 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            console.log('clicked element', e.target);
 
             // if (this.iframeContainer.classList.contains("iframe-container-hide")) {
             //     if (this.expandedButton)
@@ -590,7 +596,6 @@ class FloatingButton {
                 this.addProductToCart(e.data.addProductToCart);
             }
             if (e.data.addProductWithOptionsToCart) {
-                console.log('[sdk] Received addProductWithOptionsToCart event:', e.data.addProductWithOptionsToCart);
                 this.addProductWithOptionsToCart(e.data.addProductWithOptionsToCart);
             }
 
@@ -641,7 +646,6 @@ class FloatingButton {
                 window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
             }
             if (e.data.type === 'messageExistence') {
-                console.log('messageExistence', e.data.messageExistenceState);
                 this.messageExistence = e.data.messageExistenceState;
                 sessionStorage.setItem('gentoo', JSON.stringify({ ...this.gentooSessionData, messageExistence: e.data.messageExistenceState }));
             }
@@ -651,11 +655,46 @@ class FloatingButton {
         this.floatingContainer?.addEventListener("click", (e) => {
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
             window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick', floatingMessage: this.floatingMessage });
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "gentoo_clicked",
+                context: {
+                    autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                    floatingText: this.bootConfig?.floating?.button?.comment,
+                },
+            }, this.isMobileDevice);
+    
+            postChatEventLogLegacy({
+                eventCategory: 'SDKFloatingClicked',
+                partnerId: this.partnerId,
+                chatUserId: this.chatUserId,
+                products: [],
+            }, this.isMobileDevice);
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_close_requested",
+            });
             this.hideChat();
             this.redirectToCartPage();
             // add letter 관련 묶어야 됨
@@ -703,6 +742,24 @@ class FloatingButton {
         this.sendButton?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
         this.sendButton?.addEventListener("click", (e) => {
             this.iframeContainer.style.height = "400px";
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_input_started",
+                context: {
+                    dialogueId: this.dialogueId,
+                    inputType: "manual_input",
+                    messageText: this.input.value,
+                    messageLength: this.input.value.length,
+                },
+            });
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
             this.openChat();
             this.input.value = "";
@@ -710,16 +767,31 @@ class FloatingButton {
         });
 
         // 예시 버튼 클릭 이벤트 추가
-        console.log('examFloatingGroup', this.examFloatingGroup);
         this.examFloatingGroup?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
         this.examFloatingGroup?.addEventListener("mousedown", () => { this.isInteractingWithSend = true; });
         this.examFloatingGroup?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
         this.examFloatingGroup.addEventListener("click", (e) => {
             const button = e.target.closest('.exam-floating-button');
-            console.log('button', button);
             if (button) {
-                console.log('button innerText', button.innerText);
                 this.iframeContainer.style.height = "400px";
+                postChatEventLog({
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    timestamp: String(Date.now()),
+                    eventCategory: "chat_input_started",
+                    context: {
+                        dialogueId: this.dialogueId,
+                        inputType: "example_click",
+                        messageText: button.innerText,
+                        messageLength: button.innerText.length,
+                    },
+                });
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: button.innerText });
                 this.openChat();
                 this.input.blur();
@@ -731,6 +803,24 @@ class FloatingButton {
             if (e.key === "Enter" || e.keyCode === 13) {
                 e.preventDefault(); // 기본 엔터 동작 방지
                 this.iframeContainer.style.height = "400px";
+                postChatEventLog({
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    timestamp: String(Date.now()),
+                    eventCategory: "chat_input_started",
+                    context: {
+                        dialogueId: this.dialogueId,
+                        inputType: "manual_input",
+                        messageText: this.input.value,
+                        messageLength: this.input.value.length,
+                    },
+                });
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: this.input.value });
                 this.openChat();
                 this.input.value = "";
@@ -916,10 +1006,46 @@ class FloatingButton {
                 [productObject],
                 (err, res) => {
                     if (err) {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: false,
+                                errorCode: err.code,
+                                path: "direct",
+                            }
+                        });
                         console.error('Failed to add product to cart:', err);
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
                         resolve(res);
                     }
                 }
@@ -932,8 +1058,6 @@ class FloatingButton {
             console.error('CAFE24API is not initialized yet');
             return;
         }
-
-        console.log('[sdk] productBulkObject', productBulkObject);
         /* 
         const addProductWithOptionsToCart = {
             productNo: productInfo.itemId,
@@ -957,8 +1081,44 @@ class FloatingButton {
                     if (err) {
                         console.error('Failed to add product to cart:', err, res);
                         resolve(err);
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: false,
+                                errorCode: err.code,
+                                path: "with_options",
+                            }
+                        });
                         this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
                         this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
                         // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
                         if (!sessionStorage.getItem('gentoo_cart_added')) {
@@ -976,7 +1136,7 @@ class FloatingButton {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.type = 'module';
-            script.src = 'https://unpkg.com/@dotlottie/player-component@2.3.0/dist/dotlottie-player.mjs';
+            script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js';
             script.onload = () => {
                 resolve();
             };
@@ -1063,7 +1223,7 @@ class FloatingButton {
 
     handleMouseDown(e, iframe) {
         e.preventDefault();
-        iframe.classList.add("event-disabled");
+        // iframe.classList.add("event-disabled");
         const clientY = e.clientY; // Use clientY from mouse event
         if (!this.prevPosition) {
             this.prevPosition = clientY;
@@ -1085,7 +1245,7 @@ class FloatingButton {
 
     handleMouseUp(e, iframeContainer, iframe) {
         e.preventDefault();
-        iframe.classList.remove("event-disabled");
+        // iframe.classList.remove("event-disabled");
         if (this.scrollDir === "up") {
             iframeContainer.style.height = "99%";
             this.enableChat("shrink");
@@ -1099,13 +1259,6 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        postChatEventLog({
-            eventCategory: 'SDKFloatingClicked',
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
-
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
@@ -1293,39 +1446,6 @@ class FloatingButton {
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
-        }
-    }
-
-    /**
-     * 장바구니 담기 Variant를 가져오거나 설정합니다.
-     * Session Storage에 저장된 값이 있으면 사용하고,
-     * 없으면 50% 확률로 'B' 또는 'C'를 할당하여 저장합니다.
-     * 
-     * @returns {string} 'B' 또는 'C' variant 값
-     */
-    getOrSetAddToCartVariant() {
-        const STORAGE_KEY = 'gentoo_addToCartVariant';
-        
-        try {
-            // 1. Session Storage에서 기존 값 확인
-            const storedVariant = sessionStorage.getItem(STORAGE_KEY);
-            
-            if (storedVariant === 'B' || storedVariant === 'C') {
-                console.log(`[FlowLift] Using stored variant: ${storedVariant}`);
-                return storedVariant;
-            }
-            
-            // 2. 저장된 값이 없으면 50% 확률로 B 또는 C 할당
-            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
-            sessionStorage.setItem(STORAGE_KEY, randomVariant);
-            console.log(`[FlowLift] Assigned new variant: ${randomVariant}`);
-            
-            return randomVariant;
-        } catch (error) {
-            // Session Storage 접근 실패 시 새로 부여
-            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
-            sessionStorage.setItem(STORAGE_KEY, randomVariant);
-            return randomVariant;
         }
     }
 }

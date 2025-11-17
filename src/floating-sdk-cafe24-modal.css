@@ -616,7 +616,7 @@
 }
 
 .slide-up {
-    transform: translateY(0);
+    transform: none;
     transition: all 0.5s ease;
 }
 
