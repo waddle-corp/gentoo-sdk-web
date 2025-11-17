@@ -27,21 +27,21 @@
                     // 0:control, 1:variantA, 2:variantB
                     var r = Math.floor(Math.random() * 3);
                     if (r === 0) variant = 'control';
-                    else if (r === 1) variant = 'variantA';
-                    else variant = 'variantB';
+                    else if (r === 1) variant = 'variantB';
+                    else variant = 'variantC';
                     sessionStorage.setItem(variantKey, variant);
                 }
             } catch (e) {
                 // 세션스토리지 접근 실패시 fallback (임시, 랜덤)
                 var r = Math.floor(Math.random() * 3);
                 if (r === 0) variant = 'control';
-                else if (r === 1) variant = 'variantA';
-                else variant = 'variantB';
+                else if (r === 1) variant = 'variantB';
+                else variant = 'variantC';
             }
             // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = isMobile ? (
-                variant === 'control' ? 'https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js?variant=control' : (
+                variant === 'control' ? 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js?variant=control' : (
                     `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js?variant=${variant}`
                 )
             ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';

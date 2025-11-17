@@ -61,9 +61,6 @@ class FloatingButton {
         this.originalViewport = null;
         this.isInteractingWithSend = false;
 
-        // FlowLift Project: 장바구니 담기 UX 결정 -> Variant B(one-click add to cart), Variant C (option selectable add to cart)
-        this.addProductToCartVariant = this.getOrSetAddToCartVariant(); 
-
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
             const ref = document.referrer;
@@ -210,7 +207,7 @@ class FloatingButton {
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://accio-webclient-git-feat-seo-4727-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.addProductToCartVariant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-feat-seo-4727-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
@@ -690,7 +687,7 @@ class FloatingButton {
             postChatEventLog({
                 experimentId: "flowlift_abctest_v1",
                 partnerId: this.partnerId,
-                variantId: "control",
+                variantId: this.variant,
                 sessionId: this.sessionId || "sess-test",
                 chatUserId: this.chatUserId,
                 userType: this.userType,
@@ -1453,39 +1450,6 @@ class FloatingButton {
         } catch (error) {
             console.error('Invalid URL:', error);
             return null;
-        }
-    }
-
-    /**
-     * 장바구니 담기 Variant를 가져오거나 설정합니다.
-     * Session Storage에 저장된 값이 있으면 사용하고,
-     * 없으면 50% 확률로 'B' 또는 'C'를 할당하여 저장합니다.
-     * 
-     * @returns {string} 'B' 또는 'C' variant 값
-     */
-    getOrSetAddToCartVariant() {
-        const STORAGE_KEY = 'gentoo_addToCartVariant';
-        
-        try {
-            // 1. Session Storage에서 기존 값 확인
-            const storedVariant = sessionStorage.getItem(STORAGE_KEY);
-            
-            if (storedVariant === 'B' || storedVariant === 'C') {
-                console.log(`[FlowLift] Using stored variant: ${storedVariant}`);
-                return storedVariant;
-            }
-            
-            // 2. 저장된 값이 없으면 50% 확률로 B 또는 C 할당
-            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
-            sessionStorage.setItem(STORAGE_KEY, randomVariant);
-            console.log(`[FlowLift] Assigned new variant: ${randomVariant}`);
-            
-            return randomVariant;
-        } catch (error) {
-            // Session Storage 접근 실패 시 새로 부여
-            const randomVariant = Math.random() < 0.5 ? 'B' : 'C';
-            sessionStorage.setItem(STORAGE_KEY, randomVariant);
-            return randomVariant;
         }
     }
 }
