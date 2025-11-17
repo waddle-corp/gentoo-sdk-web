@@ -1102,7 +1102,7 @@ class FloatingButton {
                         this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
                         // err 없이 res 안에 error 가 있는 케이스 처리
-                        const errorCode = res?.error?.[0]?.code || res?.error?.code;
+                        const errorCode = res?.errors?.[0]?.code || res?.errors?.code;
                         if (errorCode) {
                             console.error('Failed to add product to cart:', res);
                             resolve(res);
