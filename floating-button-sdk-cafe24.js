@@ -25,10 +25,16 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
+        this.variant = new URLSearchParams(window.location.search).get('variant');
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        if (!this.gentooSessionData?.sessionId) {
+            this.gentooSessionData.sessionId = this.sessionId;
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        }
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.userType;
         this.displayLocation;
@@ -370,7 +376,7 @@ class FloatingButton {
             contentData: {
                 experimentId: "flowlift_abctest_v1",
                 partnerId: this.partnerId,
-                variantId: "control",
+                variantId: this.variant,
                 sessionId: this.sessionId || "sess-test",
                 chatUserId: this.chatUserId,
                 userType: this.userType,
@@ -389,7 +395,7 @@ class FloatingButton {
         this.logEvent({
             experimentId: "flowlift_abctest_v1",
             partnerId: this.partnerId,
-            variantId: "control",
+            variantId: this.variant,
             sessionId: this.sessionId || "sess-test",
             chatUserId: this.chatUserId,
             userType: this.userType,
@@ -798,7 +804,7 @@ class FloatingButton {
             const params = {
                 "experiment_id": String(payload.experimentId),
                 "partner_id": String(payload.partnerId),
-                "variant": String(payload.variantId) || 'control',
+                "variant": String(payload.variantId),
                 "session_id": String(payload.sessionId),
                 "user_id": String(payload.chatUserId),
                 "user_type": String(payload.userType) || 'guest',
@@ -1106,7 +1112,7 @@ class FloatingButton {
         this.logEvent({
             experimentId: "flowlift_abctest_v1",
             partnerId: this.partnerId,
-            variantId: "control",
+            variantId: this.variant,
             sessionId: this.sessionId || "sess-test",
             chatUserId: this.chatUserId,
             userType: this.userType,

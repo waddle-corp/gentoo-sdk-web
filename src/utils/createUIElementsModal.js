@@ -170,7 +170,7 @@ export const createUIElementsModal = (
     postChatEventLog({
         experimentId: "flowlift_abctest_v1",
         partnerId: context.partnerId,
-        variantId: "control",
+        variantId: context.variant,
         sessionId: context.sessionId || "sess-test",
         chatUserId: context.chatUserId,
         userType: context.userType,
@@ -302,7 +302,7 @@ export const createUIElementsModal = (
             contentData: {
                 experimentId: "flowlift_abctest_v1",
                 partnerId: context.partnerId,
-                variantId: "control",
+                variantId: context.variant,
                 sessionId: context.sessionId || "sess-test",
                 chatUserId: context.chatUserId,
                 userType: context.userType,
