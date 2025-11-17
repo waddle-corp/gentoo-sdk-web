@@ -1101,6 +1101,32 @@ class FloatingButton {
                         });
                         this.sendPostMessageHandler({ addProductToCartFailed: true });
                     } else {
+                        // err 없이 res 안에 error 가 있는 케이스 처리
+                        const errorCode = res?.error?.[0]?.code || res?.error?.code;
+                        if (errorCode) {
+                            console.error('Failed to add product to cart:', res);
+                            resolve(res);
+                            postChatEventLog({
+                                experimentId: "flowlift_abctest_v1",
+                                partnerId: this.partnerId,
+                                variantId: this.variant,
+                                sessionId: this.sessionId || "sess-test",
+                                chatUserId: this.chatUserId,
+                                userType: this.userType,
+                                displayLocation: this.displayLocation,
+                                deviceType: this.isMobileDevice ? "mobile" : "web",
+                                timestamp: String(Date.now()),
+                                eventCategory: "chat_add_to_cart_completed",
+                                context: {
+                                    productId: productBulkObject.productNo,
+                                    success: false,
+                                    errorCode: errorCode,
+                                    path: "with_options",
+                                }
+                            });
+                            this.sendPostMessageHandler({ addProductToCartFailed: true });
+                            return;
+                        }
                         postChatEventLog({
                             experimentId: "flowlift_abctest_v1",
                             partnerId: this.partnerId,
