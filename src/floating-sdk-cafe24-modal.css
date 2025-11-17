@@ -212,6 +212,24 @@
     -webkit-box-orient: vertical;
 }
 
+.expanded-area-text-zoom-md {
+    font-family: "pretendard";
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 17px;
+    letter-spacing: -0.35px;
+    margin: 0;
+    width: fit-content;
+    max-width: 160px;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    white-space: pre-wrap;
+    -webkit-line-clamp: 3; 
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
 .expanded-area-text-md {
     font-family: "pretendard";
     font-size: 12px;
