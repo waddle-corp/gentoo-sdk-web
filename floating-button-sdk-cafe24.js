@@ -649,7 +649,7 @@ class FloatingButton {
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
             this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href });
-            postChatEventLog({
+            this.logEvent({
                 experimentId: "flowlift_abctest_v1",
                 partnerId: this.partnerId,
                 variantId: this.variant,
@@ -1007,7 +1007,7 @@ class FloatingButton {
                 [productObject],
                 (err, res) => {
                     if (err) {
-                        postChatEventLog({
+                        this.logEvent({
                             experimentId: "flowlift_abctest_v1",
                             partnerId: this.partnerId,
                             variantId: this.variant,
@@ -1029,7 +1029,7 @@ class FloatingButton {
                         reject(err);
                     } else {
                         this.sendPostMessageHandler({ addedProductToCart: true });
-                        postChatEventLog({
+                        this.logEvent({
                             experimentId: "flowlift_abctest_v1",
                             partnerId: this.partnerId,
                             variantId: this.variant,
