@@ -487,6 +487,7 @@ class FloatingButton {
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.customFloatingImage || this.floatingData.imageUrl})`;
+            this.button.appendChild(document.createTextNode('\u200B'));
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
