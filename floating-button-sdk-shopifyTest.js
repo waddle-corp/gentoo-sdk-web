@@ -370,7 +370,8 @@ class FloatingButton {
             return;
         }
 
-        if (!this.floatingData || !this.floatingData.imageUrl) {
+        // customFloatingImage가 있으면 floatingData.imageUrl이 없어도 진행 가능
+        if (!this.floatingData || (!this.customFloatingImage && !this.floatingData.imageUrl)) {
             console.error("Floating data is incomplete");
             return;
         }
