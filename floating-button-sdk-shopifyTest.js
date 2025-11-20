@@ -70,6 +70,12 @@ class FloatingButton {
         this.warningActivated;
         this.floatingData;
         this.floatingAvatar;
+        // 테스트용 커스텀 플로팅 이미지
+        if (window.location.hostname === '7tmeab-ia.myshopify.com') {
+            this.customFloatingImage = 'https://gentoo-public.s3.ap-northeast-2.amazonaws.com/gentoo-floating-parts.png';
+        } else {
+            this.customFloatingImage = null;
+        }
         this.pageList = [];
         this.eventCallback = {
             show: null,
@@ -399,8 +405,8 @@ class FloatingButton {
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
-        
-        if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
+
+        if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
             const player = document.createElement('dotlottie-wc');
             player.setAttribute('autoplay', '');
             player.setAttribute('loop', '');
@@ -410,7 +416,7 @@ class FloatingButton {
             player.style.height = this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
-            
+
             this.dotLottiePlayer = player;
         }
 
@@ -480,7 +486,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common button-image`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            this.button.style.backgroundImage = `url(${this.customFloatingImage || this.floatingData.imageUrl})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
@@ -699,7 +705,7 @@ class FloatingButton {
                     } else {
                         this.button.className = "floating-button-common button-image";
                     }
-                    this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+                    this.button.style.backgroundImage = `url(${this.customFloatingImage || this.floatingData.imageUrl})`;
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
@@ -806,7 +812,7 @@ class FloatingButton {
             e.preventDefault();
             this.dimmedBackground.className = "dimmed-background hide";
             this.hideChat();
-            if (this.button) this.button.style.backgroundImage = `url(${this.floatingData.imageUrl})`;
+            if (this.button) this.button.style.backgroundImage = `url(${this.customFloatingImage || this.floatingData.imageUrl})`;
         });
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
