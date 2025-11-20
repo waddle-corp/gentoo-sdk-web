@@ -59,6 +59,9 @@ class FloatingButton {
         this.warningMessage;
         this.warningActivated;
         this.floatingAvatar;
+        this.isDraggingFloating = false;
+        this._dragMoved = false;
+        this._dragStart = { x: 0, y: 0, right: 0, bottom: 0 };
 
         this.itemId = this.getProductNo();
         this.iframeHeightState;
@@ -393,7 +396,24 @@ class FloatingButton {
             this.floatingContainer.className = `floating-container`;
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
 
-            this.updateFloatingContainerPosition(position); // Set initial position
+            // Merge stored position (session) with provided/default position
+            const storedFloatingPosition = this.gentooSessionData?.floatingPosition || {};
+            let initialPosition = position ? JSON.parse(JSON.stringify(position)) : {};
+            if (!initialPosition.web) initialPosition.web = {};
+            if (!initialPosition.mobile) initialPosition.mobile = {};
+            if (this.isSmallResolution) {
+                if (storedFloatingPosition?.mobile) {
+                    if (typeof storedFloatingPosition.mobile.bottom === 'number') initialPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
+                    if (typeof storedFloatingPosition.mobile.right === 'number') initialPosition.mobile.right = storedFloatingPosition.mobile.right;
+                }
+            } else {
+                if (storedFloatingPosition?.web) {
+                    if (typeof storedFloatingPosition.web.bottom === 'number') initialPosition.web.bottom = storedFloatingPosition.web.bottom;
+                    if (typeof storedFloatingPosition.web.right === 'number') initialPosition.web.right = storedFloatingPosition.web.right;
+                }
+            }
+
+            this.updateFloatingContainerPosition(initialPosition); // Set initial position
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
@@ -470,7 +490,23 @@ class FloatingButton {
         }
 
         // Add event listeners
-        this.setupEventListeners(position, isCustomButton);
+        // Pass initialPosition (with stored overrides) to listeners
+        const storedFloatingPosition = this.gentooSessionData?.floatingPosition || {};
+        let initialPosition = position ? JSON.parse(JSON.stringify(position)) : {};
+        if (!initialPosition.web) initialPosition.web = {};
+        if (!initialPosition.mobile) initialPosition.mobile = {};
+        if (this.isSmallResolution) {
+            if (storedFloatingPosition?.mobile) {
+                if (typeof storedFloatingPosition.mobile.bottom === 'number') initialPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
+                if (typeof storedFloatingPosition.mobile.right === 'number') initialPosition.mobile.right = storedFloatingPosition.mobile.right;
+            }
+        } else {
+            if (storedFloatingPosition?.web) {
+                if (typeof storedFloatingPosition.web.bottom === 'number') initialPosition.web.bottom = storedFloatingPosition.web.bottom;
+                if (typeof storedFloatingPosition.web.right === 'number') initialPosition.web.right = storedFloatingPosition.web.right;
+            }
+        }
+        this.setupEventListeners(initialPosition, isCustomButton);
         if (this.gentooSessionData?.redirectState) {
             setTimeout(() => {
                 if (this.expandedButtonWrapper)
@@ -497,6 +533,10 @@ class FloatingButton {
         var buttonClickHandler = (e) => {
             e.stopPropagation();
             e.preventDefault();
+            if (this.isDraggingFloating || this._dragMoved) {
+                // Suppress click when drag just happened
+                return;
+            }
             this.floatingClicked = true;
 
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
@@ -609,6 +649,63 @@ class FloatingButton {
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         // this.testButton?.addEventListener("click", testButtonClickHandler);
+
+        // Mobile touch-drag for floatingContainer
+        const onTouchStart = (e) => {
+            if (!this.isSmallResolution || !this.floatingContainer) return;
+            const touch = e.touches && e.touches[0];
+            if (!touch) return;
+            const cs = window.getComputedStyle(this.floatingContainer);
+            const right = parseFloat(cs.right) || 0;
+            const bottom = parseFloat(cs.bottom) || 0;
+            this._dragStart = { x: touch.clientX, y: touch.clientY, right, bottom };
+            this._dragMoved = false;
+        };
+        const onTouchMove = (e) => {
+            if (!this.isSmallResolution || !this.floatingContainer) return;
+            const touch = e.touches && e.touches[0];
+            if (!touch) return;
+            this.isDraggingFloating = true;
+            this._dragMoved = true;
+            // Prevent page scroll while dragging
+            e.preventDefault();
+            const dx = this._dragStart.x - touch.clientX;
+            const dy = this._dragStart.y - touch.clientY;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const rect = this.floatingContainer.getBoundingClientRect();
+            const cw = rect.width;
+            const ch = rect.height;
+            const maxRight = Math.max(vw - cw, 0);
+            const maxBottom = Math.max(vh - ch, 0);
+            let newRight = this._dragStart.right + dx;
+            let newBottom = this._dragStart.bottom + dy;
+            newRight = Math.min(Math.max(newRight, 0), maxRight);
+            newBottom = Math.min(Math.max(newBottom, 0), maxBottom);
+            this.floatingContainer.style.right = `${Math.round(newRight)}px`;
+            this.floatingContainer.style.bottom = `${Math.round(newBottom)}px`;
+            // Persist to position object and session
+            position.mobile = position.mobile || {};
+            position.mobile.right = Math.round(newRight);
+            position.mobile.bottom = Math.round(newBottom);
+            this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || this.gentooSessionData || {};
+            this.gentooSessionData.floatingPosition = this.gentooSessionData.floatingPosition || {};
+            this.gentooSessionData.floatingPosition.mobile = { right: position.mobile.right, bottom: position.mobile.bottom };
+            sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        };
+        const onTouchEnd = (e) => {
+            if (!this.isSmallResolution) return;
+            if (this._dragMoved) {
+                e.preventDefault();
+            }
+            this.isDraggingFloating = false;
+            this._dragMoved = false;
+        };
+        this.floatingContainer?.addEventListener("touchstart", onTouchStart, { passive: true });
+        this.floatingContainer?.addEventListener("touchmove", onTouchMove, { passive: false });
+        this.floatingContainer?.addEventListener("touchend", onTouchEnd);
+        this.floatingContainer?.addEventListener("touchcancel", onTouchEnd);
+
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
             this.browserWidth = this.logWindowWidth();
@@ -637,6 +734,7 @@ class FloatingButton {
     }
 
     openChat() {
+        if (this.isDraggingFloating) return;
         // Inject viewport meta tag to block ios zoom in
         this.injectViewport();
         // Chat being visible
@@ -925,6 +1023,7 @@ class FloatingButton {
     }
 
     enableChat(mode) {
+        if (this.isDraggingFloating) return;
 
         this.sendPostMessageHandler({ enableMode: mode });
 
