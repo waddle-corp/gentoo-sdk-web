@@ -70,9 +70,9 @@ class FloatingButton {
         this.warningActivated;
         this.floatingData;
         this.floatingAvatar;
-        // 테스트용 커스텀 플로팅 이미지
-        if (window.location.hostname === '7tmeab-ia.myshopify.com') {
-            this.customFloatingImage = 'https://gentoo-public.s3.ap-northeast-2.amazonaws.com/gentoo-floating-parts.png';
+        // dualtronusa 전용 커스텀 플로팅 이미지
+        if (window.location.hostname === 'dualtronusa.com') {
+            this.customFloatingImage = 'https://gentoo-public.s3.ap-northeast-2.amazonaws.com/gentoo-floating-parts-small.png';
         } else {
             this.customFloatingImage = null;
         }
