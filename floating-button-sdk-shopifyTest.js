@@ -70,11 +70,10 @@ class FloatingButton {
         this.warningActivated;
         this.floatingData;
         this.floatingAvatar;
+        this.customFloatingImage = null;
         // dualtronusa 전용 커스텀 플로팅 이미지
         if (window.location.hostname === 'dualtronusa.com') {
             this.customFloatingImage = 'https://gentoo-public.s3.ap-northeast-2.amazonaws.com/gentoo-floating-parts-small.png';
-        } else {
-            this.customFloatingImage = null;
         }
         this.pageList = [];
         this.eventCallback = {
