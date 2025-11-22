@@ -654,3 +654,76 @@
 .event-disabled {
     pointer-events: none;
 }
+
+/* Gentoo Recommendation Banner */
+.gentoo-reco-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(90deg, rgba(240,232,255,0.8) 0%, rgba(245,243,255,0.8) 100%);
+    border: 1px solid rgba(131, 94, 242, 0.18);
+    box-shadow: 0 2px 8px rgba(17, 17, 26, 0.05);
+    margin: 8px 0 16px 0;
+}
+.gentoo-reco-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    flex: 0 0 44px;
+}
+.gentoo-reco-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.gentoo-reco-content {
+    display: grid;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.gentoo-reco-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b4bd3;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+}
+.gentoo-reco-title {
+    color: #1f2233;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gentoo-reco-desc {
+    color: #4b4f67;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gentoo-reco-cta {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #6b4bd3;
+    background: rgba(131, 94, 242, 0.12);
+    flex: 0 0 28px;
+}

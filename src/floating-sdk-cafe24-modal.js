@@ -66,6 +66,7 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
         this.isInteractingWithSend = false;
+        this.recommendationBanner = null;
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -198,7 +199,7 @@ class FloatingButton {
 
         await this.injectLottie();
         window.__GentooInited = 'init';
-        const { position, showGentooButton = true, isCustomButton = false } = params;
+        const { position, showGentooButton = true, isCustomButton = false, isRecommendationBanner = false } = params;
 
         try {
             // Wait for boot process to complete
@@ -218,7 +219,7 @@ class FloatingButton {
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `https://accio-webclient-git-bw-featcollection-view-flow-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `https://accio-webclient-git-bw-featcollection-view-flow-waddle.vercel.app/chatroute/${this.partnerType}?ptid=67d6b5c010678137d77e6d6e&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
 
@@ -235,6 +236,7 @@ class FloatingButton {
                     this.checkSDKExists(),
                     this.customButton,
                     this.chatbotData,
+                    isRecommendationBanner,
                 );
             }
 
@@ -751,6 +753,14 @@ class FloatingButton {
         });
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+
+        // Recommendation banner click event
+        console.log('add recommendation banner click event', this.recommendationBanner);
+        this.recommendationBanner?.addEventListener("click", (e) => {
+            console.log('recommendationBanner clicked', this.recommendationBanner.getAttribute('data-curation-id'));
+            this.sendPostMessageHandler({ curationId: this.recommendationBanner.getAttribute('data-curation-id') });
+            this.enableChat("full");
+        });
         this.sendButton?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
         this.sendButton?.addEventListener("mousedown", () => { this.isInteractingWithSend = true; });
         this.sendButton?.addEventListener("touchstart", () => { this.isInteractingWithSend = true; }, { passive: true });
@@ -1410,6 +1420,89 @@ class FloatingButton {
             }
         }
         return false;
+    }
+
+    // Inject a recommendation banner above <upsell-widget-timesale> (if present)
+    injectRecommendationBanner() {
+        if (document.querySelector('.gentoo-reco-banner[data-gentoo-sdk="true"]')) return;
+
+        const tryPlace = () => {
+            const target = document.querySelector('upsell-widget-timesale');
+            if (!target || !target.parentNode) return false;
+
+            const banner = this.createRecommendationBannerElement();
+            banner.setAttribute('data-gentoo-sdk', 'true');
+            target.parentNode.insertBefore(banner, target);
+            return true;
+        };
+
+        if (tryPlace()) return;
+
+        const observer = new MutationObserver(() => {
+            if (tryPlace()) {
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        setTimeout(() => observer.disconnect(), 15000);
+    }
+
+    createRecommendationBannerElement() {
+        const container = document.createElement('div');
+        container.className = 'gentoo-reco-banner';
+        this.recommendationBanner = container;
+        this.recommendationBanner.setAttribute('data-curation-id', 'recoBanner');
+        console.log('recommendationBanner', this.recommendationBanner);
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'gentoo-reco-avatar';
+        const img = document.createElement('img');
+        const penguinSrc =
+            (this.floatingAvatar && (this.floatingAvatar.profileImage || this.floatingAvatar.avatar || this.floatingAvatar.imageUrl)) ||
+            (this.chatbotData && this.chatbotData.avatar && (this.chatbotData.avatar.profileImage || this.chatbotData.avatar.imageUrl)) ||
+            '';
+        if (penguinSrc) {
+            img.src = penguinSrc;
+            img.alt = 'Gentoo';
+            avatarWrap.appendChild(img);
+        } else {
+            avatarWrap.textContent = '🐧';
+            avatarWrap.style.fontSize = '22px';
+        }
+
+        const content = document.createElement('div');
+        content.className = 'gentoo-reco-content';
+
+        const eyebrow = document.createElement('div');
+        eyebrow.className = 'gentoo-reco-eyebrow';
+        const sparkle = document.createElement('span');
+        sparkle.textContent = '✨';
+        const eyebrowText = document.createElement('span');
+        eyebrowText.textContent = 'Gentoo Pick';
+        eyebrow.appendChild(sparkle);
+        eyebrow.appendChild(eyebrowText);
+
+        const title = document.createElement('div');
+        title.className = 'gentoo-reco-title';
+        title.textContent = '러블리 데일리 스냅 무드';
+
+        const desc = document.createElement('div');
+        desc.className = 'gentoo-reco-desc';
+        desc.textContent = '사랑스러운 데일리 스냅엔 깔끔한 숏코트 한 장—산뜻한 실루엣으로 오늘을 기록해요.';
+
+        const cta = document.createElement('div');
+        cta.className = 'gentoo-reco-cta';
+        cta.textContent = '→';
+
+        content.appendChild(eyebrow);
+        content.appendChild(title);
+        content.appendChild(desc);
+
+        container.appendChild(avatarWrap);
+        container.appendChild(content);
+        container.appendChild(cta);
+
+        return container;
     }
 
     /**

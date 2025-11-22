@@ -10,6 +10,7 @@ export const createUIElementsModal = (
     checkSDKExists = false,
     customButton,
     chatbotData,
+    isRecommendationBanner = false,
 ) => {
     console.log('createUIElementsModal called', context, position, showGentooButton, isCustomButton, checkSDKExists, customButton, chatbotData);
     // Check if any SDK elements exist in document
@@ -281,6 +282,11 @@ export const createUIElementsModal = (
         button: context.button,
         expandedButton: context.expandedButton,
         customButton: customButton,
+    }
+
+    // Inject promotional banner above upsell widget if requested, before setting up listeners
+    if (isRecommendationBanner && typeof context.injectRecommendationBanner === 'function') {
+        context.injectRecommendationBanner();
     }
 
     // Add event listeners
