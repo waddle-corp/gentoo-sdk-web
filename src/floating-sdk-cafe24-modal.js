@@ -688,7 +688,10 @@ class FloatingButton {
             }, this.isMobileDevice);
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
+        this.closeButtonContainer?.addEventListener("click", (e) => {
+            console.log('closeButtonContainer clicked');
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href })
+        });
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => {
             postChatEventLog({
@@ -742,7 +745,10 @@ class FloatingButton {
                 }
             }, 500);
         });
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
+        this.closeActionArea?.addEventListener("click", (e) => {
+            console.log('closeActionArea clicked');
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href })
+        });
         this.customButton?.addEventListener("click", buttonClickHandler);
         this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         this.sendButton?.addEventListener("pointerdown", () => { this.isInteractingWithSend = true; });
@@ -784,7 +790,7 @@ class FloatingButton {
             if (button.classList.contains('exam-floating-button-curation')) {
                 console.log('curation button clicked');
                 this.enableChat("full");
-                this.sendPostMessageHandler({ curationId: 'exampleCurationId' });
+                this.sendPostMessageHandler({ curationId: button.getAttribute('data-curation-id') });
                 return;
             }
             if (button) {
