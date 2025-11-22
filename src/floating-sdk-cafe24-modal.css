@@ -600,6 +600,13 @@
     padding: 6px 14px;
     cursor: pointer;
 
+    &.exam-floating-button-curation {
+        border: 1px solid transparent;
+        background-image: linear-gradient(white, white), linear-gradient(135deg, #a78bfa 0%, #f0abfc 45%, #1e3a8a 100%);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+    }
+
     p {
         font-family: 'pretendard', sans-serif;
         font-size: 15px;
