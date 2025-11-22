@@ -38,13 +38,19 @@
                 else if (r === 1) variant = 'variantB';
                 else variant = 'variantC';
             }
-            // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
+            const urlParams = new URLSearchParams(window.location.search);
+            const gentooBoostTest = urlParams.get('gentoo-boost-test');
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
-            var source = isMobile ? (
-                variant === 'control' ? 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
-                    `https://sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
-                )
-            ) : 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js';
+            var source = '';
+            if (gentooBoostTest) {
+                source = 'https://dev-sdk.gentooai.com/dist/builder-weekend/floating-cafe24-modal.js';
+            } else {
+                source = isMobile ? (
+                    variant === 'control' ? 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
+                        `https://sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
+                    )
+                ) : 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js';
+            }
             s.src = source; // dev
             // s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; 
             s.onload = () => { 
