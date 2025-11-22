@@ -784,7 +784,7 @@ class FloatingButton {
             if (button.classList.contains('exam-floating-button-curation')) {
                 console.log('curation button clicked');
                 this.enableChat("full");
-                this.sendPostMessageHandler({ curationButtonClicked: 'exampleCurationId' });
+                this.sendPostMessageHandler({ curationId: 'exampleCurationId' });
                 return;
             }
             if (button) {
