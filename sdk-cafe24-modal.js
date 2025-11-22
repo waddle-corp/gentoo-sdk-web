@@ -39,8 +39,8 @@
                 else variant = 'variantC';
             }
             const urlParams = new URLSearchParams(window.location.search);
-            const gentooBoostTest = urlParams.get('gentoo-bootst-test');
-            console.log('gentoo-bootst-test', gentooBoostTest);
+            const gentooBoostTest = urlParams.get('gentoo-boost-test');
+            console.log('gentoo-boost-test', gentooBoostTest);
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
             if (gentooBoostTest) {
