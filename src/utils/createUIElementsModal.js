@@ -137,6 +137,13 @@ export const createUIElementsModal = (
         context.inputContainer.appendChild(context.inputWrapper);
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
+        const curationExamples = ['A 인플루언서 Pick!', 'SNS 인기 상품'];
+        curationExamples.forEach(example => {
+            const examFloatingButton = document.createElement("div");
+            examFloatingButton.className = "exam-floating-button exam-floating-button-curation";
+            examFloatingButton.innerText = example;
+            context.examFloatingGroup.appendChild(examFloatingButton);
+        });
         chatbotData?.examples?.forEach(example => {
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button";
