@@ -40,11 +40,12 @@
             }
             // s.src = "https://sdk.gentooai.com/dist/cafe24/floating-cafe24-glacier.js";
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
-            var source = isMobile ? (
-                variant === 'control' ? 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
-                    `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
-                )
-            ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
+            // var source = isMobile ? (
+            //     variant === 'control' ? 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
+            //         `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
+            //     )
+            // ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
+            var source = './dist/cafe24-modal/floating-cafe24-modal.js';
             s.src = source; // dev
             // s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; 
             s.onload = () => { 

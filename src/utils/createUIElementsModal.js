@@ -11,6 +11,7 @@ export const createUIElementsModal = (
     customButton,
     chatbotData,
 ) => {
+    console.log('createUIElementsModal called', context, position, showGentooButton, isCustomButton, checkSDKExists, customButton, chatbotData);
     // Check if any SDK elements exist in document
     if (checkSDKExists) {
         console.warn("GentooIO UI elements already exist in the document, skipping creation.");
