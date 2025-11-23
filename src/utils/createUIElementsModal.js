@@ -285,6 +285,7 @@ export const createUIElementsModal = (
     }
 
     // Inject promotional banner above upsell widget if requested, before setting up listeners
+    console.log('isRecommendationBanner', isRecommendationBanner);
     if (isRecommendationBanner && typeof context.injectRecommendationBanner === 'function') {
         context.injectRecommendationBanner();
     }

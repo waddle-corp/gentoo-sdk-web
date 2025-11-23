@@ -199,7 +199,7 @@ class FloatingButton {
 
         await this.injectLottie();
         window.__GentooInited = 'init';
-        const { position, showGentooButton = true, isCustomButton = false, isRecommendationBanner = false } = params;
+        const { position, showGentooButton = true, isCustomButton = false, isRecommendationBanner = true } = params;
 
         try {
             // Wait for boot process to complete
@@ -1425,9 +1425,11 @@ class FloatingButton {
     // Inject a recommendation banner above <upsell-widget-timesale> (if present)
     injectRecommendationBanner() {
         if (document.querySelector('.gentoo-reco-banner[data-gentoo-sdk="true"]')) return;
+        console.log('injectRecommendationBanner called');
 
         const tryPlace = () => {
             const target = document.querySelector('upsell-widget-timesale');
+            console.log('target', target);
             if (!target || !target.parentNode) return false;
 
             const banner = this.createRecommendationBannerElement();
@@ -1484,11 +1486,11 @@ class FloatingButton {
 
         const title = document.createElement('div');
         title.className = 'gentoo-reco-title';
-        title.textContent = '러블리 데일리 스냅 무드';
+        title.textContent = '가을 감성 실루엣 에디트';
 
         const desc = document.createElement('div');
         desc.className = 'gentoo-reco-desc';
-        desc.textContent = '사랑스러운 데일리 스냅엔 깔끔한 숏코트 한 장—산뜻한 실루엣으로 오늘을 기록해요.';
+        desc.textContent = '요즘 이런 느낌 좋아하셨을 것 같아서요— 계절에 어울리는 실루엣 룩만 모아봤어요.';
 
         const cta = document.createElement('div');
         cta.className = 'gentoo-reco-cta';
