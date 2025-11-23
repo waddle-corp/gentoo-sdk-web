@@ -40,6 +40,10 @@
             }
             const urlParams = new URLSearchParams(window.location.search);
             const gentooBoostTest = urlParams.get('gentoo-boost-test');
+            const profileId = urlParams.get('profileId');
+            if (profileId) {
+                sessionStorage.setItem('gentoo-boost-test-profileId', profileId);
+            }
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
             if (gentooBoostTest) {
