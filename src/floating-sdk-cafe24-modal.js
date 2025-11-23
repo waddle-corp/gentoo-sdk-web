@@ -98,33 +98,33 @@ class FloatingButton {
                 };
             })();
 
-            // ((CAFE24API) => {
-            //     // Store the CAFE24API instance for use in other methods
-            //     this.cafe24API = CAFE24API;
+            ((CAFE24API) => {
+                // Store the CAFE24API instance for use in other methods
+                this.cafe24API = CAFE24API;
 
                 // Wrap CAFE24API methods in Promises
                 const getCustomerIDInfoPromise = () => {
-                    // return new Promise((innerResolve, innerReject) => {
-                    //     CAFE24API.getCustomerIDInfo((err, res) => {
-                    //         if (err) {
-                    //             console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                    //             innerReject(err);
-                    //         } else {
-                    //             innerResolve(res);
-                    //         }
-                    //     });
-                    // });
-                    return Promise.resolve({
-                        id: {
-                            member_id: 'test-member-id',
-                            guest_id: 'test-guest-id',
-                        },
+                    return new Promise((innerResolve, innerReject) => {
+                        CAFE24API.getCustomerIDInfo((err, res) => {
+                            if (err) {
+                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
+                                innerReject(err);
+                            } else {
+                                innerResolve(res);
+                            }
+                        });
                     });
+                    // return Promise.resolve({
+                    //     id: {
+                    //         member_id: 'test-member-id',
+                    //         guest_id: 'test-guest-id',
+                    //     },
+                    // });
                 };
 
                 // Fetch partner ID first
-                // getPartnerId(CAFE24API.MALL_ID)
-                getPartnerId('jintaebaek')
+                getPartnerId(CAFE24API.MALL_ID)
+                // getPartnerId('jintaebaek')
                     .then(partnerId => {
                         this.partnerId = partnerId;
                         return getCustomerIDInfoPromise();
@@ -169,11 +169,11 @@ class FloatingButton {
                         console.error('Initialization error:', error);
                         reject(error);
                     });
-            // })(CAFE24API.init({
-            //     client_id: process.env.CAFE24_CLIENTID,
-            //     version: process.env.CAFE24_VERSION
-            // }));
-            });
+            })(CAFE24API.init({
+                client_id: process.env.CAFE24_CLIENTID,
+                version: process.env.CAFE24_VERSION
+            }));
+        });
         
     }
 
@@ -1018,10 +1018,10 @@ class FloatingButton {
     }
 
     async addProductToCart(product) {
-        // if (!this.cafe24API) {
-        //     console.error('CAFE24API is not initialized yet');
-        //     return;
-        // }
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
 
         const productObject = {
             product_no: product.product_no,
@@ -1030,137 +1030,137 @@ class FloatingButton {
         }
 
         // Wrap the Cafe24 API call in a Promise for better error handling
-        // return new Promise((resolve, reject) => {
-        //     this.cafe24API.addCart(
-        //         'A0000',
-        //         product.prepaid_shipping_fee,
-        //         [productObject],
-        //         (err, res) => {
-        //             if (err) {
-        //                 postChatEventLog({
-        //                     experimentId: "flowlift_abctest_v1",
-        //                     partnerId: this.partnerId,
-        //                     variantId: this.variant,
-        //                     sessionId: this.sessionId || "sess-test",
-        //                     chatUserId: this.chatUserId,
-        //                     userType: this.userType,
-        //                     displayLocation: this.displayLocation,
-        //                     deviceType: this.isMobileDevice ? "mobile" : "web",
-        //                     timestamp: String(Date.now()),
-        //                     eventCategory: "chat_add_to_cart_completed",
-        //                     context: {
-        //                         productId: product.product_no,
-        //                         success: false,
-        //                         errorCode: err.code,
-        //                         path: "direct",
-        //                     }
-        //                 });
-        //                 console.error('Failed to add product to cart:', err);
-        //                 reject(err);
-        //             } else {
-        //                 this.sendPostMessageHandler({ addedProductToCart: true });
-        //                 postChatEventLog({
-        //                     experimentId: "flowlift_abctest_v1",
-        //                     partnerId: this.partnerId,
-        //                     variantId: this.variant,
-        //                     sessionId: this.sessionId || "sess-test",
-        //                     chatUserId: this.chatUserId,
-        //                     userType: this.userType,
-        //                     displayLocation: this.displayLocation,
-        //                     deviceType: this.isMobileDevice ? "mobile" : "web",
-        //                     timestamp: String(Date.now()),
-        //                     eventCategory: "chat_add_to_cart_completed",
-        //                     context: {
-        //                         productId: product.product_no,
-        //                         success: true,
-        //                         errorCode: null,
-        //                         path: "direct",
-        //                     }
-        //                 });
-        //                 resolve(res);
-        //             }
-        //         }
-        //     );
-        // });
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCart(
+                'A0000',
+                product.prepaid_shipping_fee,
+                [productObject],
+                (err, res) => {
+                    if (err) {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: false,
+                                errorCode: err.code,
+                                path: "direct",
+                            }
+                        });
+                        console.error('Failed to add product to cart:', err);
+                        reject(err);
+                    } else {
+                        this.sendPostMessageHandler({ addedProductToCart: true });
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: product.product_no,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
+                        resolve(res);
+                    }
+                }
+            );
+        });
     }
 
-    // async addProductWithOptionsToCart(productBulkObject) {
-    //     // if (!this.cafe24API) {
-    //     //     console.error('CAFE24API is not initialized yet');
-    //     //     return;
-    //     // }
-    //     /* 
-    //     const addProductWithOptionsToCart = {
-    //         productNo: productInfo.itemId,
-    //         prepaidShippingFee: prepaidShippingFee,
-    //         productList: productList,
-    //     }
-    //     */
+    async addProductWithOptionsToCart(productBulkObject) {
+        if (!this.cafe24API) {
+            console.error('CAFE24API is not initialized yet');
+            return;
+        }
+        /* 
+        const addProductWithOptionsToCart = {
+            productNo: productInfo.itemId,
+            prepaidShippingFee: prepaidShippingFee,
+            productList: productList,
+        }
+        */
 
-    //     const productListFull = productBulkObject.productList.map(product => ({
-    //         ...product,
-    //         product_no: productBulkObject.productNo,
-    //     }));
+        const productListFull = productBulkObject.productList.map(product => ({
+            ...product,
+            product_no: productBulkObject.productNo,
+        }));
 
-    //     // Wrap the Cafe24 API call in a Promise for better error handling
-    //     return new Promise((resolve, reject) => {
-    //         this.cafe24API.addCart(
-    //             'A0000',
-    //             productBulkObject.prepaidShippingFee,
-    //             productListFull,
-    //             (err, res) => {
-    //                 if (err) {
-    //                     console.error('Failed to add product to cart:', err, res);
-    //                     resolve(err);
-    //                     postChatEventLog({
-    //                         experimentId: "flowlift_abctest_v1",
-    //                         partnerId: this.partnerId,
-    //                         variantId: this.variant,
-    //                         sessionId: this.sessionId || "sess-test",
-    //                         chatUserId: this.chatUserId,
-    //                         userType: this.userType,
-    //                         displayLocation: this.displayLocation,
-    //                         deviceType: this.isMobileDevice ? "mobile" : "web",
-    //                         timestamp: String(Date.now()),
-    //                         eventCategory: "chat_add_to_cart_completed",
-    //                         context: {
-    //                             productId: productBulkObject.productNo,
-    //                             success: false,
-    //                             errorCode: err.code,
-    //                             path: "with_options",
-    //                         }
-    //                     });
-    //                     this.sendPostMessageHandler({ addProductToCartFailed: true });
-    //                 } else {
-    //                     postChatEventLog({
-    //                         experimentId: "flowlift_abctest_v1",
-    //                         partnerId: this.partnerId,
-    //                         variantId: this.variant,
-    //                         sessionId: this.sessionId || "sess-test",
-    //                         chatUserId: this.chatUserId,
-    //                         userType: this.userType,
-    //                         displayLocation: this.displayLocation,
-    //                         deviceType: this.isMobileDevice ? "mobile" : "web",
-    //                         timestamp: String(Date.now()),
-    //                         eventCategory: "chat_add_to_cart_completed",
-    //                         context: {
-    //                             productId: productBulkObject.productNo,
-    //                             success: true,
-    //                             errorCode: null,
-    //                             path: "direct",
-    //                         }
-    //                     });
-    //                     this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
-    //                     // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
-    //                     if (!sessionStorage.getItem('gentoo_cart_added')) {
-    //                         sessionStorage.setItem('gentoo_cart_added', 'true');
-    //                     }
-    //                     resolve(res);
-    //                 }
-    //             }
-    //         );
-    //     });
-    // }
+        // Wrap the Cafe24 API call in a Promise for better error handling
+        return new Promise((resolve, reject) => {
+            this.cafe24API.addCart(
+                'A0000',
+                productBulkObject.prepaidShippingFee,
+                productListFull,
+                (err, res) => {
+                    if (err) {
+                        console.error('Failed to add product to cart:', err, res);
+                        resolve(err);
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: false,
+                                errorCode: err.code,
+                                path: "with_options",
+                            }
+                        });
+                        this.sendPostMessageHandler({ addProductToCartFailed: true });
+                    } else {
+                        postChatEventLog({
+                            experimentId: "flowlift_abctest_v1",
+                            partnerId: this.partnerId,
+                            variantId: this.variant,
+                            sessionId: this.sessionId || "sess-test",
+                            chatUserId: this.chatUserId,
+                            userType: this.userType,
+                            displayLocation: this.displayLocation,
+                            deviceType: this.isMobileDevice ? "mobile" : "web",
+                            timestamp: String(Date.now()),
+                            eventCategory: "chat_add_to_cart_completed",
+                            context: {
+                                productId: productBulkObject.productNo,
+                                success: true,
+                                errorCode: null,
+                                path: "direct",
+                            }
+                        });
+                        this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
+                        // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
+                        if (!sessionStorage.getItem('gentoo_cart_added')) {
+                            sessionStorage.setItem('gentoo_cart_added', 'true');
+                        }
+                        resolve(res);
+                    }
+                }
+            );
+        });
+    }
 
     // Function to inject Lottie
     async injectLottie() {
