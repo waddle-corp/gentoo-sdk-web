@@ -210,6 +210,18 @@ export function generateGuestUserToken(length = 16) {
     return 'guest' + Math.random().toString(36).substring(2, length);
 }
 
+// Instagram profile
+export async function getInstagramProfile(profileId) {
+    try {
+        const response = await fetch(`https://storika-waddle.vercel.app/instagram-profiles/${profileId}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Error while calling getInstagramProfile API: ${error}`);
+        return null;
+    }
+}
+
 // shopify
 export async function checkTrainingProgress(partnerId) {
 
