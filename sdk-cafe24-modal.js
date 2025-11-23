@@ -71,4 +71,6 @@ GentooIO('boot', {
     partnerType: 'cafe24',
 })
 
-GentooIO('init', {});
+GentooIO('init', {
+    isRecommendationBanner: true,
+});
