@@ -67,6 +67,7 @@ class FloatingButton {
         this.originalViewport = null;
         this.isInteractingWithSend = false;
         this.recommendationBanner = null;
+        this.profileId = sessionStorage.getItem('gentoo-boost-test-profileId');
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
@@ -219,7 +220,7 @@ class FloatingButton {
 
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=67d6b5c010678137d77e6d6e&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&isBuilderWeekend=true`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=67d6b5c010678137d77e6d6e&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&variant=${this.variant}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&isBuilderWeekend=true${this.profileId ? `&profileId=${this.profileId}` : ''}`;
 
             // Create UI elements after data is ready
 
@@ -228,7 +229,7 @@ class FloatingButton {
             else if (!this.bootConfig?.floating?.isVisible) {
                 console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else { 
-                createUIElementsModal(
+                await createUIElementsModal(
                     this, // this 객체를 첫 번째 인자로 전달
                     position,
                     showGentooButton,

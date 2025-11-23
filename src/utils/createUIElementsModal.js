@@ -1,8 +1,8 @@
-import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
+import { postChatEventLog, postChatEventLogLegacy, getInstagramProfile } from "../apis/chatConfig";
 import '../floating-sdk-cafe24-modal.css';
 
 // Separate UI creation into its own method for clarity
-export const createUIElementsModal = (
+export const createUIElementsModal = async (
     context, // this 객체를 받는 인자
     position, 
     showGentooButton, 
@@ -138,7 +138,32 @@ export const createUIElementsModal = (
         context.inputContainer.appendChild(context.inputWrapper);
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
-        const curationExamples = [{text: 'A 인플루언서 Pick!', id: 'aInfluencer'}, {text: 'SNS 인기 상품', id: 'snsInfluencer'}];
+        
+        // Build curation examples based on profileId
+        let curationExamples = [];
+        
+        if (context.profileId) {
+            try {
+                const profileData = await getInstagramProfile(context.profileId);
+                if (profileData) {
+                    const displayName = profileData.full_name && profileData.full_name.trim() !== '' 
+                        ? profileData.full_name 
+                        : profileData.username;
+                    curationExamples = [
+                        {text: `${displayName} 인플루언서 Pick!`, id: 'influencerPick'},
+                        {text: 'SNS 인기 상품', id: 'snsInfluencer'}
+                    ];
+                } else {
+                    curationExamples = [{text: 'SNS 인기 상품', id: 'snsInfluencer'}];
+                }
+            } catch (error) {
+                console.error('Failed to fetch Instagram profile:', error);
+                curationExamples = [{text: 'SNS 인기 상품', id: 'snsInfluencer'}];
+            }
+        } else {
+            curationExamples = [{text: 'SNS 인기 상품', id: 'snsInfluencer'}];
+        }
+        
         curationExamples.forEach(example => {
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button exam-floating-button-curation";
@@ -146,7 +171,7 @@ export const createUIElementsModal = (
             examFloatingButton.setAttribute('data-curation-id', example.id);
             context.examFloatingGroup.appendChild(examFloatingButton);
         });
-        chatbotData?.examples?.forEach(example => {
+        chatbotData?.examples?.slice(0, 3).forEach(example => {
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button";
             examFloatingButton.innerText = example;
