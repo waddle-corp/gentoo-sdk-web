@@ -53,6 +53,7 @@
     flex-direction: row-reverse;
     align-items: flex-end;
     z-index: 9999999;
+    transition: all 0.1s ease-in;
 }
 
 .floating-container-fastfive {
@@ -65,6 +66,7 @@
     flex-direction: row-reverse;
     align-items: flex-end;
     z-index: 10000;
+    transition: all 0.1s ease-in;
 }
 
 .floating-button-common {
@@ -537,7 +539,13 @@
     display: none;
 }
 
+.display-flex {
+    display: flex;
+}
+
 .hide-visibility {
+    opacity: 0;
+    transition: all 0.1s ease-in;
     visibility: hidden;
 }
 

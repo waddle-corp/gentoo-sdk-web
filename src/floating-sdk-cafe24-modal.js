@@ -217,7 +217,6 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-                console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else { 
                 createUIElementsModal(
                     this, // this 객체를 첫 번째 인자로 전달
