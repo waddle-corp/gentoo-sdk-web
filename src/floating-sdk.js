@@ -159,7 +159,6 @@ class FloatingButton {
             else if (!this.bootConfig?.floating?.isVisible) {
                 // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
-                console.log('emergeThreshold', emergeThreshold);
                 this.createUIElements(position, showGentooButton, isCustomButton, parentElem, emergeThreshold);
             }
 
@@ -414,7 +413,6 @@ class FloatingButton {
     }
 
     setupEventListeners(position, isCustomButton, emergeThreshold) {
-        console.log('emergeThreshold @setupEventListeners', emergeThreshold);
         if (!emergeThreshold) emergeThreshold = { isTimeBased: false, isScrollBased: false, timeThreshold: 0, scrollThreshold: 0 };
         // Button click event
         var buttonClickHandler = (e) => {
