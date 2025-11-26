@@ -57,6 +57,19 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        function gentooGetCookie(name) {
+            if (!document || !document.cookie) return null;
+            const pairs = document.cookie.split('; ');
+            for (const pair of pairs) {
+              const [k, ...rest] = pair.split('=');
+              if (k === name) return decodeURIComponent(rest.join('='));
+            }
+            return null;
+          }
+
+        this.cvid = gentooGetCookie('CVID');
+        this.cvid_y = gentooGetCookie('CVID_Y');
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -522,6 +535,8 @@ class FloatingButton {
                     partnerId: this.partnerId,
                     variantId: this.variant,
                     sessionId: this.sessionId || "sess-test",
+                    cafe24CVID: this.cvid,
+                    cafe24CVIDY: this.cvid_y,
                     chatUserId: this.chatUserId,
                     userType: this.userType,
                     displayLocation: this.displayLocation,
