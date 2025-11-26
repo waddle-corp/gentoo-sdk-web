@@ -68,6 +68,9 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        // Ensure trackingKey is injected into order form if present
+        this.injectTrackingKeyIntoOrderForm();
+
         this.bootPromise = new Promise((resolve, reject) => {
             const ref = document.referrer;
             (function attachScrollTracker() {
@@ -951,6 +954,49 @@ class FloatingButton {
             console.error('Failed to delete viewport meta tag:', error);
         } finally {
             this.viewportInjected = false;
+        }
+    }
+
+    // Inject hidden trackingKey input with this.sessionId into #frmOrder, if present
+    injectTrackingKeyIntoOrderForm() {
+        const insertOrUpdateTrackingKey = () => {
+            const form =
+                document.getElementById('frmOrder') ||
+                document.querySelector('form#frmOrder');
+            if (!form) return false;
+            let input = form.querySelector('input[name="trackingKey"]');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'trackingKey';
+                form.appendChild(input);
+            }
+            input.value = this.sessionId || '';
+            return true;
+        };
+
+        if (insertOrUpdateTrackingKey()) return;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                insertOrUpdateTrackingKey();
+            }, { once: true });
+            return;
+        }
+
+        const observer = new MutationObserver((mutations, obs) => {
+            if (insertOrUpdateTrackingKey()) {
+                obs.disconnect();
+            }
+        });
+        try {
+            observer.observe(document.documentElement || document.body, {
+                childList: true,
+                subtree: true,
+            });
+            setTimeout(() => observer.disconnect(), 15000);
+        } catch (e) {
+            // no-op
         }
     }
 
