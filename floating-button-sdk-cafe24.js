@@ -57,6 +57,18 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        function gentooGetCookie(name) {
+            if (!document || !document.cookie) return null;
+            const pairs = document.cookie.split('; ');
+            for (const pair of pairs) {
+              const [k, ...rest] = pair.split('=');
+              if (k === name) return decodeURIComponent(rest.join('='));
+            }
+            return null;
+          }
+        console.log('CVID', gentooGetCookie('CVID'));
+        console.log('CVID_Y', gentooGetCookie('CVID_Y'));
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
