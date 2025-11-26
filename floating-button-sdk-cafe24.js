@@ -66,8 +66,9 @@ class FloatingButton {
             }
             return null;
           }
-        console.log('CVID', gentooGetCookie('CVID'));
-        console.log('CVID_Y', gentooGetCookie('CVID_Y'));
+
+        this.cvid = gentooGetCookie('CVID');
+        this.cvid_y = gentooGetCookie('CVID_Y');
 
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
@@ -534,6 +535,8 @@ class FloatingButton {
                     partnerId: this.partnerId,
                     variantId: this.variant,
                     sessionId: this.sessionId || "sess-test",
+                    cvid: this.cvid,
+                    cvid_y: this.cvid_y,
                     chatUserId: this.chatUserId,
                     userType: this.userType,
                     displayLocation: this.displayLocation,
