@@ -367,6 +367,7 @@ class FloatingButton {
                 userType: this.userType,
                 displayLocation: this.displayLocation,
                 deviceType: this.isMobileDevice ? "mobile" : "web",
+                godomallCVID: this.sessionId,
             }
         });
 
