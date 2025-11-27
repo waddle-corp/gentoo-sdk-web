@@ -355,21 +355,23 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        // gentoo static parameters to iframe
-        this.sendPostMessageHandler({
-            type: "gentoo-statics",
-            contentData: {
-                experimentId: "flowlift_abctest_v1",
-                partnerId: this.partnerId,
-                variantId: this.variant,
-                sessionId: this.sessionId || "sess-test",
-                chatUserId: this.chatUserId,
-                userType: this.userType,
-                displayLocation: this.displayLocation,
-                deviceType: this.isMobileDevice ? "mobile" : "web",
-                godomallCVID: this.sessionId,
-            }
-        });
+        setTimeout(() => {
+            // gentoo static parameters to iframe
+            this.sendPostMessageHandler({
+                type: "gentoo-statics",
+                contentData: {
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    godomallCVID: this.sessionId,
+                }
+            });
+        }, 1000)
 
         postChatEventLog({
             experimentId: "flowlift_abctest_v1",
