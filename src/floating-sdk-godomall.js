@@ -357,9 +357,8 @@ class FloatingButton {
 
         setTimeout(() => {
             // gentoo static parameters to iframe
-            console.log('godomallCVID', this.sessionId);
             this.sendPostMessageHandler({
-                type: "gentoo-statics",
+                messageType: "gentoo-statics",
                 contentData: {
                     experimentId: "flowlift_abctest_v1",
                     partnerId: this.partnerId,
