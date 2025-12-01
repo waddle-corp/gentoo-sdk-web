@@ -304,15 +304,28 @@ class FloatingButton {
             this.buttonContainer = document.createElement("div");
             this.buttonContainer.className = "button-container";
 
+            // zoom button size
+            if (this.isSmallResolution && ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e')) {
+                if (this.floatingZoom) {
+                    this.buttonContainer.classList.add('button-zoom');
+                } else {
+                    this.buttonContainer.classList.add('button-md');
+                }
+            } else {
+                if (this.floatingZoom) {
+                    this.buttonContainer.classList.add('button-zoom');
+                }
+            }
+
             // tmp for fastfive
             if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
 
             this.button = document.createElement("div");
-            if (this.isSmallResolution) {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
-            } else {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
-            }
+            // if (this.isSmallResolution) {
+            //     this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
+            // } else {
+            //     this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
+            // }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             this.buttonContainer.appendChild(this.dotLottiePlayer ? this.dotLottiePlayer : this.button);
