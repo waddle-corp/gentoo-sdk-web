@@ -5,6 +5,7 @@ import {
     getBootConfig,
     postChatEventLog
 } from './apis/chatConfig';
+import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 
 
 class FloatingButton {
@@ -289,7 +290,7 @@ class FloatingButton {
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-                player.setAttribute('src', selectedAsset);
+                player.setAttribute('src', window.location.hostname.includes('dev.fastfive.com') ? Ff_fab_nopad : selectedAsset);
                 player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
                 player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
                 player.style.cursor = 'pointer';

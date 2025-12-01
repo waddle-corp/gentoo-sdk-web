@@ -41,6 +41,13 @@ module.exports = (env, argv) => {
                     test: /\.css$/,
                     use: ['style-loader', 'css-loader'],
                 },
+                {
+                    test: /\.lottie$/i,
+                    type: 'asset/resource',
+                    generator: {
+                        filename: 'assets/[name][contenthash][ext]',
+                    },
+                },
             ],
         },
         optimization: {
