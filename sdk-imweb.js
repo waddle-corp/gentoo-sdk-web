@@ -18,8 +18,8 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/dist/imweb/floating-imweb.js"; 
-            // s.src = "https://dev-sdk.gentooai.com/dist/imweb/floating-imweb.js";
+            // s.src = "https://sdk.gentooai.com/dist/imweb/floating-imweb.js"; 
+            s.src = "https://dev-sdk.gentooai.com/dist/imweb/floating-imweb.js";
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
