@@ -226,26 +226,6 @@ class FloatingButton {
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl;
 
-        // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
-        const bootImage = this.bootConfig?.floating?.button?.imageUrl;
-        const avatarAsset = this.floatingAvatar?.floatingAsset;
-        this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
-        const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
-        if (selectedAsset?.includes('lottie')) {
-            const player = document.createElement('dotlottie-wc');
-            player.setAttribute('autoplay', '');
-            player.setAttribute('loop', '');
-            player.setAttribute('mode', 'normal');
-            // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-            player.setAttribute('src', selectedAsset);
-            player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-            player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-            player.style.cursor = 'pointer';
-            player.appendChild(document.createTextNode('\u200B'));
-
-            this.dotLottiePlayer = player;
-        }
-
         if (this.isSmallResolution) {
             this.chatHeader.className = "chat-header-md";
             this.chatHandler.className = "chat-handler-md";
@@ -298,24 +278,46 @@ class FloatingButton {
 
         // Create floating button
         if (showGentooButton) {
+            // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
+            const bootImage = this.bootConfig?.floating?.button?.imageUrl;
+            const avatarAsset = this.floatingAvatar?.floatingAsset;
+            this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
+            const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+            if (selectedAsset?.includes('lottie')) {
+                const player = document.createElement('dotlottie-wc');
+                player.setAttribute('autoplay', '');
+                player.setAttribute('loop', '');
+                player.setAttribute('mode', 'normal');
+                // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
+                player.setAttribute('src', selectedAsset);
+                player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+                player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+                player.style.cursor = 'pointer';
+                player.appendChild(document.createTextNode('\u200B'));
+
+                this.dotLottiePlayer = player;
+            }
             this.floatingContainer = document.createElement("div");
             this.floatingContainer.className = `floating-container ${emergeThreshold?.isScrollBased ? 'hide-visibility' : ''}`;
             this.floatingContainer.setAttribute("data-gentoo-sdk", "true");
             this.updateFloatingContainerPosition(position); // Set initial position
+            this.buttonContainer = document.createElement("div");
+            this.buttonContainer.className = "button-container";
+
+            // tmp for fastfive
+            if (this.partnerId === '67615284c5ff44110dbc6613' || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
+
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
             } else {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
+            this.buttonContainer.appendChild(this.dotLottiePlayer ? this.dotLottiePlayer : this.button);
             parentElem.appendChild(this.floatingContainer);
-            if (this.dotLottiePlayer) {
-                this.floatingContainer.appendChild(this.dotLottiePlayer);
-            } else {
-                this.floatingContainer.appendChild(this.button);
-            }
+            this.floatingContainer.appendChild(this.buttonContainer);
             if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
             else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
                 // Check if component is destroyed or clicked
@@ -451,9 +453,9 @@ class FloatingButton {
                 );
                 if (this.button) {
                     if (this.isSmallResolution) {
-                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
                     } else {
-                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
+                        this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
                     }
                     this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
                     if (this.dotLottiePlayer) {
@@ -508,8 +510,12 @@ class FloatingButton {
             }
         });
 
-        this.floatingContainer?.addEventListener("click", buttonClickHandler);
-        this.floatingContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.button?.addEventListener("click", buttonClickHandler);
+        this.button?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.dotLottiePlayer?.addEventListener("click", buttonClickHandler);
+        this.dotLottiePlayer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.expandedButtonWrapper?.addEventListener("click", buttonClickHandler);
+        this.expandedButtonWrapper?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
@@ -537,7 +543,7 @@ class FloatingButton {
                         setTimeout(() => {
                             this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
                         }, 500);
-    
+
                         // Remove expanded button after delay
                         setTimeout(() => {
                             if (
@@ -566,7 +572,7 @@ class FloatingButton {
                         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                         this.floatingContainer.appendChild(this.expandedButtonWrapper);
                         this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);
-    
+
                         // Remove expanded button after delay
                         setTimeout(() => {
                             if (
@@ -942,9 +948,9 @@ class FloatingButton {
 
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
             } else {
-                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
             }
         }
         if (this.dotLottiePlayer) {
