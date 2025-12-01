@@ -318,8 +318,7 @@ class FloatingButton {
             }
 
             // tmp for fastfive
-            console.log('partnerId', this.partnerId, window.location.hostname);
-            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
+            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.co.kr')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
 
             this.button = document.createElement("div");
             // if (this.isSmallResolution) {
