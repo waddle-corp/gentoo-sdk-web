@@ -305,7 +305,7 @@ class FloatingButton {
             this.buttonContainer.className = "button-container";
 
             // tmp for fastfive
-            if (this.partnerId === '67615284c5ff44110dbc6613' || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
+            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
 
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
