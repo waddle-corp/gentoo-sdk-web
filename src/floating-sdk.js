@@ -308,7 +308,11 @@ class FloatingButton {
             this.buttonContainer.className = "button-container";
 
             // zoom button size
-            if (this.isSmallResolution && ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e')) {
+            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e') {
+                if (this.floatingZoom) {
+                    this.buttonContainer.classList.add('button-zoom');
+                }
+            } else if (this.isSmallResolution) {
                 if (this.floatingZoom) {
                     this.buttonContainer.classList.add('button-zoom');
                 } else {
