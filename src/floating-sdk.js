@@ -291,13 +291,10 @@ class FloatingButton {
                 player.setAttribute('mode', 'normal');
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
                 player.setAttribute('src', window.location.hostname.includes('dev.fastfive.co.kr') ? Ff_fab_nopad : selectedAsset);
-                if (window.location.hostname.includes('dev.fastfive.co.kr')) {
-                player.style.width = this.floatingZoom ? '100px' : this.isSmallResolution ? '48px' : '74px';
-                player.style.height = this.floatingZoom ? '100px' : this.isSmallResolution ? '48px' : '74px';
-                } else {
-                    player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-                    player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
-                }
+
+                player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+                player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
+
                 player.style.cursor = 'pointer';
                 player.appendChild(document.createTextNode('\u200B'));
 
@@ -324,7 +321,7 @@ class FloatingButton {
             }
 
             // tmp for fastfive
-            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.co.kr')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-padding');
+            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.co.kr')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-margin-left');
 
             this.button = document.createElement("div");
             // if (this.isSmallResolution) {

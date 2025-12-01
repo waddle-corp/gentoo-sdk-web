@@ -90,6 +90,10 @@
     padding: 10px;
 }
 
+.button-margin-left {
+    margin-left: 24px;
+}
+
 .floating-button-common {
     /* position: fixed;
     bottom: 66px;
