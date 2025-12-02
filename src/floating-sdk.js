@@ -76,6 +76,18 @@ class FloatingButton {
         this.viewportInjected = false;
         this.originalViewport = null;
 
+        function gentooGetCookie(name) {
+            if (!document || !document.cookie) return null;
+            const pairs = document.cookie.split('; ');
+            for (const pair of pairs) {
+              const [k, ...rest] = pair.split('=');
+              if (k === name) return decodeURIComponent(rest.join('='));
+            }
+            return null;
+        }
+
+        this.fbclid = gentooGetCookie('_fbc');
+
 
         // Add a promise to track initialization status
         this.bootPromise = Promise.all([
@@ -424,6 +436,26 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+
+        setTimeout(() => {
+            // gentoo static parameters to iframe
+            this.sendPostMessageHandler({
+                messageType: "gentoo-statics",
+                contentData: {
+                    experimentId: "",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    cafe24CVID: this.cafe24CVID || '',
+                    cafe24CVIDY: this.cafe24CVIDY || '',
+                    chatUserId: this.chatUserId,
+                    userType: this.userType || 'guest',
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    fbclid: this.fbclid,
+                }
+            });
+        }, 1000);
     }
 
     addLetter(bootConfig, expandedText, isDestroyed, i = 0) {

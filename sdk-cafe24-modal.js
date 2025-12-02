@@ -50,10 +50,10 @@
                 source = 'https://dev-sdk.gentooai.com/dist/builder-weekend/floating-cafe24-modal.js';
             } else {
                 source = isMobile ? (
-                    variant === 'control' ? 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
-                        `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
+                    variant === 'control' ? 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
+                        `https://sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
                     )
-                ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
+                ) : 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js';
             }
             s.src = source; // dev
             // s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; 
