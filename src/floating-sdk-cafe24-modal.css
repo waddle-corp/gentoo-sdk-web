@@ -497,8 +497,7 @@
     height: fit-content;
     position: fixed;
     bottom: 66px;
-    right: 16px;
-    left: 16px;
+    right: 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -510,6 +509,7 @@
 .chat-input-wrapper {
     width: 100%;
     height: fit-content;
+    margin: 0 16px;
     padding: 8px 16px;
     display: flex;
     align-items: center;

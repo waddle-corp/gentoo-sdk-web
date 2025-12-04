@@ -18,43 +18,11 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // 세션별로 control:variantA:variantB=1:1:1로 할당 (sessionStorage 활용)
-            var variantKey = 'gentoo-cafe24-variant';
-            var variant;
-            try {
-                variant = sessionStorage.getItem(variantKey);
-                if (!variant) {
-                    // 0:control, 1:variantA, 2:variantB
-                    var r = Math.floor(Math.random() * 3);
-                    if (r === 0) variant = 'control';
-                    else if (r === 1) variant = 'variantB';
-                    else variant = 'variantC';
-                    sessionStorage.setItem(variantKey, variant);
-                }
-            } catch (e) {
-                // 세션스토리지 접근 실패시 fallback (임시, 랜덤)
-                var r = Math.floor(Math.random() * 3);
-                if (r === 0) variant = 'control';
-                else if (r === 1) variant = 'variantB';
-                else variant = 'variantC';
-            }
-            const urlParams = new URLSearchParams(window.location.search);
-            const gentooBoostTest = urlParams.get('gentoo-boost-test');
-            const profileId = urlParams.get('profileId');
-            if (profileId) {
-                sessionStorage.setItem('gentoo-boost-test-profileId', profileId);
-            }
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
-            if (gentooBoostTest) {
-                source = 'https://dev-sdk.gentooai.com/dist/builder-weekend/floating-cafe24-modal.js';
-            } else {
-                source = isMobile ? (
-                    variant === 'control' ? 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js' : (
-                        `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js`
-                    )
-                ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
-            }
+            source = isMobile 
+                ? `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js` 
+                : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
             s.src = source; // dev
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
