@@ -60,7 +60,7 @@ class FloatingButton {
         this.displayLocation;
         this.browserWidth = logWindowWidth(window);
         this.isSmallResolution = this.browserWidth < 601;
-        this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
         this.isDestroyed = false;
         this.isInitialized = false;  // Add flag to track initialization
         this.floatingCount = 0;

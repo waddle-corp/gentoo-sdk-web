@@ -603,7 +603,7 @@ input.chat-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #e0e6f3;
+    background-color: var(--gentoo-color-3, #e0e6f3);
     border-radius: 999px;
     padding: 5px 14px;
     cursor: pointer;
@@ -614,8 +614,14 @@ input.chat-input {
         line-height: 19px;
         letter-spacing: -0.375px;
         font-weight: 400;
-        color: #154cca !important;
+        color: var(--gentoo-color-1, #154cca);
     }
+}
+
+/* Ensure example floating buttons use their injected colors even under the global [data-gentoo-sdk] color rule */
+[data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button,
+[data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button * {
+    color: var(--gentoo-color-1, #154cca);
 }
 
 .footer-add-height {

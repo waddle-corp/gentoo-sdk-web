@@ -187,6 +187,8 @@ export const createUIElementsModal = (
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button";
             examFloatingButton.innerText = example;
+            examFloatingButton.style.setProperty('--gentoo-color-3', context.chatbotData?.colorCode[2]?.hex);
+            examFloatingButton.style.setProperty('--gentoo-color-1', context.chatbotData?.colorCode[0]?.hex);
             context.examFloatingGroup.appendChild(examFloatingButton);
         });
         context.inputContainer.appendChild(context.examFloatingGroup);
