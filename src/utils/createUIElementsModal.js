@@ -1,5 +1,5 @@
 import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
-import '../floating-sdk-cafe24-modal.css';
+import '../floating-sdk-modal.css';
 import { setupEventListenersModal } from "./setupEventListenersModal";
 import { 
     updateFloatingContainerPosition, 

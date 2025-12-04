@@ -1,5 +1,5 @@
 import '../global.css'
-import './floating-sdk-cafe24-modal.css';
+import './floating-sdk-modal.css';
 import { 
     getChatbotData, 
     postChatUserId, 

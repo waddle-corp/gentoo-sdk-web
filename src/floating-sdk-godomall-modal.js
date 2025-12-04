@@ -1,10 +1,10 @@
 import '../global.css'
-import './floating-sdk-godomall-modal.css';
+import './floating-sdk-modal.css';
 import { 
     getChatbotData, 
     postChatUserId, 
     getFloatingData, 
-    getPartnerId, 
+    getGodomallPartnerId, 
     postChatEventLog, 
     getBootConfig, 
 } from './apis/chatConfig';
