@@ -225,8 +225,8 @@ class FloatingButton {
         // Inject viewport meta tag to block ios zoom in
         injectViewport(this, document);
         // Chat being visible
-        this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
-        if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
+        this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
+        if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
@@ -597,11 +597,11 @@ class FloatingButton {
         if (mode === "shrink") {
             this.iframeContainer.className = "iframe-container-shrink";
             if (this.chatHandler) this.chatHandler.classList.remove('visibility-hidden');
-            if (this.isMobileDevice) this.iframeContainer.style.height = "400px";
+            if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "400px";
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
             if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
-            if (this.isMobileDevice) this.iframeContainer.style.height = "99%";
+            if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "99%";
         } else {
             return;
         }

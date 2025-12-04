@@ -103,7 +103,7 @@ export const setupEventListenersModal = (context, position) => {
             // context.enableChat("full");
         }
         if (e.data.resetState) {
-            if (context.isMobileDevice && context.iframeContainer) {
+            if ((context.isMobileDevice || context.isSmallResolution) && context.iframeContainer) {
                 context.hideChat();
                 // open modal 로 묶어야 됨
                 if (context.inputContainer.classList.contains("hide")) {
@@ -437,7 +437,7 @@ export const setupEventListenersModal = (context, position) => {
     });
 
     window?.addEventListener('popstate', () => {
-        if (context.isMobileDevice) {
+        if (context.isMobileDevice || context.isSmallResolution) {
             context.hideChat();
         }
     });
