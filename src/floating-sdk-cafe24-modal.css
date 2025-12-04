@@ -497,7 +497,8 @@
     height: fit-content;
     position: fixed;
     bottom: 66px;
-    right: 0;
+    right: 16px;
+    left: 16px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
