@@ -6,6 +6,8 @@ import {
     getFloatingData, 
     getGodomallPartnerId, 
     postChatEventLog, 
+    postChatEventLogLegacy,
+    generateGuestUserToken,
     getBootConfig, 
 } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
