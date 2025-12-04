@@ -244,9 +244,14 @@ class FloatingButton {
         this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
+        // Prevent native scroll gestures interfering with drag-resize on header
+        if (this.chatHeader) {
+            this.chatHeader.style.touchAction = 'none';
+        }
+
         this.chatHeader?.addEventListener("touchmove", (e) => {
             this.handleTouchMove(e, this.iframeContainer);
-        }, { passive: true });
+        }, { passive: false });
 
         this.chatHeader?.addEventListener("touchend", (e) => {
             this.handleTouchEnd(
@@ -575,7 +580,7 @@ class FloatingButton {
     }
 
     handleTouchMove(e, iframeContainer) {
-        e.preventDefault();
+        if (e && e.cancelable) e.preventDefault();
         const touch = e.touches[0];
         if (!this.prevPosition) {
             this.prevPosition = touch.clientY;
@@ -593,7 +598,7 @@ class FloatingButton {
     }
 
     handleTouchEnd(e) {
-        e.preventDefault();
+        if (e && e.cancelable) e.preventDefault();
         if (this.scrollDir === "up") {
             this.enableChat("full");
         } else if (this.scrollDir === "down") {

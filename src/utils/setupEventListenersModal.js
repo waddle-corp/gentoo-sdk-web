@@ -374,9 +374,6 @@ export const setupEventListenersModal = (context, position) => {
         const raw = e.target;
         const el = raw.nodeType === Node.TEXT_NODE ? raw.parentElement : raw; // Text면 부모 Element로 승격
         const button = el?.closest?.('.exam-floating-button');
-        console.log('[debug] raw:', raw);
-        console.log('[debug] el:', el);
-        console.log('[debug] button:', button);
         if (button) {
             context.iframeContainer.style.height = "400px";
             postChatEventLog({
