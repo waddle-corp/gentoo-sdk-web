@@ -525,7 +525,7 @@
     z-index: 2147483647;
 }
 
-.chat-input {
+input.chat-input {
     width: 100%;
     flex-grow: 1;
     border: none;
@@ -541,6 +541,8 @@
     transition: width 0.5s ease;
     white-space: nowrap;
     height: 19px;
+    min-height: 19px;
+    max-height: 19px;
 }
 
 .gentoo-profile-image {
