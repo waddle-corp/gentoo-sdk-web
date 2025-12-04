@@ -56,7 +56,6 @@
                 ) : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
             }
             s.src = source; // dev
-            s.src = "./dist/cafe24-modal/floating-cafe24-modal.js"; // local
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
