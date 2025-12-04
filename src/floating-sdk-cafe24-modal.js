@@ -271,21 +271,6 @@ class FloatingButton {
         });
     }
 
-    remove() {
-        if (this.button) {
-            document.body.removeChild(this.button);
-        }
-        if (this.expandedButton) {
-            document.body.removeChild(this.expandedButton);
-        }
-        if (this.iframeContainer) {
-            document.body.removeChild(this.iframeContainer);
-        }
-        this.button = null;
-        this.expandedButton = null;
-        this.iframeContainer = null;
-    }
-
     destroy() {
         if (window.__GentooInited !== 'created') {
             console.log('FloatingButton instance is not created');
@@ -299,11 +284,13 @@ class FloatingButton {
         deleteViewport(this, document);
 
         // Remove event listeners
-        window.removeEventListener("resize", this.handleResize);
-        if (this.button) {
+        if (this.handleResize) {
+            window.removeEventListener("resize", this.handleResize);
+        }
+        if (this.button && this.buttonClickHandler) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
-        if (this.expandedButton) {
+        if (this.expandedButton && this.expandedButtonClickHandler) {
             this.expandedButton.removeEventListener(
                 "click",
                 this.expandedButtonClickHandler
@@ -311,10 +298,22 @@ class FloatingButton {
         }
 
         // Remove event listeners for the input container
-        this.inputContainer.removeEventListener("click", this.inputContainerClickHandler);
-        this.inputContainer.removeEventListener("blur", this.inputContainerBlurHandler);
+        if (this.inputContainer) {
+            if (this.inputContainerClickHandler) {
+                this.inputContainer.removeEventListener("click", this.inputContainerClickHandler);
+            }
+            if (this.inputContainerBlurHandler) {
+                this.inputContainer.removeEventListener("blur", this.inputContainerBlurHandler);
+            }
+        }
 
         // Remove all DOM elements
+        if (this.button && this.button.parentNode) {
+            this.button.parentNode.removeChild(this.button);
+        }
+        if (this.expandedButton && this.expandedButton.parentNode) {
+            this.expandedButton.parentNode.removeChild(this.expandedButton);
+        }
         if (this.floatingContainer && this.floatingContainer.parentNode) {
             this.floatingContainer.parentNode.removeChild(this.floatingContainer);
         }

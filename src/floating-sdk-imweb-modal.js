@@ -4,9 +4,10 @@ import {
     getChatbotData, 
     postChatUserId, 
     getFloatingData, 
-    getGodomallPartnerId, 
+    getPartnerId, 
     postChatEventLog, 
     postChatEventLogLegacy,
+    getImwebPartnerId,
     generateGuestUserToken,
     getBootConfig, 
 } from './apis/chatConfig';
@@ -48,7 +49,7 @@ class FloatingButton {
             return;
         }
 
-        this.partnerType = props.partnerType || 'godomall';
+        this.partnerType = props.partnerType || 'imweb';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
@@ -82,63 +83,30 @@ class FloatingButton {
         this._dragMoved = false;
         this._dragStart = { x: 0, y: 0, right: 0, bottom: 0 };
 
-        // Ensure trackingKey is injected into order form if present
-        this.injectTrackingKeyIntoOrderForm();
-
         this.bootPromise = new Promise((resolve, reject) => {
-            /* 고도몰 init process */
+            /* 아임웹 init process */
 
-            this.godomallAPI = window.GodomallSDK.init(process.env.GODOMALL_SYSTEMKEY);
+            let imwebMallUnitCode = window.UNIT_CODE;      // 아임웹 쇼핑몰 식별자
+            let imwebMemberUid = window.MEMBER_UID;        // 아임웹 유저 식별자, empty string if guest user
+            this.userType = imwebMemberUid ? "member" : "guest";
 
-            const getMallInfoPromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMallInfo((err, res) => {
-                    if (err) {
-                        reject(new Error(`Error while calling godomall getMallInfo api: ${err}`));
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
+            // 비회원이면 난수로 대체
+            if (!imwebMemberUid || imwebMemberUid.length === 0) {
+                if (sessionStorage.getItem('gentooGuest')) {
+                    imwebMemberUid = sessionStorage.getItem('gentooGuest');
+                } else {
+                    imwebMemberUid = generateGuestUserToken();
+                    sessionStorage.setItem('gentooGuest', imwebMemberUid);
+                }
+            }
 
-            const getMemberProfilePromise = new Promise((resolve, reject) => {
-                this.godomallAPI.getMemberProfile((err, res) => {
-                    if (err) {
-                        // Handle guest users who get 403 error - they're not logged in
-                        // console.log('User is guest (not logged in):', err);
-                        resolve(null); // Resolve with null for guest users
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
-
-            Promise.all([getMallInfoPromise, getMemberProfilePromise])
-                .then(([mallInfo, memberProfile]) => {
-                    const godomallMallId = mallInfo.mallDomain.split('.')[0];
-                    const partnerIdPromise = getGodomallPartnerId(godomallMallId)
-                        .then(partnerId => {
-                            this.partnerId = partnerId;
-                            return partnerId;
-                        });
-
-                    // Handle both member and guest users
-                    this.godomallUserId = memberProfile?.id || null;
-                    this.userType = memberProfile?.id ? "member" : "guest";
-
-                    // 비회원이면 난수로 대체
-                    if (!this.godomallUserId || this.godomallUserId.length === 0) {
-                        if (sessionStorage.getItem('gentooGuest')) {
-                            this.godomallUserId = sessionStorage.getItem('gentooGuest');
-                        } else {
-                            this.godomallUserId = generateGuestUserToken();
-                            sessionStorage.setItem('gentooGuest', this.godomallUserId);
-                        }
-                    }
-
-                    // Wait for partner ID before fetching chat user ID
-                    return partnerIdPromise.then(partnerId => {
-                        return postChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
-                    });
+            getImwebPartnerId(imwebMallUnitCode)
+                .then((partnerId) => {
+                    this.imwebUserId = imwebMemberUid;
+                    this.partnerId = partnerId;
+                })
+                .then(() => {
+                    return postChatUserId(this.imwebUserId, '', this.partnerId, this.chatUserId);
                 })
                 .then(chatUserId => {
                     this.chatUserId = chatUserId;
@@ -363,49 +331,6 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    // Inject hidden trackingKey input with this.sessionId into #frmOrder, if present
-    injectTrackingKeyIntoOrderForm() {
-        const insertOrUpdateTrackingKey = () => {
-            const form =
-                document.getElementById('frmOrder') ||
-                document.querySelector('form#frmOrder');
-            if (!form) return false;
-            let input = form.querySelector('input[name="trackingKey"]');
-            if (!input) {
-                input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'trackingKey';
-                form.appendChild(input);
-            }
-            input.value = this.sessionId || '';
-            return true;
-        };
-
-        if (insertOrUpdateTrackingKey()) return;
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                insertOrUpdateTrackingKey();
-            }, { once: true });
-            return;
-        }
-
-        const observer = new MutationObserver((mutations, obs) => {
-            if (insertOrUpdateTrackingKey()) {
-                obs.disconnect();
-            }
-        });
-        try {
-            observer.observe(document.documentElement || document.body, {
-                childList: true,
-                subtree: true,
-            });
-            setTimeout(() => observer.disconnect(), 15000);
-        } catch (e) {
-            // no-op
-        }
-    }
-
     async addProductToCart(product) {
         console.log('not supported yet');
         return;
@@ -486,7 +411,7 @@ class FloatingButton {
 
     enableChat(mode) {
         if (this.isDraggingFloating) return;
-
+        
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
@@ -542,43 +467,28 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('/goods_view')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/goods_list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
-
-            // 1. 쿼리 파라미터에서 goodsNo 추출 시도
-            const productNoFromQuery = url.searchParams.get('goodsNo');
-            if (productNoFromQuery) {
-                return productNoFromQuery;
-            }
-
-            // 2. 경로 기반 URL에서 product_no 추출 시도
             const path = url.pathname;
 
             /**
-             * 고려가 필요한 고도몰 경로 패턴
-                /goods/goods_view.php?goodsNo={goodsNo}
+             * Imweb URL 패턴:
+             * - Product Detail: {shopdomain}/{list_id_OR_custom_string}/?idx={product_id}
+             * - Product List: {shopdomain}/{list_id_OR_custom_string}
              */
 
-            /**
-             * 정규 표현식 설명:
-                (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
-                \/product\/	/product/ 고정
-                [^\/]+	product_name
-                \/([^\/]+)	✅ 캡처할 product_no
-                (?:\/category/...)?	🔹 optional category/display path
-             */
-            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-
-            const match = path.match(regex);
-            if (match && match[1]) {
-                return match[1]; // product_no
+            // 1. 쿼리 파라미터에서 idx 추출 시도 (Product Detail Page)
+            const productIdFromQuery = url.searchParams.get('idx');
+            if (productIdFromQuery) {
+                this.displayLocation = 'PRODUCT_DETAIL';
+                return productIdFromQuery;
             }
 
-            // 3. 찾을 수 없는 경우 null 반환
+            // 현재 imweb url parsing 으로 PLP를 구분할 수 없음
+            this.displayLocation = 'HOME';
+
+            // Product list page or home에서는 product_no 없음
             return null;
         } catch (error) {
             console.error('Invalid URL:', error);
