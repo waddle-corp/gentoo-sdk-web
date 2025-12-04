@@ -10,6 +10,10 @@ export const setupEventListenersModal = (context, position) => {
     var buttonClickHandler = (e) => {
         e.stopPropagation();
         e.preventDefault();
+        if (context.isDraggingFloating || context._dragMoved) {
+            // Suppress click when drag just happened
+            return;
+        }
         context.floatingClicked = true;
 
         if (context.messageExistence || context.displayLocation === 'PRODUCT_DETAIL') {
@@ -220,6 +224,62 @@ export const setupEventListenersModal = (context, position) => {
             products: [],
         }, context.isMobileDevice);
     });
+    /* Mobile touch-drag for floatingContainer */
+    const onTouchStart = (e) => {
+        if (!context.isSmallResolution || !context.floatingContainer) return;
+        const touch = e.touches && e.touches[0];
+        if (!touch) return;
+        const cs = window.getComputedStyle(context.floatingContainer);
+        const right = parseFloat(cs.right) || 0;
+        const bottom = parseFloat(cs.bottom) || 0;
+        context._dragStart = { x: touch.clientX, y: touch.clientY, right, bottom };
+        context._dragMoved = false;
+    };
+    const onTouchMove = (e) => {
+        if (!context.isSmallResolution || !context.floatingContainer) return;
+        const touch = e.touches && e.touches[0];
+        if (!touch) return;
+        context.isDraggingFloating = true;
+        context._dragMoved = true;
+        // Prevent page scroll while dragging
+        e.preventDefault();
+        const dx = context._dragStart.x - touch.clientX;
+        const dy = context._dragStart.y - touch.clientY;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const rect = context.floatingContainer.getBoundingClientRect();
+        const cw = rect.width;
+        const ch = rect.height;
+        const maxRight = Math.max(vw - cw, 0);
+        const maxBottom = Math.max(vh - ch, 0);
+        let newRight = context._dragStart.right + dx;
+        let newBottom = context._dragStart.bottom + dy;
+        newRight = Math.min(Math.max(newRight, 0), maxRight);
+        newBottom = Math.min(Math.max(newBottom, 0), maxBottom);
+        context.floatingContainer.style.right = `${Math.round(newRight)}px`;
+        context.floatingContainer.style.bottom = `${Math.round(newBottom)}px`;
+        // Persist to position object and session
+        position.mobile = position.mobile || {};
+        position.mobile.right = Math.round(newRight);
+        position.mobile.bottom = Math.round(newBottom);
+        context.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || context.gentooSessionData || {};
+        context.gentooSessionData.floatingPosition = context.gentooSessionData.floatingPosition || {};
+        context.gentooSessionData.floatingPosition.mobile = { right: position.mobile.right, bottom: position.mobile.bottom };
+        sessionStorage.setItem('gentoo', JSON.stringify(context.gentooSessionData));
+    };
+    const onTouchEnd = (e) => {
+        if (!context.isSmallResolution) return;
+        if (context._dragMoved) {
+            e.preventDefault();
+        }
+        context.isDraggingFloating = false;
+        context._dragMoved = false;
+    };
+    context.floatingContainer?.addEventListener("touchstart", onTouchStart, { passive: true });
+    context.floatingContainer?.addEventListener("touchmove", onTouchMove, { passive: false });
+    context.floatingContainer?.addEventListener("touchend", onTouchEnd);
+    context.floatingContainer?.addEventListener("touchcancel", onTouchEnd);
+
     context.closeButtonContainer?.addEventListener("click", buttonClickHandler);
     context.closeButtonContainer?.addEventListener("click", (e) => context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
     context.closeButtonIcon?.addEventListener("click", buttonClickHandler);

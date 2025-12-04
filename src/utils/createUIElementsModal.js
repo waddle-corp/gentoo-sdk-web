@@ -66,7 +66,26 @@ const logFloatingRendered = (context) => {
     window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
 };
 
-// Separate UI creation into its own method for clarity
+const getCurrentFloatingPosition = (context, position) => {
+    const storedFloatingPosition = context.gentooSessionData?.floatingPosition || {};
+        let currentFloatingPosition = position ? JSON.parse(JSON.stringify(position)) : {};
+        if (!currentFloatingPosition.web) currentFloatingPosition.web = {};
+        if (!currentFloatingPosition.mobile) currentFloatingPosition.mobile = {};
+        if (context.isSmallResolution) {
+            if (storedFloatingPosition?.mobile) {
+                if (typeof storedFloatingPosition.mobile.bottom === 'number') currentFloatingPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
+                if (typeof storedFloatingPosition.mobile.right === 'number') currentFloatingPosition.mobile.right = storedFloatingPosition.mobile.right;
+            }
+        } else {
+            if (storedFloatingPosition?.web) {
+                if (typeof storedFloatingPosition.web.bottom === 'number') currentFloatingPosition.web.bottom = storedFloatingPosition.web.bottom;
+                if (typeof storedFloatingPosition.web.right === 'number') currentFloatingPosition.web.right = storedFloatingPosition.web.right;
+            }
+        }
+    return currentFloatingPosition;
+}
+
+// ------------------------------ Modal UI Creation ------------------------------
 export const createUIElementsModal = (
     context, // this 객체를 받는 인자
     position, 
@@ -229,7 +248,9 @@ export const createUIElementsModal = (
         context.floatingContainer.setAttribute("data-gentoo-sdk", "true");
         document.body.appendChild(context.floatingContainer);
 
-        updateFloatingContainerPosition(context, position); // Set initial position
+        /* [Floating Position] */
+        context.currentFloatingPosition = getCurrentFloatingPosition(context, position);
+        updateFloatingContainerPosition(context, context.currentFloatingPosition); // Set initial position
         
         /* [non-lottie Floating Button] */
         context.button = document.createElement("div");
@@ -312,7 +333,8 @@ export const createUIElementsModal = (
     }
 
     /* [Event Listeners] */
-    setupEventListenersModal(context, position);
+    context.currentFloatingPosition = getCurrentFloatingPosition(context, position);
+    setupEventListenersModal(context, context.currentFloatingPosition);
 
     /* 캐러셀 리다이렉트 시 채팅창 자동 열림 */
     if (context.gentooSessionData?.redirectState) {
@@ -347,6 +369,7 @@ export const createUIElementsModal = (
                 userType: context.userType,
                 displayLocation: context.displayLocation,
                 deviceType: context.isMobileDevice ? "mobile" : "web",
+                godomallCVID: context.sessionId,
             }
         });
     }, 1000);
