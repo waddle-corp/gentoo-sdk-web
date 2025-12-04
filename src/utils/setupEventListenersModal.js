@@ -112,8 +112,6 @@ export const setupEventListenersModal = (context, position) => {
                     context.input.classList.remove("shrink-hide");
                     context.examFloatingGroup.classList.add("slide-up");
                     context.examFloatingGroup.classList.remove("hide");
-                    // context.examFloatingButton.classList.remove("slide-down");
-                    // context.examFloatingButton.classList.remove("hide");
                     context.sendButton.classList.remove("hide");
                     context.profileImage.classList.remove("hide");
                     if (context.dimmedBackground) context.dimmedBackground.classList.remove('hide');
@@ -372,7 +370,13 @@ export const setupEventListenersModal = (context, position) => {
     context.examFloatingGroup?.addEventListener("mousedown", () => { context.isInteractingWithSend = true; });
     context.examFloatingGroup?.addEventListener("touchstart", () => { context.isInteractingWithSend = true; }, { passive: true });
     context.examFloatingGroup.addEventListener("click", (e) => {
-        const button = e.target.closest('.exam-floating-button');
+        //const button = e.target.closest('.exam-floating-button');
+        const raw = e.target;
+        const el = raw.nodeType === Node.TEXT_NODE ? raw.parentElement : raw; // Text면 부모 Element로 승격
+        const button = el?.closest?.('.exam-floating-button');
+        console.log('[debug] raw:', raw);
+        console.log('[debug] el:', el);
+        console.log('[debug] button:', button);
         if (button) {
             context.iframeContainer.style.height = "400px";
             postChatEventLog({
