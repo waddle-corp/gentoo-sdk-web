@@ -370,6 +370,8 @@ export const createUIElementsModal = (
                 displayLocation: context.displayLocation,
                 deviceType: context.isMobileDevice ? "mobile" : "web",
                 godomallCVID: context.sessionId,
+                cafe24CVID: context?.cvid,
+                cafe24CVIDY: context?.cvid_y,
             }
         });
     }, 1000);

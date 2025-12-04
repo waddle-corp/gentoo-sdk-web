@@ -79,6 +79,18 @@ class FloatingButton {
         this.isDraggingFloating = false;
         this._dragMoved = false;
         this._dragStart = { x: 0, y: 0, right: 0, bottom: 0 };
+        /* CVID 추가 */
+        function gentooGetCookie(name) {
+            if (!document || !document.cookie) return null;
+            const pairs = document.cookie.split('; ');
+            for (const pair of pairs) {
+              const [k, ...rest] = pair.split('=');
+              if (k === name) return decodeURIComponent(rest.join('='));
+            }
+            return null;
+        }
+        this.cvid = gentooGetCookie('CVID');
+        this.cvid_y = gentooGetCookie('CVID_Y');
 
         // Modify the CAFE24API initialization to ensure promises are handled correctly
         this.bootPromise = new Promise((resolve, reject) => {
