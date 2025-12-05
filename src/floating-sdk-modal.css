@@ -646,6 +646,16 @@ input.chat-input {
     color: var(--gentoo-color-1, #154cca);
 }
 
+/* Increase specificity so paragraph styles inside the example floating button are not overridden by site styles */
+[data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button p {
+    font-family: 'pretendard', sans-serif;
+    font-size: 15px;
+    line-height: 19px;
+    letter-spacing: -0.375px;
+    font-weight: 400;
+    color: var(--gentoo-color-1, #154cca);
+}
+
 .footer-add-height {
     height: calc(100% - 75px);
 }
