@@ -229,23 +229,6 @@ export async function checkTrainingProgress(partnerId) {
     }
 }
 
-export async function checkTrainingProgress(partnerId) {
-    try {
-        const response = await fetch(`${process.env.API_MAIN_BASE_URL}/api/shop/data/check/progress/${partnerId}`);
-        const data = await response.json();
-
-        if (data.success && data.data) {
-            return data.data.status === 'success';
-        }
-
-        console.log("Training progress is not 'success'. Initialization will not proceed.");
-        return false;
-    } catch (error) {
-        console.log("Training progress check failed, proceeding with initialization.");
-        return false;
-    }
-}
-
 export async function fetchShopifyExperimentData(partnerId) {
     try {
         const response = await fetch(
