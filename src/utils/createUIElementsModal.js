@@ -230,6 +230,7 @@ export const createUIElementsModal = (
         /* [Chat Header] */
         context.chatHeader.className = "chat-header";
         context.chatHeaderText.className = "chat-header-text";
+        context.chatHeaderText.innerText = "Gentoo";
         context.closeButtonContainer.className = "chat-close-button-container";
         context.closeButtonIcon.className = "chat-close-button-icon";
         context.closeButtonText.className = "chat-close-button-text";

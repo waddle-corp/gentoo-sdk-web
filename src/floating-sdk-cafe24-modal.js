@@ -618,6 +618,10 @@ class FloatingButton {
             this.iframeContainer.className = "iframe-container";
             if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "99%";
+            if (this.chatHeader) {
+                this.chatHeader.removeChild(this.chatHeaderProfile);
+                this.chatHeader.appendChild(this.chatHeaderText);
+            }
         } else {
             return;
         }
