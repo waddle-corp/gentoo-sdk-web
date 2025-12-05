@@ -18,6 +18,9 @@ export const setupEventListenersModal = (context, position) => {
 
         if (context.messageExistence || context.displayLocation === 'PRODUCT_DETAIL') {
             context.openChat();
+            if (context?.eventCallback?.click) {
+                try { context.eventCallback.click(); } catch {}
+            }
         } else if (context.inputContainer.classList.contains("hide")) {
             if (context.dimmedBackground) context.dimmedBackground.classList.remove("hide");
             context.inputContainer.classList.remove("hide");
@@ -42,6 +45,9 @@ export const setupEventListenersModal = (context, position) => {
                 context.dotLottiePlayer.classList.add('hide');
             }
             context.input.focus();
+            if (context?.eventCallback?.click) {
+                try { context.eventCallback.click(); } catch {}
+            }
         }
     };
 
@@ -63,11 +69,11 @@ export const setupEventListenersModal = (context, position) => {
                 } else {
                     context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                 }
-                context.button.style.backgroundImage = `url(${context.bootConfig?.floating?.button?.imageUrl || context.floatingData.imageUrl})`;
+                context.button.style.backgroundImage = `url(${context.selectedFloatingImage})`;
             }
             if (context.dotLottiePlayer) {
                 context.dotLottiePlayer.classList.remove('hide');
-                context.dotLottiePlayer.setAttribute('src', context.bootConfig?.floating?.button?.imageUrl || context.floatingData.imageUrl);
+                context.dotLottiePlayer.setAttribute('src', context.selectedFloatingImage);
             }
         }, 100);
         context.inputContainerTimeout = null;
@@ -135,6 +141,11 @@ export const setupEventListenersModal = (context, position) => {
         }
         if (e.data.closeRequestState) {
             context.hideChat();
+        }
+        if (e.data.userSentMessageState) {
+            if (context.eventCallback.userSentMessage !== null) {
+                try { context.eventCallback?.userSentMessage(); } catch {}
+            }
         }
         if (e.data.addProductToCart) {
             context.addProductToCart(e.data.addProductToCart);

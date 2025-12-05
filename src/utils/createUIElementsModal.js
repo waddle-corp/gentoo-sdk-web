@@ -15,14 +15,19 @@ const hasValidChatbotData = (chatbotData) => {
 const hasValidFloatingData = (context) => {
     const bootImage = context.bootConfig?.floating?.button?.imageUrl;
     const avatarAsset = context.floatingAvatar?.floatingAsset;
-    return Boolean(context.bootConfig?.floating && (bootImage || avatarAsset));
+    const fallbackImage = context.floatingData?.imageUrl;
+    return Boolean(
+        (context.bootConfig?.floating && (bootImage || avatarAsset || fallbackImage)) ||
+        fallbackImage
+    );
 };
 
 const selectFloatingAsset = (context) => {
     const bootImage = context.bootConfig?.floating?.button?.imageUrl;
     const avatarAsset = context.floatingAvatar?.floatingAsset;
+    const floatingImage = context.floatingData?.imageUrl;
     const useBootImage = Boolean(bootImage && !bootImage.includes('default.lottie'));
-    const selectedAsset = useBootImage ? bootImage : avatarAsset;
+    const selectedAsset = useBootImage ? bootImage : (avatarAsset || floatingImage);
     return { useBootImage, selectedAsset };
 };
 
@@ -114,6 +119,11 @@ export const createUIElementsModal = (
         return;
     }
 
+    // Fire "show" callback if provided (parity with legacy)
+    if (context?.eventCallback?.show) {
+        try { context.eventCallback.show(); } catch {}
+    }
+
     /* [Dimmed Background] */
     context.dimmedBackground = document.createElement("div");
     context.dimmedBackground.className = "dimmed-background hide";
@@ -151,6 +161,7 @@ export const createUIElementsModal = (
     // Reuse pre-validated floating data
     const { useBootImage, selectedAsset } = selectFloatingAsset(context);
     context.useBootConfigFloatingImage = useBootImage;
+    context.selectedFloatingImage = selectedAsset;
 
     /* [DotLottie Player] */
     if (selectedAsset?.includes('lottie')) {
@@ -273,7 +284,7 @@ export const createUIElementsModal = (
         }
         context.button.type = "button";
         context.button.style.backgroundImage = 
-            `url(${context.useBootConfigFloatingImage ? context.bootConfig?.floating?.button?.imageUrl : context.floatingAvatar?.floatingAsset})`;
+            `url(${context.selectedFloatingImage})`;
         
         /* [Lottie Floating Button] */
         if (context.dotLottiePlayer) {
@@ -330,6 +341,13 @@ export const createUIElementsModal = (
                         context.floatingContainer.removeChild(context.expandedButtonWrapper);
                     }
                 }, 7000);
+            }
+
+            // Start repeating interval for experiment target (every 10 seconds)
+            if (context?.isExperimentTarget && context?.availableComments && context?.availableComments?.length > 0) {
+                context.floatingMessageIntervalId = setInterval(() => {
+                    context.showRandomFloatingMessage();
+                }, context.FLOATING_MESSAGE_INTERVAL_MS);
             }
         }
     }
