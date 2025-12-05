@@ -18,9 +18,12 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/dist/godomall/floating-godomall.js"; 
-            // s.src = "./dist/godomall/floating-godomall.js"; 
-            // s.src = "https://dev-sdk.gentooai.com/dist/godomall/floating-godomall.js";
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
+            var source = '';
+            source = isMobile 
+                ? `https://sdk.gentooai.com/dist/godomall-modal/floating-godomall-modal.js` 
+                : 'https://sdk.gentooai.com/dist/godomall/floating-godomall.js';
+            s.src = source;
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
