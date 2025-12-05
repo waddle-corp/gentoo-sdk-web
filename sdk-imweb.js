@@ -18,8 +18,12 @@
             var s = document.createElement("script"); 
             s.type = "text/javascript"; 
             s.async = true; 
-            // s.src = "https://sdk.gentooai.com/dist/imweb/floating-imweb.js"; 
-            s.src = "https://dev-sdk.gentooai.com/dist/imweb/floating-imweb.js";
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
+            var source = '';
+            source = isMobile 
+                ? `https://dev-sdk.gentooai.com/dist/imweb-modal/floating-imweb-modal.js` 
+                : 'https://dev-sdk.gentooai.com/dist/imweb/floating-imweb.js';
+            s.src = source;
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
