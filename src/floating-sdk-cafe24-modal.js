@@ -615,7 +615,9 @@ class FloatingButton {
             if (this.chatHandler) this.chatHandler.classList.remove('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "400px";
             if (this.chatHeader) {
-                this.chatHeader.removeChilren();
+                while (this.chatHeader.firstChild) {
+                    this.chatHeader.removeChild(this.chatHeader.firstChild);
+                }
                 this.chatHeaderText.innerText = this.chatbotData?.name || 'Gentoo';
                 this.chatHeader.appendChild(this.chatHeaderProfile);
                 this.chatHeader.appendChild(this.chatHandler);
@@ -626,7 +628,9 @@ class FloatingButton {
             if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "99%";
             if (this.chatHeader) {
-                this.chatHeader.removeChilren();
+                while (this.chatHeader.firstChild) {
+                    this.chatHeader.removeChild(this.chatHeader.firstChild);
+                }
                 this.chatHeaderText.innerText = 'Gentoo';
                 this.chatHeader.appendChild(this.chatHeaderText);
                 this.chatHeader.appendChild(this.closeButtonContainer);
