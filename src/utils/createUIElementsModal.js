@@ -169,7 +169,7 @@ export const createUIElementsModal = (
         context.chatHeaderText.className = "chat-header-text-md";
         context.chatHeaderProfile.className = "chat-header-profile-md";
         context.chatHeaderImage.className = "chat-header-image-md";
-        context.chatHeaderImage.style.setProperty('--gentoo-profile-image', `url(${context.chatbotData?.profileImg})`);
+        context.chatHeaderImage.style.setProperty('--gentoo-profile-image', `url(${context.floatingAvatar?.profileAsset})`);
         
         context.closeButtonContainer.className = "chat-close-button-container-md";
         context.closeButtonIcon.className = "chat-close-button-icon-md";
@@ -202,7 +202,7 @@ export const createUIElementsModal = (
         context.input.autocapitalize = "off";
         context.input.autocorrect = "off";
         context.profileImage = document.createElement("div");
-        context.profileImage.style.setProperty('--gentoo-profile-image', `url(${context.chatbotData?.profileImg})`);
+        context.profileImage.style.setProperty('--gentoo-profile-image', `url(${context.floatingAvatar?.profileAsset})`);
         context.profileImage.className = "gentoo-profile-image hide";
         context.inputWrapper.appendChild(context.profileImage);
         context.inputWrapper.appendChild(context.input);
