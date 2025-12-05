@@ -440,6 +440,23 @@
     justify-content: space-between;
 }
 
+.chat-header-profile-md {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.chat-header-image-md {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: var(--gentoo-profile-image, url('https://dev-avatar.gentooai.com/default/default-profile.png'));
+}
+
 .chat-handler-md {
     width: 40px;
     height: 20px;
@@ -457,6 +474,7 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 17px;
+    letter-spacing: -0.35px;
     margin: 0;
     color: #C0C0C0;
 }
@@ -553,7 +571,7 @@ input.chat-input {
     border-radius: 50%;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('https://dev-avatar.gentooai.com/default/default-profile.png');
+    background-image: var(--gentoo-profile-image, url('https://dev-avatar.gentooai.com/default/default-profile.png'));
     box-sizing: border-box;
 }
 

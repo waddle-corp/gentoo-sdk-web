@@ -132,11 +132,14 @@ export const createUIElementsModal = (
     /* [Chat Header] */
     context.chatHeader = document.createElement("div");
     context.chatHandler = document.createElement("div");
+    context.chatHeaderProfile = document.createElement("div");
+    context.chatHeaderImage = document.createElement("img");
     context.chatHeaderText = document.createElement("p");
+    context.chatHeaderText.innerText = context.chatbotData?.name || "Gentoo";
+
     context.closeButtonContainer = document.createElement("div");
     context.closeButtonIcon = document.createElement("div");
     context.closeButtonText = document.createElement("p");
-    context.chatHeaderText.innerText = "Gentoo";
     
     /* [Chat Footer] */
     context.footer = document.createElement("div");
@@ -164,13 +167,20 @@ export const createUIElementsModal = (
         context.chatHeader.className = "chat-header-md";
         context.chatHandler.className = "chat-handler-md";
         context.chatHeaderText.className = "chat-header-text-md";
+        context.chatHeaderProfile.className = "chat-header-profile-md";
+        context.chatHeaderImage.className = "chat-header-image-md";
+        context.chatHeaderImage.style.setProperty('--gentoo-profile-image', `url(${context.chatbotData?.profileImg})`);
+        
         context.closeButtonContainer.className = "chat-close-button-container-md";
         context.closeButtonIcon.className = "chat-close-button-icon-md";
         context.closeActionArea = document.createElement("div");
         context.closeActionArea.className = "chat-close-action-area-md";
         context.closeButtonContainer.appendChild(context.closeButtonIcon);
         context.closeButtonContainer.appendChild(context.closeButtonText);
-        context.chatHeader.appendChild(context.chatHeaderText);
+        
+        context.chatHeaderProfile.appendChild(context.chatHeaderImage);
+        context.chatHeaderProfile.appendChild(context.chatHeaderText);
+        context.chatHeader.appendChild(context.chatHeaderProfile);
         context.chatHeader.appendChild(context.chatHandler);
         context.chatHeader.appendChild(context.closeButtonContainer);
         context.iframeContainer.appendChild(context.closeActionArea);
@@ -184,7 +194,7 @@ export const createUIElementsModal = (
         context.sendButton = document.createElement("div");
         context.sendButton.className = "chat-send-button chat-send-button-active hide";
         context.input.className = "chat-input shrink-hide";
-        context.input.placeholder = "상품 추천, 문의도 — 무엇이든 물어보세요";
+        context.input.placeholder = "무엇이든 물어보세요";
         context.input.name = "gentoo-chat-input";
         context.input.type = "text";
         context.input.autocomplete = "off";
@@ -192,6 +202,7 @@ export const createUIElementsModal = (
         context.input.autocapitalize = "off";
         context.input.autocorrect = "off";
         context.profileImage = document.createElement("div");
+        context.profileImage.style.setProperty('--gentoo-profile-image', `url(${context.chatbotData?.profileImg})`);
         context.profileImage.className = "gentoo-profile-image hide";
         context.inputWrapper.appendChild(context.profileImage);
         context.inputWrapper.appendChild(context.input);
