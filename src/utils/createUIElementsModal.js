@@ -165,7 +165,12 @@ export const createUIElementsModal = (
 
     /* [DotLottie Player] */
     if (selectedAsset?.includes('lottie')) {
-        const lottieSize = context.floatingZoom ? '120px' : (context.isSmallResolution ? '68px' : '94px');
+        let lottieSize = '';
+        if (context.partnerType === 'cafe24') {
+            lottieSize = context.isSmallResolution ? '68px' : (context.floatingZoom ? '120px' : '94px');
+        } else {
+            lottieSize = context.floatingZoom ? '120px' : (context.isSmallResolution ? '68px' : '94px');
+        }
         context.dotLottiePlayer = createDotLottiePlayer(selectedAsset, lottieSize);
     }
 
@@ -277,7 +282,9 @@ export const createUIElementsModal = (
         
         /* [non-lottie Floating Button] */
         context.button = document.createElement("div");
-        if (context.isSmallResolution) {
+        if (context.isSmallResolution && context.partnerType === 'cafe24') {
+            context.button.className = `floating-button-common button-image-md`;
+        } else if (context.isSmallResolution) {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
         } else {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
@@ -301,7 +308,11 @@ export const createUIElementsModal = (
 
             /* [Floating Message] */
             context.expandedButtonWrapper = document.createElement("div");
-            context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+            if (context.partnerType === 'cafe24') {
+                context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.isSmallResolution ? 'expanded-area-wrapper-md' : context.floatingZoom ? 'expanded-area-wrapper-zoom' : ''}`;
+            } else {
+                context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+            }
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
             
@@ -312,7 +323,11 @@ export const createUIElementsModal = (
                         !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                             `expanded-area-md` :
                             `expanded-area-md expanded-area-neutral-md`;
-                context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                if (context.partnerType === 'cafe24') {
+                    context.expandedText.className = "expanded-area-text-md"; // 추후 아가방 노티 후에 다른 SDK들과 동일하게 업데이트 필요
+                } else {
+                    context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                }
             } else {
                 context.expandedButton.className =
                     context.useBootConfigFloatingImage ?

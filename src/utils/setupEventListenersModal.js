@@ -162,17 +162,26 @@ export const setupEventListenersModal = (context, position) => {
                 context.floatingMessage = e.data.floatingMessage;
                 context.expandedButton = document.createElement("div");
                 context.expandedText = document.createElement("p");
+                
                 if (context.isSmallResolution) {
                     context.expandedButton.className =
-                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area-md" :
-                            "expanded-area-md expanded-area-neutral-md";
-                    context.expandedText.className = "expanded-area-text-md";
+                        context.useBootConfigFloatingImage ?
+                            `expanded-area-md expanded-area-neutral-md` :
+                            !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                `expanded-area-md` :
+                                `expanded-area-md expanded-area-neutral-md`;
+                    if (context.partnerType === 'cafe24') {
+                        context.expandedText.className = "expanded-area-text-md"; // 추후 아가방 노티 후에 다른 SDK들과 동일하게 업데이트 필요
+                    } else {
+                        context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                    }
                 } else {
                     context.expandedButton.className =
-                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                            "expanded-area" :
-                            "expanded-area expanded-area-neutral";
+                        context.useBootConfigFloatingImage ?
+                            `expanded-area expanded-area-neutral` :
+                            !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                                "expanded-area" :
+                                `expanded-area expanded-area-neutral`;
                     context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
                 context.expandedButton.appendChild(context.expandedText);
@@ -314,15 +323,23 @@ export const setupEventListenersModal = (context, position) => {
             context.expandedText = document.createElement("p");
             if (context.isSmallResolution) {
                 context.expandedButton.className =
-                    !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area-md" :
-                        "expanded-area-md expanded-area-neutral-md";
-                context.expandedText.className = "expanded-area-text-md";
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area-md expanded-area-neutral-md` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            `expanded-area-md` :
+                            `expanded-area-md expanded-area-neutral-md`;
+                if (context.partnerType === 'cafe24') {
+                    context.expandedText.className = "expanded-area-text-md"; // 추후 아가방 노티 후에 다른 SDK들과 동일하게 업데이트 필요
+                } else {
+                    context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                }
             } else {
                 context.expandedButton.className =
-                    !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                        "expanded-area" :
-                        "expanded-area expanded-area-neutral";
+                    context.useBootConfigFloatingImage ?
+                        `expanded-area expanded-area-neutral` :
+                        !context.floatingAvatar || context.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                            "expanded-area" :
+                            `expanded-area expanded-area-neutral`;
                 context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
             }
             context.expandedButton.appendChild(context.expandedText);
