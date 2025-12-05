@@ -4,9 +4,12 @@ import {
     getChatbotData, 
     postChatUserId, 
     getFloatingData, 
-    getPartnerId, 
     postChatEventLog, 
+    postChatEventLogLegacy,
+    generateGuestUserToken,
     getBootConfig, 
+    checkTrainingProgress,
+    fetchShopifyExperimentData,
 } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 import { 
@@ -17,6 +20,13 @@ import {
     checkSDKExists,
     isAllowedDomainForIframe
 } from './utils/floatingSdkUtils';
+import { 
+    checkExperimentTarget,
+    getDualtronUSAMessage,
+    getBoostedUSAMessage,
+    getVomfassMessage,
+    getPaperTreeMessage,
+} from './utils/shopifySdkUtils';
 
 class FloatingButton {
     constructor(props) {
@@ -24,7 +34,16 @@ class FloatingButton {
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
             '*.myshopify.com',
+            'shopify-test.gentooai.com',
+            '*.shopify-partners.com',
+            'localhost',
+            '127.0.0.1'
         ];
+        this.FLOATING_MESSAGE_INTERVAL_MS = 30000;
+        this.FLOATING_MESSAGE_DISPLAY_MS = 12000;
+        this.TYPING_ANIMATION_SPEED_MS = 800;
+        this.MIN_TYPING_SPEED_MS = 50;
+        this.isExperimentTarget = checkExperimentTarget();
 
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
@@ -33,6 +52,7 @@ class FloatingButton {
 
         const isInIframe = window !== window.top;
         const isAllowedDomain = isAllowedDomainForIframe(this, window, document);
+
         if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
             window.__GentooInited = 'iframe_blocked';
@@ -45,9 +65,18 @@ class FloatingButton {
             window.__GentooInited = 'created';
             return;
         }
+        if (!props.partnerId || !props.authCode) {
+            throw new Error(
+                "Missing required parameters: partnerId, authCode are required"
+            );
+        }
 
-        this.partnerType = props.partnerType || 'cafe24';
+        this.partnerType = props.partnerType || 'shopify';
         this.partnerId = props.partnerId;
+        this.authCode = props.authCode;
+        this.itemId = props.itemId || null;
+        this.displayLocation = props.displayLocation || "HOME";
+        this.udid = props.udid || "";
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
@@ -56,8 +85,6 @@ class FloatingButton {
             sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
         }
         this.chatUserId = this.gentooSessionData?.cuid || null;
-        this.userType;
-        this.displayLocation;
         this.browserWidth = logWindowWidth(window);
         this.isSmallResolution = this.browserWidth < 601;
         this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -66,11 +93,15 @@ class FloatingButton {
         this.floatingCount = 0;
         this.floatingClicked = false;
         this.floatingMessage = '';
+        this.availableComments = null;
+        this.selectedCommentSet = null;
+        this.floatingMessageIntervalId = null;
+        this.currentTypingTimeoutId = null;
         this.warningMessage;
         this.warningActivated;
         this.floatingAvatar;
         this.floatingMessage;
-        this.itemId = this.getProductNo();
+        this.customFloatingImage = null;
         this.iframeHeightState;
         this.viewportInjected = false;
         this.originalViewport = null;
@@ -79,90 +110,64 @@ class FloatingButton {
         this.isDraggingFloating = false;
         this._dragMoved = false;
         this._dragStart = { x: 0, y: 0, right: 0, bottom: 0 };
-        /* CVID 추가 */
-        function gentooGetCookie(name) {
-            if (!document || !document.cookie) return null;
-            const pairs = document.cookie.split('; ');
-            for (const pair of pairs) {
-              const [k, ...rest] = pair.split('=');
-              if (k === name) return decodeURIComponent(rest.join('='));
-            }
-            return null;
+        // dualtronusa 전용 커스텀 플로팅 이미지
+        if (window.location.hostname === 'dualtronusa.com') {
+            this.customFloatingImage = 'https://gentoo-public.s3.ap-northeast-2.amazonaws.com/gentoo-floating-parts-small.png';
         }
-        this.cvid = gentooGetCookie('CVID');
-        this.cvid_y = gentooGetCookie('CVID_Y');
+        this.pageList = [];
+        this.eventCallback = {
+            show: null,
+            click: null,
+            formSubmitted: null,
+            userSentMessage: null,
+        }
+        // 🛡️ 메모리 누수 방지를 위한 다중 cleanup 전략
+        this.handlePageUnload = this.handlePageUnload.bind(this);
+        window.addEventListener('pagehide', this.handlePageUnload);
+        window.addEventListener('beforeunload', this.handlePageUnload);
 
-        // Modify the CAFE24API initialization to ensure promises are handled correctly
-        this.bootPromise = new Promise((resolve, reject) => {
+        // Add a promise to track initialization status
+        this.bootPromise = checkTrainingProgress(this.partnerId).then((canProceed) => {
+            if (!canProceed) {
+                console.warn("GentooIO: Training not completed, skipping initialization");
+                window.__GentooInited = 'training_incomplete';
+                return Promise.reject(new Error("Training not completed"));
+            }
 
-            ((CAFE24API) => {
-                // Store the CAFE24API instance for use in other methods
-                this.cafe24API = CAFE24API;
-
-                // Wrap CAFE24API methods in Promises
-                const getCustomerIDInfoPromise = () => {
-                    return new Promise((innerResolve, innerReject) => {
-                        CAFE24API.getCustomerIDInfo((err, res) => {
-                            if (err) {
-                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                                innerReject(err);
-                            } else {
-                                innerResolve(res);
-                            }
-                        });
-                    });
-                };
-
-                // Fetch partner ID first
-                getPartnerId(CAFE24API.MALL_ID)
-                    .then(partnerId => {
-                        this.partnerId = partnerId;
-                        return getCustomerIDInfoPromise();
-                    })
-                    .then(res => {
-                        if (res.id.member_id) {
-                            this.cafe24UserId = res.id.member_id;
-                            this.userType = "member";
-                        } else {
-                            this.cafe24UserId = res.id['guest_id'];
-                            this.userType = "guest";
-                        }
-
-                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                    })
-                    .then(chatUserId => {
-                        this.chatUserId = chatUserId;
-                        this.gentooSessionData.cuid = chatUserId;
-                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-
-                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
-                        return Promise.all([
-                            getChatbotData(this.partnerId, chatUserId),
-                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId),
-                            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId),
-                        ]);
-                    })
-                    .then(([chatbotData, floatingData, bootConfig]) => {
-                        this.bootConfig = bootConfig;
-                        this.chatbotData = chatbotData;
-                        this.floatingData = floatingData;
-                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                        const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
-                        this.warningMessage = warningMessageData?.extra?.message;
-                        this.warningActivated = warningMessageData?.activated;
-                        this.floatingZoom = floatingZoom?.activated;
-                        this.floatingAvatar = chatbotData?.avatar;
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Initialization error:', error);
-                        reject(error);
-                    });
-            })(CAFE24API.init({
-                client_id: process.env.CAFE24_CLIENTID,
-                version: process.env.CAFE24_VERSION
-            }));
+            return Promise.all([
+                postChatUserId(this.authCode, this.udid, this.partnerId, this.chatUserId).then((res) => {
+                    if (!res) throw new Error("Failed to fetch chat user ID");
+                    this.chatUserId = res;
+                    this.gentooSessionData.cuid = res;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                })
+                .catch(() => {
+                    this.chatUserId = 'test';
+                }),
+                getChatbotData(this.partnerId, this.chatUserId).then((res) => {
+                    if (!res) throw new Error("Failed to fetch chatbot data");
+                    this.chatbotData = res;
+                    this.floatingAvatar = res?.avatar || null;
+                    const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                    this.warningMessage = warningMessageData?.extra?.message;
+                    this.warningActivated = warningMessageData?.activated;
+                }),
+                getFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId).then((res) => {
+                    if (!res) throw new Error("Failed to fetch floating data");
+                    this.floatingData = res;
+                }),
+                getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
+                    if (!res) throw new Error("Failed to fetch boot config");
+                    this.bootConfig = res;
+                }),
+            ]);
+        }).catch((error) => {
+            if (error.message === "Training not completed") {
+                console.log("GentooIO: Training incomplete, stopping initialization");
+                return; // 학습 미완료는 정상적인 중단이므로 에러로 처리하지 않음
+            }
+            console.error(`Error during initialization: ${error}`);
+            throw error;
         });
     }
 
@@ -205,8 +210,119 @@ class FloatingButton {
 
             this.isInitialized = true;
 
+            if (this.isExperimentTarget && !this.gentooSessionData?.redirectState) {
+                const currentHref = window.location.href;
+                const hostname = window.location.hostname;
+                let customMessage = null;
+
+                // 🎯 도메인별 커스텀 메시지 매칭
+                switch(hostname) {
+                    case 'dualtronusa.com':
+                        customMessage = getDualtronUSAMessage(currentHref);
+                        break;
+                    case 'boostedusa.com':
+                        customMessage = getBoostedUSAMessage(currentHref);
+                        break;
+                    case 'vomfassghirardellisquare.com':
+                        customMessage = getVomfassMessage(currentHref);
+                        break;
+                    case 'paper-tree.com':
+                        customMessage = getPaperTreeMessage(currentHref);
+                        break;
+                    // 새 스토어 추가 시 여기에 case 추가
+                }
+
+                // 커스텀 메시지가 매칭되었으면 적용
+                if (customMessage) {
+                    this.availableComments = [customMessage];
+                    this.selectedCommentSet = customMessage;
+                    this.floatingData.comment = customMessage.floating;
+                }
+                // 기존 실험 대상 스토어 로직 (paper-tree, saranghello, olivethisolivethat)
+                else if (currentHref.includes('paper-tree.com') &&
+                    currentHref.includes('search') &&
+                    document.body.textContent.includes('No results found for')) {
+                    this.availableComments = [
+                        {
+                            "floating": "Can't find what you're looking for?",
+                            "greeting": "I'm here to help you find the perfect product. Can you tell me what you're looking for?",
+                        },
+                    ];
+                    this.selectedCommentSet = this.availableComments[0];
+                    this.floatingData.comment = this.selectedCommentSet.floating;
+                }
+                else if (currentHref.includes('saranghello.com') &&
+                        currentHref.includes('search') &&
+                        document.querySelector('.grid-product__tag--sold-out')) {
+                    this.availableComments = [
+                        {
+                            "floating": "Is the item you want sold out?",
+                            "greeting": "Looking for a specific album or merch?  If it's sold out, just tell me the name and your email — I'll notify you.  (e.g. youremail@gmail.com, STRAY KIDS - KARMA - ACCORDION VERSION)",
+                        },
+                    ];
+                    this.selectedCommentSet = this.availableComments[0];
+                    this.floatingData.comment = this.selectedCommentSet.floating;
+                }
+                else if (currentHref.includes('olivethisolivethat.com') &&
+                        currentHref.includes('/collections/')) {
+
+                    const collectionMessages = {
+                        'extra-virgin-olive-oil': {
+                            floating: "Curious how these oils differ from each other?",
+                            greeting: "Are you looking for a spicy, grassy, or mild olive oil or vinegar? Or is there a specific product you'd like to learn more about?"
+                        },
+                        'infused-olive-oils': {
+                            floating: "Curious how these oils differ from each other?",
+                            greeting: "Are you looking for a spicy, grassy, or mild olive oil or vinegar? Or is there a specific product you'd like to learn more about?"
+                        },
+                        'balsamic-fruit-vinegars': {
+                            floating: "Curious how these vinegars differ from each other?",
+                            greeting: "Are you looking for a earthy sweet, or refreshing vinegar? Or is there a specific product you'd like to learn more about?"
+                        }
+                    };
+
+                    const matchedCollection = Object.keys(collectionMessages).find(
+                        slug => currentHref.includes(`/collections/${slug}`)
+                    );
+
+                    if (matchedCollection) {
+                        const messages = collectionMessages[matchedCollection];
+                        this.availableComments = [messages];
+                        this.selectedCommentSet = this.availableComments[0];
+                        this.floatingData.comment = this.selectedCommentSet.floating;
+                    }
+                }
+                else if (this.displayLocation === 'PRODUCT_DETAIL') {
+                    const pdpComment = this.floatingData?.comment;
+                    this.availableComments = [
+                        {
+                            "floating": pdpComment,
+                            "greeting": null,
+                        },
+                    ];
+                    this.selectedCommentSet = this.availableComments[0];
+                }
+                // Fallback: 기존 실험 API 호출
+                else {
+                    this.experimentData = await fetchShopifyExperimentData(this.partnerId);
+
+                    if (this.experimentData && this.experimentData?.comments && this.experimentData?.comments?.length > 0) {
+                        this.availableComments = this.experimentData.comments;
+
+                        if (this.availableComments && this.availableComments?.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+                            this.selectedCommentSet = this.availableComments[randomIndex];
+
+                            if (this.selectedCommentSet && this.selectedCommentSet?.floating) {
+                                this.floatingData.comment = this.selectedCommentSet.floating;
+                            }
+                        }
+                    }
+                }
+            }
+
             // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=en`;
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
@@ -360,175 +476,13 @@ class FloatingButton {
     }
 
     async addProductToCart(product) {
-        if (!this.cafe24API) {
-            console.error('CAFE24API is not initialized yet');
-            return;
-        }
-
-        const productObject = {
-            product_no: product.product_no,
-            variants_code: product.variants_code,
-            quantity: product.quantity,
-        }
-
-        // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
-            this.cafe24API.addCart(
-                'A0000',
-                product.prepaid_shipping_fee,
-                [productObject],
-                (err, res) => {
-                    if (err) {
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: product.product_no,
-                                success: false,
-                                errorCode: err.code,
-                                path: "direct",
-                            }
-                        });
-                        console.error('Failed to add product to cart:', err);
-                        reject(err);
-                    } else {
-                        this.sendPostMessageHandler({ addedProductToCart: true });
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: product.product_no,
-                                success: true,
-                                errorCode: null,
-                                path: "direct",
-                            }
-                        });
-                        resolve(res);
-                    }
-                }
-            );
-        });
+        console.log('not supported yet');
+        return;
     }
 
     async addProductWithOptionsToCart(productBulkObject) {
-        if (!this.cafe24API) {
-            console.error('CAFE24API is not initialized yet');
-            return;
-        }
-        /* 
-        const addProductWithOptionsToCart = {
-            productNo: productInfo.itemId,
-            prepaidShippingFee: prepaidShippingFee,
-            productList: productList,
-        }
-        */
-
-        const productListFull = productBulkObject.productList.map(product => ({
-            ...product,
-            product_no: productBulkObject.productNo,
-        }));
-
-        // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
-            this.cafe24API.addCart(
-                'A0000',
-                productBulkObject.prepaidShippingFee,
-                productListFull,
-                (err, res) => {
-                    if (err) {
-                        console.error('Failed to add product to cart:', err, res);
-                        resolve(err);
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: productBulkObject.productNo,
-                                success: false,
-                                errorCode: err.code,
-                                path: "with_options",
-                            }
-                        });
-                        this.sendPostMessageHandler({ addProductToCartFailed: true });
-                    } else {
-                        // err 없이 res 안에 error 가 있는 케이스 처리
-                        const errorCode = res?.errors?.[0]?.code || res?.errors?.code;
-                        if (errorCode) {
-                            console.error('Failed to add product to cart:', res);
-                            resolve(res);
-                            postChatEventLog({
-                                experimentId: "flowlift_abctest_v1",
-                                partnerId: this.partnerId,
-                                variantId: this.variant,
-                                sessionId: this.sessionId || "sess-test",
-                                chatUserId: this.chatUserId,
-                                userType: this.userType,
-                                displayLocation: this.displayLocation,
-                                deviceType: this.isMobileDevice ? "mobile" : "web",
-                                timestamp: String(Date.now()),
-                                eventCategory: "chat_add_to_cart_completed",
-                                context: {
-                                    productId: productBulkObject.productNo,
-                                    success: false,
-                                    errorCode: errorCode,
-                                    path: "with_options",
-                                }
-                            });
-                            this.sendPostMessageHandler({ addProductToCartFailed: true });
-                            return;
-                        }
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: productBulkObject.productNo,
-                                success: true,
-                                errorCode: null,
-                                path: "direct",
-                            }
-                        });
-                        this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
-                        // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
-                        if (!sessionStorage.getItem('gentoo_cart_added')) {
-                            sessionStorage.setItem('gentoo_cart_added', 'true');
-                        }
-                        console.log('addedProductWithOptionsToCart', res);
-                        resolve(res);
-                    }
-                }
-            );
-        });
+        console.log('not supported yet');
+        return;
     }
 
     handleTouchMove(e, iframeContainer) {
@@ -601,7 +555,7 @@ class FloatingButton {
 
     enableChat(mode) {
         if (this.isDraggingFloating) return;
-        
+
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
@@ -661,72 +615,217 @@ class FloatingButton {
         this.iframeContainer.className = "iframe-container iframe-container-hide";
     }
 
-    redirectToCartPage() {
-        if (String(sessionStorage.getItem('gentoo_cart_added')) === 'true') {
-            sessionStorage.removeItem('gentoo_cart_added');
-            window.location.href = '/order/basket.html';
+    // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
+    createFloatingMessage(messageText, shouldIncrementCounter = false) {
+        if (!messageText || typeof messageText !== 'string' || messageText.length === 0) {
+            console.warn('Invalid messageText for floating message:', messageText);
+            return;
+        }
+
+        // 기존 코드의 안전장치들 유지
+        if (this.floatingClicked || this.isDestroyed || !this.floatingContainer)
+            return;
+
+        // 기존 타이핑 애니메이션과 expandedButton 정리 (새로운 메시지용) - 안전한 제거
+        this.clearCurrentTyping();
+        this.safeRemoveExpandedButton();
+
+        // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
+        this.expandedButton = document.createElement("div");
+        this.expandedText = document.createElement("p");
+        
+        if (this.isSmallResolution) {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area-md" :
+                "expanded-area-md expanded-area-neutral-md";
+            this.expandedText.className = "expanded-area-text-md";
+        } else {
+            this.expandedButton.className = 
+                !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
+                "expanded-area" :
+                "expanded-area expanded-area-neutral";
+            this.expandedText.className = "expanded-area-text";
+        }
+        this.expandedButton.appendChild(this.expandedText);
+
+        // 기존 코드의 안전한 DOM 추가 로직 유지
+        if (this.floatingContainer && this.floatingContainer.parentNode) {
+            this.floatingContainer.appendChild(this.expandedButton);
+
+            // ⚡ 플로팅 문구 타이핑 애니메이션 (기존 로직 기반)
+            let i = 0;
+            const typeSpeed = Math.max(this.MIN_TYPING_SPEED_MS, this.TYPING_ANIMATION_SPEED_MS / messageText.length); // 최소 타이핑 속도 보장
+            const addLetter = () => {
+                // 기존 안전장치 유지 + DOM 존재 확인
+                if (!messageText || !this.expandedText || !this.expandedText.parentNode) return;
+                if (i < messageText.length && !this.isDestroyed) {
+                    try {
+                        this.expandedText.innerText += messageText[i];
+                        i++;
+                        if (i < messageText.length && !this.isDestroyed) {
+                            // 다음 타이핑을 예약하고 ID 저장 (충돌 방지)
+                            this.currentTypingTimeoutId = setTimeout(addLetter, typeSpeed);
+                        } else {
+                            // 타이핑 완료시 ID 초기화
+                            this.currentTypingTimeoutId = null;
+                        }
+                    } catch (error) {
+                        console.warn('Error during typing animation:', error);
+                        this.currentTypingTimeoutId = null;
+                    }
+                }
+            };
+            addLetter();
+            
+            // 카운터 증가 (옵션)
+            if (shouldIncrementCounter) {
+                this.floatingCount += 1;
+            }
+
+            // 7초 후 제거 (안전한 제거 메서드 사용)
+            setTimeout(() => {
+                this.safeRemoveExpandedButton();
+            }, this.FLOATING_MESSAGE_DISPLAY_MS);
         }
     }
 
+    // Method to display a random floating message (uses common function)
+    showRandomFloatingMessage() {
+        if (!this.availableComments || this.availableComments?.length === 0) {
+            return;
+        }
+
+        if (this.availableComments && this.availableComments?.length > 0) {
+            const randomIndex = Math.floor(Math.random() * this.availableComments.length);
+            this.selectedCommentSet = this.availableComments[randomIndex];
+        }
+
+        if (!this.selectedCommentSet || !this.selectedCommentSet.floating || typeof this.selectedCommentSet.floating !== 'string') {
+            console.warn('Invalid comment data for floating message:', this.selectedCommentSet);
+            return;
+        }
+
+        this.createFloatingMessage(this.selectedCommentSet.floating, false);
+    }
+
+    // 현재 진행 중인 타이핑 애니메이션 중단
+    clearCurrentTyping() {
+        if (this.currentTypingTimeoutId) {
+            clearTimeout(this.currentTypingTimeoutId);
+            this.currentTypingTimeoutId = null;
+        }
+    }
+
+    safeRemoveExpandedButton() {
+        // 타이핑 애니메이션 먼저 중단
+        this.clearCurrentTyping();
+        
+        try {
+            if (this.expandedButton && 
+                this.expandedButton.parentNode && 
+                this.floatingContainer &&
+                this.expandedButton.parentNode === this.floatingContainer) {
+                this.floatingContainer.removeChild(this.expandedButton);
+            }
+        } catch (error) {
+            console.warn('Error removing expanded button:', error);
+        }
+    }
+
+    // 🛡️ 페이지 언로드 시 리소스 정리 (다중 이벤트 대응)
+    handlePageUnload() {
+        this.cleanup();
+    }
+
+    // 🧹 리소스 정리 메서드 (멱등성 보장)
+    cleanup() {
+        if (this.isDestroyed) return; // 중복 실행 방지
+        
+        // interval 정리
+        if (this.floatingMessageIntervalId) {
+            clearInterval(this.floatingMessageIntervalId);
+            this.floatingMessageIntervalId = null;
+        }
+        
+        // 타이핑 애니메이션 정리
+        this.clearCurrentTyping();
+        
+        // 이벤트 리스너 정리
+        window.removeEventListener('pagehide', this.handlePageUnload);
+        window.removeEventListener('beforeunload', this.handlePageUnload);
+        
+        this.isDestroyed = true;
+    }
+
+    redirectToCartPage() {
+        return;
+    }
+
+    setPageList(pageList) {
+        this.pageList = pageList;
+    }
+
     sendPostMessageHandler(payload) {
+        if (this.selectedCommentSet && this.selectedCommentSet?.greeting) {
+            if (this.displayLocation !== 'PRODUCT_DETAIL') {
+                payload.customizedGreeting = this.selectedCommentSet.greeting;
+            }
+        }
+
         this.iframe.contentWindow.postMessage(payload, "*");
     }
 
-    /**
-     * 현재 URL 또는 주어진 URL에서 product_no 값을 추출하는 함수
-     * 
-     * @param {string} [urlString=window.location.href] - 분석할 URL 문자열
-     * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
-     */
-    getProductNo(urlString = window.location.href) {
-        if (urlString.includes('keyword=') || urlString.includes('query=')) { this.displayLocation = 'PRODUCT_SEARCH' }
-        else if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
-        else { this.displayLocation = 'HOME' }
+    async sendLog(input) {
         try {
-            // URL 객체 생성
-            const url = new URL(urlString);
+            await this.bootPromise;
+            // Ensure chatUserId exists (refresh if needed)
+            try {
+                const refreshed = await postChatUserId(input.authCode, this.udid, this.partnerId, this.chatUserId);
+                if (refreshed) {
+                    this.chatUserId = refreshed;
+                    this.gentooSessionData.cuid = refreshed;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+                }
+            } catch {}
 
-            // 1. 쿼리 파라미터에서 product_no 추출 시도
-            const productNoFromQuery = url.searchParams.get('product_no');
-            if (productNoFromQuery) {
-                return productNoFromQuery;
-            }
-
-            // 2. 경로 기반 URL에서 product_no 추출 시도
-            const path = url.pathname;
-
-            /**
-             * 고려가 필요한 cafe24 경로 패턴
-                /product/{product_name}/{product_no}
-                /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
-                /{shop_no}/product/{product_name}/{product_no}
-             */
-
-            /**
-             * 정규 표현식 설명:
-                (?:\/[^\/]+)?	🔹 optional shop_no segment (/12345 등)
-                \/product\/	/product/ 고정
-                [^\/]+	product_name
-                \/([^\/]+)	✅ 캡처할 product_no
-                (?:\/category/...)?	🔹 optional category/display path
-             */
-            const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-            const alterRegex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)/;
-
-            const match = path.match(regex);
-            const alterMatch = path.match(alterRegex);
-            if (match && match[1]) {
-                return match[1]; // product_no
-            } else if (alterMatch && alterMatch[1]) {
-                return alterMatch[1]; // product_no
-            }
-
-            // 3. 찾을 수 없는 경우 null 반환
-            return null;
+            return postChatEventLogLegacy({
+                eventCategory: input.eventCategory,
+                partnerId: String(input.partnerId || this.partnerId),
+                chatUserId: String(this.chatUserId),
+                products: input.products,
+            }, this.isMobileDevice);
         } catch (error) {
-            console.error('Invalid URL:', error);
-            return null;
+            console.error("Failed to send log:", error);
+            throw error;
+        }
+    }
+
+    getGentooShowEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.show = callback;
+        }
+    }
+
+    getGentooClickEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.click = callback;
+        }
+    }
+
+    getFormSubmittedEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.formSubmitted = callback;
+        }
+    }
+
+    getUserSentMessageEvent(callback) {
+        // Execute the callback function
+        if (typeof callback === "function" && this.eventCallback) {
+            this.eventCallback.userSentMessage = callback;
         }
     }
 }

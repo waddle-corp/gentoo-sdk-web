@@ -4,8 +4,10 @@ import {
     getChatbotData, 
     postChatUserId, 
     getFloatingData, 
-    getPartnerId, 
+    getGodomallPartnerId, 
     postChatEventLog, 
+    postChatEventLogLegacy,
+    generateGuestUserToken,
     getBootConfig, 
 } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
@@ -46,7 +48,7 @@ class FloatingButton {
             return;
         }
 
-        this.partnerType = props.partnerType || 'cafe24';
+        this.partnerType = props.partnerType || 'godomall';
         this.partnerId = props.partnerId;
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
@@ -79,90 +81,92 @@ class FloatingButton {
         this.isDraggingFloating = false;
         this._dragMoved = false;
         this._dragStart = { x: 0, y: 0, right: 0, bottom: 0 };
-        /* CVID 추가 */
-        function gentooGetCookie(name) {
-            if (!document || !document.cookie) return null;
-            const pairs = document.cookie.split('; ');
-            for (const pair of pairs) {
-              const [k, ...rest] = pair.split('=');
-              if (k === name) return decodeURIComponent(rest.join('='));
-            }
-            return null;
-        }
-        this.cvid = gentooGetCookie('CVID');
-        this.cvid_y = gentooGetCookie('CVID_Y');
 
-        // Modify the CAFE24API initialization to ensure promises are handled correctly
+        // Ensure trackingKey is injected into order form if present
+        this.injectTrackingKeyIntoOrderForm();
+
         this.bootPromise = new Promise((resolve, reject) => {
+            /* 고도몰 init process */
 
-            ((CAFE24API) => {
-                // Store the CAFE24API instance for use in other methods
-                this.cafe24API = CAFE24API;
+            this.godomallAPI = window.GodomallSDK.init(process.env.GODOMALL_SYSTEMKEY);
 
-                // Wrap CAFE24API methods in Promises
-                const getCustomerIDInfoPromise = () => {
-                    return new Promise((innerResolve, innerReject) => {
-                        CAFE24API.getCustomerIDInfo((err, res) => {
-                            if (err) {
-                                console.error(`Error while calling cafe24 getCustomerIDInfo api: ${err}`);
-                                innerReject(err);
-                            } else {
-                                innerResolve(res);
-                            }
+            const getMallInfoPromise = new Promise((resolve, reject) => {
+                this.godomallAPI.getMallInfo((err, res) => {
+                    if (err) {
+                        reject(new Error(`Error while calling godomall getMallInfo api: ${err}`));
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+
+            const getMemberProfilePromise = new Promise((resolve, reject) => {
+                this.godomallAPI.getMemberProfile((err, res) => {
+                    if (err) {
+                        // Handle guest users who get 403 error - they're not logged in
+                        // console.log('User is guest (not logged in):', err);
+                        resolve(null); // Resolve with null for guest users
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+
+            Promise.all([getMallInfoPromise, getMemberProfilePromise])
+                .then(([mallInfo, memberProfile]) => {
+                    const godomallMallId = mallInfo.mallDomain.split('.')[0];
+                    const partnerIdPromise = getGodomallPartnerId(godomallMallId)
+                        .then(partnerId => {
+                            this.partnerId = partnerId;
+                            return partnerId;
                         });
-                    });
-                };
 
-                // Fetch partner ID first
-                getPartnerId(CAFE24API.MALL_ID)
-                    .then(partnerId => {
-                        this.partnerId = partnerId;
-                        return getCustomerIDInfoPromise();
-                    })
-                    .then(res => {
-                        if (res.id.member_id) {
-                            this.cafe24UserId = res.id.member_id;
-                            this.userType = "member";
+                    // Handle both member and guest users
+                    this.godomallUserId = memberProfile?.id || null;
+                    this.userType = memberProfile?.id ? "member" : "guest";
+
+                    // 비회원이면 난수로 대체
+                    if (!this.godomallUserId || this.godomallUserId.length === 0) {
+                        if (sessionStorage.getItem('gentooGuest')) {
+                            this.godomallUserId = sessionStorage.getItem('gentooGuest');
                         } else {
-                            this.cafe24UserId = res.id['guest_id'];
-                            this.userType = "guest";
+                            this.godomallUserId = generateGuestUserToken();
+                            sessionStorage.setItem('gentooGuest', this.godomallUserId);
                         }
+                    }
 
-                        // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
-                        return postChatUserId(this.cafe24UserId, '', this.partnerId, this.chatUserId);
-                    })
-                    .then(chatUserId => {
-                        this.chatUserId = chatUserId;
-                        this.gentooSessionData.cuid = chatUserId;
-                        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
-
-                        // 2. chatUserId가 세팅된 후, 나머지 fetch 실행
-                        return Promise.all([
-                            getChatbotData(this.partnerId, chatUserId),
-                            getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId),
-                            getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId),
-                        ]);
-                    })
-                    .then(([chatbotData, floatingData, bootConfig]) => {
-                        this.bootConfig = bootConfig;
-                        this.chatbotData = chatbotData;
-                        this.floatingData = floatingData;
-                        const warningMessageData = chatbotData?.experimentalData.find(item => item.key === "warningMessage");
-                        const floatingZoom = chatbotData?.experimentalData.find(item => item.key === "floatingZoom");
-                        this.warningMessage = warningMessageData?.extra?.message;
-                        this.warningActivated = warningMessageData?.activated;
-                        this.floatingZoom = floatingZoom?.activated;
-                        this.floatingAvatar = chatbotData?.avatar;
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Initialization error:', error);
-                        reject(error);
+                    // Wait for partner ID before fetching chat user ID
+                    return partnerIdPromise.then(partnerId => {
+                        return postChatUserId(this.godomallUserId, '', partnerId, this.chatUserId);
                     });
-            })(CAFE24API.init({
-                client_id: process.env.CAFE24_CLIENTID,
-                version: process.env.CAFE24_VERSION
-            }));
+                })
+                .then(chatUserId => {
+                    this.chatUserId = chatUserId;
+                    this.gentooSessionData.cuid = chatUserId;
+                    sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+
+                    return Promise.all([
+                        getChatbotData(this.partnerId, chatUserId),
+                        getFloatingData(this.partnerId, this.displayLocation, this.itemId, chatUserId),
+                        getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId)
+                    ]);
+                })
+                .then(([chatbotData, floatingData, bootConfig]) => {
+                    this.chatbotData = chatbotData;
+                    this.floatingData = floatingData;
+                    this.bootConfig = bootConfig;
+                    const warningMessageData = chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
+                    this.warningMessage = warningMessageData?.extra?.message;
+                    this.warningActivated = warningMessageData?.activated;
+                    this.floatingAvatar = chatbotData?.avatar;
+                    const floatingZoom = chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
+                    this.floatingZoom = floatingZoom?.activated;
+                    resolve();
+                })
+                .catch(error => {
+                    console.error('Initialization error:', error);
+                    reject(error);
+                });
         });
     }
 
@@ -359,176 +363,57 @@ class FloatingButton {
         window.__GentooInited = null;
     }
 
-    async addProductToCart(product) {
-        if (!this.cafe24API) {
-            console.error('CAFE24API is not initialized yet');
+    // Inject hidden trackingKey input with this.sessionId into #frmOrder, if present
+    injectTrackingKeyIntoOrderForm() {
+        const insertOrUpdateTrackingKey = () => {
+            const form =
+                document.getElementById('frmOrder') ||
+                document.querySelector('form#frmOrder');
+            if (!form) return false;
+            let input = form.querySelector('input[name="trackingKey"]');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'trackingKey';
+                form.appendChild(input);
+            }
+            input.value = this.sessionId || '';
+            return true;
+        };
+
+        if (insertOrUpdateTrackingKey()) return;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                insertOrUpdateTrackingKey();
+            }, { once: true });
             return;
         }
 
-        const productObject = {
-            product_no: product.product_no,
-            variants_code: product.variants_code,
-            quantity: product.quantity,
-        }
-
-        // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
-            this.cafe24API.addCart(
-                'A0000',
-                product.prepaid_shipping_fee,
-                [productObject],
-                (err, res) => {
-                    if (err) {
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: product.product_no,
-                                success: false,
-                                errorCode: err.code,
-                                path: "direct",
-                            }
-                        });
-                        console.error('Failed to add product to cart:', err);
-                        reject(err);
-                    } else {
-                        this.sendPostMessageHandler({ addedProductToCart: true });
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: product.product_no,
-                                success: true,
-                                errorCode: null,
-                                path: "direct",
-                            }
-                        });
-                        resolve(res);
-                    }
-                }
-            );
+        const observer = new MutationObserver((mutations, obs) => {
+            if (insertOrUpdateTrackingKey()) {
+                obs.disconnect();
+            }
         });
+        try {
+            observer.observe(document.documentElement || document.body, {
+                childList: true,
+                subtree: true,
+            });
+            setTimeout(() => observer.disconnect(), 15000);
+        } catch (e) {
+            // no-op
+        }
+    }
+
+    async addProductToCart(product) {
+        console.log('not supported yet');
+        return;
     }
 
     async addProductWithOptionsToCart(productBulkObject) {
-        if (!this.cafe24API) {
-            console.error('CAFE24API is not initialized yet');
-            return;
-        }
-        /* 
-        const addProductWithOptionsToCart = {
-            productNo: productInfo.itemId,
-            prepaidShippingFee: prepaidShippingFee,
-            productList: productList,
-        }
-        */
-
-        const productListFull = productBulkObject.productList.map(product => ({
-            ...product,
-            product_no: productBulkObject.productNo,
-        }));
-
-        // Wrap the Cafe24 API call in a Promise for better error handling
-        return new Promise((resolve, reject) => {
-            this.cafe24API.addCart(
-                'A0000',
-                productBulkObject.prepaidShippingFee,
-                productListFull,
-                (err, res) => {
-                    if (err) {
-                        console.error('Failed to add product to cart:', err, res);
-                        resolve(err);
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: productBulkObject.productNo,
-                                success: false,
-                                errorCode: err.code,
-                                path: "with_options",
-                            }
-                        });
-                        this.sendPostMessageHandler({ addProductToCartFailed: true });
-                    } else {
-                        // err 없이 res 안에 error 가 있는 케이스 처리
-                        const errorCode = res?.errors?.[0]?.code || res?.errors?.code;
-                        if (errorCode) {
-                            console.error('Failed to add product to cart:', res);
-                            resolve(res);
-                            postChatEventLog({
-                                experimentId: "flowlift_abctest_v1",
-                                partnerId: this.partnerId,
-                                variantId: this.variant,
-                                sessionId: this.sessionId || "sess-test",
-                                chatUserId: this.chatUserId,
-                                userType: this.userType,
-                                displayLocation: this.displayLocation,
-                                deviceType: this.isMobileDevice ? "mobile" : "web",
-                                timestamp: String(Date.now()),
-                                eventCategory: "chat_add_to_cart_completed",
-                                context: {
-                                    productId: productBulkObject.productNo,
-                                    success: false,
-                                    errorCode: errorCode,
-                                    path: "with_options",
-                                }
-                            });
-                            this.sendPostMessageHandler({ addProductToCartFailed: true });
-                            return;
-                        }
-                        postChatEventLog({
-                            experimentId: "flowlift_abctest_v1",
-                            partnerId: this.partnerId,
-                            variantId: this.variant,
-                            sessionId: this.sessionId || "sess-test",
-                            chatUserId: this.chatUserId,
-                            userType: this.userType,
-                            displayLocation: this.displayLocation,
-                            deviceType: this.isMobileDevice ? "mobile" : "web",
-                            timestamp: String(Date.now()),
-                            eventCategory: "chat_add_to_cart_completed",
-                            context: {
-                                productId: productBulkObject.productNo,
-                                success: true,
-                                errorCode: null,
-                                path: "direct",
-                            }
-                        });
-                        this.sendPostMessageHandler({ addedProductWithOptionsToCart: true });
-                        // session storage 에 장바구니 담기 실행 여부를 저장 (for redirecting to cart page)
-                        if (!sessionStorage.getItem('gentoo_cart_added')) {
-                            sessionStorage.setItem('gentoo_cart_added', 'true');
-                        }
-                        console.log('addedProductWithOptionsToCart', res);
-                        resolve(res);
-                    }
-                }
-            );
-        });
+        console.log('not supported yet');
+        return;
     }
 
     handleTouchMove(e, iframeContainer) {
@@ -601,7 +486,7 @@ class FloatingButton {
 
     enableChat(mode) {
         if (this.isDraggingFloating) return;
-        
+
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
@@ -662,10 +547,7 @@ class FloatingButton {
     }
 
     redirectToCartPage() {
-        if (String(sessionStorage.getItem('gentoo_cart_added')) === 'true') {
-            sessionStorage.removeItem('gentoo_cart_added');
-            window.location.href = '/order/basket.html';
-        }
+        return;
     }
 
     sendPostMessageHandler(payload) {
@@ -679,16 +561,15 @@ class FloatingButton {
      * @returns {string|null} - 추출된 product_no 값 또는 null (찾을 수 없을 경우)
      */
     getProductNo(urlString = window.location.href) {
-        if (urlString.includes('keyword=') || urlString.includes('query=')) { this.displayLocation = 'PRODUCT_SEARCH' }
-        else if (urlString.includes('/product') && !urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_DETAIL' }
-        else if (urlString.includes('/category') || urlString.includes('/product/list')) { this.displayLocation = 'PRODUCT_LIST' }
+        if (urlString.includes('/goods_view')) { this.displayLocation = 'PRODUCT_DETAIL' }
+        else if (urlString.includes('/goods_list')) { this.displayLocation = 'PRODUCT_LIST' }
         else { this.displayLocation = 'HOME' }
         try {
             // URL 객체 생성
             const url = new URL(urlString);
 
-            // 1. 쿼리 파라미터에서 product_no 추출 시도
-            const productNoFromQuery = url.searchParams.get('product_no');
+            // 1. 쿼리 파라미터에서 goodsNo 추출 시도
+            const productNoFromQuery = url.searchParams.get('goodsNo');
             if (productNoFromQuery) {
                 return productNoFromQuery;
             }
@@ -697,10 +578,8 @@ class FloatingButton {
             const path = url.pathname;
 
             /**
-             * 고려가 필요한 cafe24 경로 패턴
-                /product/{product_name}/{product_no}
-                /product/{product_name}/{product_no}/category/{category_no}/display/{display_group_no}
-                /{shop_no}/product/{product_name}/{product_no}
+             * 고려가 필요한 고도몰 경로 패턴
+                /goods/goods_view.php?goodsNo={goodsNo}
              */
 
             /**
@@ -712,14 +591,10 @@ class FloatingButton {
                 (?:\/category/...)?	🔹 optional category/display path
              */
             const regex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)(?:\/category\/[^\/]+\/display\/[^\/]+\/?)?$/;
-            const alterRegex = /^(?:\/[^\/]+)?\/product\/[^\/]+\/([^\/]+)/;
 
             const match = path.match(regex);
-            const alterMatch = path.match(alterRegex);
             if (match && match[1]) {
                 return match[1]; // product_no
-            } else if (alterMatch && alterMatch[1]) {
-                return alterMatch[1]; // product_no
             }
 
             // 3. 찾을 수 없는 경우 null 반환

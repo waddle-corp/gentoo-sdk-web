@@ -20,6 +20,9 @@ module.exports = (env, argv) => {
         { name: 'gentoo-logger', entry: './src/logger.js', output: 'logger' },
         { name: 'gentoo-logger-shopify', entry: './src/logger-shopify.js', output: 'logger-shopify' },
         { name: 'floating-cafe24-modal', entry: './src/floating-sdk-cafe24-modal.js', output: 'cafe24-modal' },
+        { name: 'floating-godomall-modal', entry: './src/floating-sdk-godomall-modal.js', output: 'godomall-modal' },
+        { name: 'floating-imweb-modal', entry: './src/floating-sdk-imweb-modal.js', output: 'imweb-modal' },
+        { name: 'floating-shopify-modal', entry: './src/floating-sdk-shopify-modal.js', output: 'shopify-modal' }
     ];
 
     return targets.map(t => ({

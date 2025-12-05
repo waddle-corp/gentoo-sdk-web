@@ -1,18 +1,106 @@
 import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
-import '../floating-sdk-cafe24-modal.css';
+import '../floating-sdk-modal.css';
+import { setupEventListenersModal } from "./setupEventListenersModal";
+import { 
+    updateFloatingContainerPosition, 
+    addLetter,
+    checkSDKExists
+} from "./floatingSdkUtils";
 
-// Separate UI creation into its own method for clarity
+// --- Small helpers for readability ---
+const hasValidChatbotData = (chatbotData) => {
+    return Boolean(chatbotData && chatbotData.position && chatbotData.mobilePosition);
+};
+
+const hasValidFloatingData = (context) => {
+    const bootImage = context.bootConfig?.floating?.button?.imageUrl;
+    const avatarAsset = context.floatingAvatar?.floatingAsset;
+    const fallbackImage = context.floatingData?.imageUrl;
+    return Boolean(
+        (context.bootConfig?.floating && (bootImage || avatarAsset || fallbackImage)) ||
+        fallbackImage
+    );
+};
+
+const selectFloatingAsset = (context) => {
+    const bootImage = context.bootConfig?.floating?.button?.imageUrl;
+    const avatarAsset = context.floatingAvatar?.floatingAsset;
+    const floatingImage = context.floatingData?.imageUrl;
+    const useBootImage = Boolean(bootImage && !bootImage.includes('default.lottie'));
+    const selectedAsset = useBootImage ? bootImage : (avatarAsset || floatingImage);
+    return { useBootImage, selectedAsset };
+};
+
+const createDotLottiePlayer = (src, sizePx) => {
+    const player = document.createElement('dotlottie-wc');
+    player.setAttribute('autoplay', '');
+    player.setAttribute('loop', '');
+    player.setAttribute('mode', 'normal');
+    player.setAttribute('src', src);
+    player.style.width = sizePx;
+    player.style.height = sizePx;
+    player.style.cursor = 'pointer';
+    player.appendChild(document.createTextNode('\u200B'));
+    return player;
+};
+
+const logFloatingRendered = (context) => {
+    const deviceType = context.isMobileDevice ? "mobile" : "web";
+    postChatEventLog({
+        experimentId: "flowlift_abctest_v1",
+        partnerId: context.partnerId,
+        variantId: context.variant,
+        sessionId: context.sessionId || "sess-test",
+        chatUserId: context.chatUserId,
+        userType: context.userType,
+        displayLocation: context.displayLocation,
+        deviceType,
+        timestamp: String(Date.now()),
+        eventCategory: "gentoo_displayed",
+        context: {
+            autoChatOpen: Boolean(context.bootConfig?.floating?.autoChatOpen),
+        },
+    });
+
+    postChatEventLogLegacy({
+        eventCategory: "SDKFloatingRendered",
+        partnerId: context.partnerId,
+        chatUserId: context.chatUserId,
+        products: [],
+    }, context.isMobileDevice);
+    window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
+};
+
+const getCurrentFloatingPosition = (context, position) => {
+    const storedFloatingPosition = context.gentooSessionData?.floatingPosition || {};
+        let currentFloatingPosition = position ? JSON.parse(JSON.stringify(position)) : {};
+        if (!currentFloatingPosition.web) currentFloatingPosition.web = {};
+        if (!currentFloatingPosition.mobile) currentFloatingPosition.mobile = {};
+        if (context.isSmallResolution) {
+            if (storedFloatingPosition?.mobile) {
+                if (typeof storedFloatingPosition.mobile.bottom === 'number') currentFloatingPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
+                if (typeof storedFloatingPosition.mobile.right === 'number') currentFloatingPosition.mobile.right = storedFloatingPosition.mobile.right;
+            }
+        } else {
+            if (storedFloatingPosition?.web) {
+                if (typeof storedFloatingPosition.web.bottom === 'number') currentFloatingPosition.web.bottom = storedFloatingPosition.web.bottom;
+                if (typeof storedFloatingPosition.web.right === 'number') currentFloatingPosition.web.right = storedFloatingPosition.web.right;
+            }
+        }
+    return currentFloatingPosition;
+}
+
+// ------------------------------ Modal UI Creation ------------------------------
 export const createUIElementsModal = (
     context, // this 객체를 받는 인자
     position, 
     showGentooButton, 
     isCustomButton = false, 
-    checkSDKExists = false,
     customButton,
     chatbotData,
 ) => {
     // Check if any SDK elements exist in document
-    if (checkSDKExists) {
+    if (checkSDKExists(window, document)) {
         console.warn("GentooIO UI elements already exist in the document, skipping creation.");
         window.__GentooInited = 'created';
         return;
@@ -21,97 +109,94 @@ export const createUIElementsModal = (
     window.__GentooInited = 'creating';
     customButton = isCustomButton ? (document.getElementsByClassName("gentoo-custom-button")[0]) : null;
     // Add null checks before accessing properties
-    if (
-        !chatbotData ||
-        !chatbotData.position ||
-        !chatbotData.mobilePosition
-    ) {
+    if (!hasValidChatbotData(chatbotData)) {
         console.error('Chatbot data is incomplete');
         return;
     }
 
-    if (
-        !context.bootConfig?.floating ||
-        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
-    ) {
+    if (!hasValidFloatingData(context)) {
         console.error("Floating data is incomplete");
         return;
     }
 
+    // Fire "show" callback if provided (parity with legacy)
+    if (context?.eventCallback?.show) {
+        try { context.eventCallback.show(); } catch {}
+    }
+
+    /* [Dimmed Background] */
     context.dimmedBackground = document.createElement("div");
     context.dimmedBackground.className = "dimmed-background hide";
     context.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
     context.dimmedBackground.appendChild(document.createTextNode('\u200B'));
 
-    // Create iframe elements
+    /* [Iframe Container] */
     context.iframeContainer = document.createElement("div");
     context.iframeContainer.className = "iframe-container iframe-container-hide";
     context.iframeContainer.setAttribute("data-gentoo-sdk", "true");
 
+    /* [Iframe] */
+    context.iframe = document.createElement("iframe");
+    context.iframe.src = context.chatUrl;
+
+    /* [Chat Header] */
     context.chatHeader = document.createElement("div");
     context.chatHandler = document.createElement("div");
+    context.chatHeaderProfile = document.createElement("div");
+    context.chatHeaderImage = document.createElement("img");
     context.chatHeaderText = document.createElement("p");
+    context.chatHeaderText.innerText = context.chatbotData?.name || "Gentoo";
+
     context.closeButtonContainer = document.createElement("div");
     context.closeButtonIcon = document.createElement("div");
     context.closeButtonText = document.createElement("p");
-    context.chatHeaderText.innerText = "Gentoo";
+    
+    /* [Chat Footer] */
     context.footer = document.createElement("div");
     context.footer.className = "chat-footer";
     context.footerText = document.createElement("p");
     context.footerText.className = "chat-footer-text";
     context.footer.appendChild(context.footerText);
-    context.iframe = document.createElement("iframe");
-    context.iframe.src = context.chatUrl;
 
-    if (
-        !context.bootConfig?.floating ||
-        (!context.bootConfig?.floating?.button?.imageUrl && !context.floatingAvatar?.floatingAsset)
-    ) {
-        console.error("Floating data is incomplete");
-        return;
-    }
+    // Reuse pre-validated floating data
+    const { useBootImage, selectedAsset } = selectFloatingAsset(context);
+    context.useBootConfigFloatingImage = useBootImage;
+    context.selectedFloatingImage = selectedAsset;
 
-    // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
-    const bootImage = context.bootConfig?.floating?.button?.imageUrl;
-    const avatarAsset = context.floatingAvatar?.floatingAsset;
-    context.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
-    const selectedAsset = context.useBootConfigFloatingImage ? bootImage : avatarAsset;
+    /* [DotLottie Player] */
     if (selectedAsset?.includes('lottie')) {
-        const player = document.createElement('dotlottie-wc');
-        player.setAttribute('autoplay', '');
-        player.setAttribute('loop', '');
-        player.setAttribute('mode', 'normal');
-        // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-        player.setAttribute('src', selectedAsset);
-        player.style.width = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
-        player.style.height = context.floatingZoom ? '120px' : context.isSmallResolution ? '68px' : '94px';
-        player.style.cursor = 'pointer';
-        player.appendChild(document.createTextNode('\u200B'));
-
-        context.dotLottiePlayer = player;
+        const lottieSize = context.floatingZoom ? '120px' : (context.isSmallResolution ? '68px' : '94px');
+        context.dotLottiePlayer = createDotLottiePlayer(selectedAsset, lottieSize);
     }
 
+    /* 모바일 채팅창 Modal UI 생성 */
     if (context.isSmallResolution) {
+        /* [Iframe] */
+        context.iframe.className = `chat-iframe-md ${context.warningActivated ? 'footer-add-height-md' : ''}`;
+        
+        /* [Chat Header] */
         context.chatHeader.className = "chat-header-md";
         context.chatHandler.className = "chat-handler-md";
         context.chatHeaderText.className = "chat-header-text-md";
+        context.chatHeaderProfile.className = "chat-header-profile-md";
+        context.chatHeaderImage.className = "chat-header-image-md";
+        context.chatHeaderImage.style.setProperty('--gentoo-profile-image', `url(${context.floatingAvatar?.profileAsset})`);
+        
         context.closeButtonContainer.className = "chat-close-button-container-md";
         context.closeButtonIcon.className = "chat-close-button-icon-md";
-        // context.closeButtonText.className = "chat-close-button-text-md";
-        // context.closeButtonText.innerText = "접기";
         context.closeActionArea = document.createElement("div");
         context.closeActionArea.className = "chat-close-action-area-md";
-        context.iframe.className = `chat-iframe-md ${context.warningActivated ? 'footer-add-height-md' : ''}`;
         context.closeButtonContainer.appendChild(context.closeButtonIcon);
         context.closeButtonContainer.appendChild(context.closeButtonText);
-        // context.testButton = document.createElement("button");
-        // context.testButton.className = "test-button";
-        // context.testButton.innerText = "테스트";
-        context.chatHeader.appendChild(context.chatHeaderText);
+        
+        context.chatHeaderProfile.appendChild(context.chatHeaderImage);
+        context.chatHeaderProfile.appendChild(context.chatHeaderText);
+        context.chatHeader.appendChild(context.chatHeaderProfile);
         context.chatHeader.appendChild(context.chatHandler);
         context.chatHeader.appendChild(context.closeButtonContainer);
         context.iframeContainer.appendChild(context.closeActionArea);
-        // context.iframeContainer.appendChild(context.testButton);
+        
+        /* [Input Container] */
         context.inputContainer = document.createElement("div");
         context.inputContainer.setAttribute("data-gentoo-sdk", "true");
         context.inputWrapper = document.createElement("div");
@@ -120,7 +205,7 @@ export const createUIElementsModal = (
         context.sendButton = document.createElement("div");
         context.sendButton.className = "chat-send-button chat-send-button-active hide";
         context.input.className = "chat-input shrink-hide";
-        context.input.placeholder = "상품 추천, 문의도 — 무엇이든 물어보세요";
+        context.input.placeholder = "무엇이든 물어보세요";
         context.input.name = "gentoo-chat-input";
         context.input.type = "text";
         context.input.autocomplete = "off";
@@ -128,30 +213,39 @@ export const createUIElementsModal = (
         context.input.autocapitalize = "off";
         context.input.autocorrect = "off";
         context.profileImage = document.createElement("div");
+        context.profileImage.style.setProperty('--gentoo-profile-image', `url(${context.floatingAvatar?.profileAsset})`);
         context.profileImage.className = "gentoo-profile-image hide";
         context.inputWrapper.appendChild(context.profileImage);
         context.inputWrapper.appendChild(context.input);
         context.inputWrapper.appendChild(context.sendButton);
         context.inputContainer.className = "chat-input-container hide";
         context.inputContainer.appendChild(context.inputWrapper);
+
+        /* [Exam Floating Group] */
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
         chatbotData?.examples?.forEach(example => {
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button";
             examFloatingButton.innerText = example;
+            examFloatingButton.style.setProperty('--gentoo-color-3', context.chatbotData?.colorCode[2]?.hex);
+            examFloatingButton.style.setProperty('--gentoo-color-1', context.chatbotData?.colorCode[0]?.hex);
             context.examFloatingGroup.appendChild(examFloatingButton);
         });
         context.inputContainer.appendChild(context.examFloatingGroup);
         document.body.appendChild(context.inputContainer);
     } else {
+        /* 데스크탑 채팅창 일반 UI 생성 */
+        /* [Iframe] */
+        context.iframe.className = `chat-iframe ${context.warningActivated ? 'footer-add-height' : ''}`;
+        /* [Chat Header] */
         context.chatHeader.className = "chat-header";
         context.chatHeaderText.className = "chat-header-text";
+        context.chatHeaderText.innerText = "Gentoo";
         context.closeButtonContainer.className = "chat-close-button-container";
         context.closeButtonIcon.className = "chat-close-button-icon";
         context.closeButtonText.className = "chat-close-button-text";
         context.closeButtonText.innerText = "채팅창 축소";
-        context.iframe.className = `chat-iframe ${context.warningActivated ? 'footer-add-height' : ''}`;
         context.closeButtonContainer.appendChild(context.closeButtonIcon);
         context.closeButtonContainer.appendChild(context.closeButtonText);
         context.chatHeader.appendChild(context.chatHeaderText);
@@ -167,37 +261,21 @@ export const createUIElementsModal = (
     document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
 
-    postChatEventLog({
-        experimentId: "flowlift_abctest_v1",
-        partnerId: context.partnerId,
-        variantId: context.variant,
-        sessionId: context.sessionId || "sess-test",
-        chatUserId: context.chatUserId,
-        userType: context.userType,
-        displayLocation: context.displayLocation,
-        deviceType: context.isMobileDevice ? "mobile" : "web",
-        timestamp: String(Date.now()),
-        eventCategory: "gentoo_displayed",
-        context: {
-            autoChatOpen: Boolean(context.bootConfig?.floating?.autoChatOpen),
-        },
-    });
+    logFloatingRendered(context);
 
-    postChatEventLogLegacy({
-        eventCategory: "SDKFloatingRendered",
-        partnerId: context.partnerId,
-        chatUserId: context.chatUserId,
-        products: [],
-    }, context.isMobileDevice);
-    window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
-
-    // Create floating button
+    /* 젠투 플로팅 버튼 UI 생성 */
     if (showGentooButton) {
+        /* [Floating Container] */
         context.floatingContainer = document.createElement("div");
         context.floatingContainer.className = `floating-container`;
         context.floatingContainer.setAttribute("data-gentoo-sdk", "true");
+        document.body.appendChild(context.floatingContainer);
 
-        context.updateFloatingContainerPosition(position); // Set initial position
+        /* [Floating Position] */
+        context.currentFloatingPosition = getCurrentFloatingPosition(context, position);
+        updateFloatingContainerPosition(context, context.currentFloatingPosition); // Set initial position
+        
+        /* [non-lottie Floating Button] */
         context.button = document.createElement("div");
         if (context.isSmallResolution) {
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
@@ -205,8 +283,10 @@ export const createUIElementsModal = (
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
         }
         context.button.type = "button";
-        context.button.style.backgroundImage = `url(${context.useBootConfigFloatingImage ? context.bootConfig?.floating?.button?.imageUrl : context.floatingAvatar?.floatingAsset})`;
-        document.body.appendChild(context.floatingContainer);
+        context.button.style.backgroundImage = 
+            `url(${context.selectedFloatingImage})`;
+        
+        /* [Lottie Floating Button] */
         if (context.dotLottiePlayer) {
             context.floatingContainer.appendChild(context.dotLottiePlayer);
         } else {
@@ -219,10 +299,12 @@ export const createUIElementsModal = (
             if (context.floatingClicked || context.isDestroyed || !context.floatingContainer)
                 return;
 
+            /* [Floating Message] */
             context.expandedButtonWrapper = document.createElement("div");
             context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
+            
             if (context.isSmallResolution) {
                 context.expandedButton.className =
                     context.useBootConfigFloatingImage ?
@@ -247,7 +329,7 @@ export const createUIElementsModal = (
             // Double check if floatingContainer still exists before appending
             if (context.floatingContainer && context.floatingContainer.parentNode) {
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
-                context.addLetter(context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
+                addLetter(context, context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
 
                 // Remove expanded button after delay
                 setTimeout(() => {
@@ -260,11 +342,17 @@ export const createUIElementsModal = (
                     }
                 }, 7000);
             }
+
+            // Start repeating interval for experiment target (every 10 seconds)
+            if (context?.isExperimentTarget && context?.availableComments && context?.availableComments?.length > 0) {
+                context.floatingMessageIntervalId = setInterval(() => {
+                    context.showRandomFloatingMessage();
+                }, context.FLOATING_MESSAGE_INTERVAL_MS);
+            }
         }
-    } else {
-        if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
     }
 
+    /* [UI Elements] */
     context.elems = {
         iframeContainer: context.iframeContainer,
         iframe: context.iframe,
@@ -274,8 +362,11 @@ export const createUIElementsModal = (
         customButton: customButton,
     }
 
-    // Add event listeners
-    context.setupEventListeners(position, isCustomButton);
+    /* [Event Listeners] */
+    context.currentFloatingPosition = getCurrentFloatingPosition(context, position);
+    setupEventListenersModal(context, context.currentFloatingPosition);
+
+    /* 캐러셀 리다이렉트 시 채팅창 자동 열림 */
     if (context.gentooSessionData?.redirectState) {
         setTimeout(() => {
             if (context.expandedButton)
@@ -295,7 +386,7 @@ export const createUIElementsModal = (
     }
     window.__GentooInited = 'created';
 
-    // post message to iframe after all elements are created
+    /* Post Static-Info Message to Chat after all elements are created */
     setTimeout(() => {
         context.sendPostMessageHandler({
             messageType: "gentoo-statics",
@@ -308,6 +399,9 @@ export const createUIElementsModal = (
                 userType: context.userType,
                 displayLocation: context.displayLocation,
                 deviceType: context.isMobileDevice ? "mobile" : "web",
+                godomallCVID: context.sessionId,
+                cafe24CVID: context?.cvid,
+                cafe24CVIDY: context?.cvid_y,
             }
         });
     }, 1000);

@@ -19,18 +19,11 @@
             s.type = "text/javascript"; 
             s.async = true; 
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
-            // 🧪 Shopify 테스트용 SDK 로드
-            if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
-                // 로컬 개발 환경
-                s.src = "./floating-button-sdk-shopifyTest.js";
-            } else if (isMobile && (window.location.hostname === "7tmeab-ia.myshopify.com")) {
-                // Mobile modal UI 적용 (둘리농장 테스트)
-                s.src = "https://sdk.gentooai.com/dist/shopify-modal/floating-shopify-modal.js";
-            } else {
-                // 프로덕션 환경
-                s.src = "https://sdk.gentooai.com/floating-button-sdk-shopifyTest.js"; 
-            }
-            // s.src = 'https://dev-sdk.gentooai.com/floating-button-sdk-shopifyTest.js'; // dev 
+            var source = '';
+            source = isMobile 
+                ? `https://dev-sdk.gentooai.com/dist/godomall-modal/floating-godomall-modal.js` 
+                : 'https://dev-sdk.gentooai.com/dist/godomall/floating-godomall.js';
+            s.src = source; // dev
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 
@@ -47,3 +40,9 @@
         };
     }
 )(window, document);
+
+GentooIO('boot', {
+    partnerType: 'godomall',
+})
+
+GentooIO('init', {});
