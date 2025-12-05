@@ -449,12 +449,15 @@
     gap: 4px;
 }
 
-img.chat-header-image-md {
+.chat-header-image-md {
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
     background-size: contain;
     background-repeat: no-repeat;
     border: none;
+    box-sizing: border-box;
     background-image: var(--gentoo-profile-image, url('https://dev-avatar.gentooai.com/default/default-profile.png'));
 }
 

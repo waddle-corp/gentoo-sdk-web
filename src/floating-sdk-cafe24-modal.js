@@ -614,13 +614,22 @@ class FloatingButton {
             this.iframeContainer.className = "iframe-container-shrink";
             if (this.chatHandler) this.chatHandler.classList.remove('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "400px";
+            if (this.chatHeader) {
+                this.chatHeader.removeChilren();
+                this.chatHeaderText.innerText = this.chatbotData?.name || 'Gentoo';
+                this.chatHeader.appendChild(this.chatHeaderProfile);
+                this.chatHeader.appendChild(this.chatHandler);
+                this.chatHeader.appendChild(this.closeButtonContainer);
+            }
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
             if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "99%";
             if (this.chatHeader) {
-                this.chatHeader.removeChild(this.chatHeaderProfile);
+                this.chatHeader.removeChilren();
+                this.chatHeaderText.innerText = 'Gentoo';
                 this.chatHeader.appendChild(this.chatHeaderText);
+                this.chatHeader.appendChild(this.closeButtonContainer);
             }
         } else {
             return;
