@@ -643,11 +643,6 @@ input.chat-input {
 /* Ensure example floating buttons use their injected colors even under the global [data-gentoo-sdk] color rule */
 [data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button,
 [data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button * {
-    color: var(--gentoo-color-1, #154cca);
-}
-
-/* Increase specificity so paragraph styles inside the example floating button are not overridden by site styles */
-[data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button p {
     font-family: 'pretendard', sans-serif;
     font-size: 15px;
     line-height: 19px;
