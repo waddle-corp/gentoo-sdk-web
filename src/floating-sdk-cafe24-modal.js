@@ -619,6 +619,11 @@ class FloatingButton {
                     this.chatHeader.removeChild(this.chatHeader.firstChild);
                 }
                 this.chatHeaderText.innerText = this.chatbotData?.name || 'Gentoo';
+                while (this.chatHeaderProfile.firstChild) {
+                    this.chatHeaderProfile.removeChild(this.chatHeaderProfile.firstChild);
+                }
+                this.chatHeaderProfile.appendChild(this.chatHeaderImage);
+                this.chatHeaderProfile.appendChild(this.chatHeaderText);
                 this.chatHeader.appendChild(this.chatHeaderProfile);
                 this.chatHeader.appendChild(this.chatHandler);
                 this.chatHeader.appendChild(this.closeButtonContainer);

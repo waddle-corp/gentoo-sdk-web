@@ -499,10 +499,32 @@ class FloatingButton {
             this.iframeContainer.className = "iframe-container-shrink";
             if (this.chatHandler) this.chatHandler.classList.remove('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "400px";
+            if (this.chatHeader) {
+                while (this.chatHeader.firstChild) {
+                    this.chatHeader.removeChild(this.chatHeader.firstChild);
+                }
+                this.chatHeaderText.innerText = this.chatbotData?.name || 'Gentoo';
+                while (this.chatHeaderProfile.firstChild) {
+                    this.chatHeaderProfile.removeChild(this.chatHeaderProfile.firstChild);
+                }
+                this.chatHeaderProfile.appendChild(this.chatHeaderImage);
+                this.chatHeaderProfile.appendChild(this.chatHeaderText);
+                this.chatHeader.appendChild(this.chatHeaderProfile);
+                this.chatHeader.appendChild(this.chatHandler);
+                this.chatHeader.appendChild(this.closeButtonContainer);
+            }
         } else if (mode === "full") {
             this.iframeContainer.className = "iframe-container";
             if (this.chatHandler) this.chatHandler.classList.add('visibility-hidden');
             if (this.isMobileDevice || this.isSmallResolution) this.iframeContainer.style.height = "99%";
+            if (this.chatHeader) {
+                while (this.chatHeader.firstChild) {
+                    this.chatHeader.removeChild(this.chatHeader.firstChild);
+                }
+                this.chatHeaderText.innerText = 'Gentoo';
+                this.chatHeader.appendChild(this.chatHeaderText);
+                this.chatHeader.appendChild(this.closeButtonContainer);
+            }
         } else {
             return;
         }
