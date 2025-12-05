@@ -568,6 +568,16 @@ input.chat-input {
     max-height: 19px;
 }
 
+[data-gentoo-sdk="true"] .chat-input-wrapper .chat-input,
+[data-gentoo-sdk="true"] .chat-input-wrapper .chat-input * {
+    font-family: "pretendard";
+    font-size: 15px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 19px;
+    color: #222;
+}
+
 .gentoo-profile-image {
     width: 28px;
     height: 28px;
