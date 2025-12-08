@@ -473,8 +473,8 @@
     /* transform: rotate(-90deg); */
     /* background-image: url('https://assets.gentooai.com/sdk/sdk-bs-handler.png'); */
     background-image: url('/public/double_arrow_up.svg');
-    position: 'absolute';
-    top: 0px;
+    position: absolute;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -587,7 +587,7 @@ input.chat-input {
     box-shadow: none;
 }
 
-.gentoo-profile-image {
+div.gentoo-profile-image {
     width: 28px;
     height: 28px;
     flex-shrink: 0;
@@ -599,7 +599,7 @@ input.chat-input {
     display: block;
 }
 
-.chat-send-button {
+div.chat-send-button {
     width: 28px;
     height: 28px;
     flex-shrink: 0;
