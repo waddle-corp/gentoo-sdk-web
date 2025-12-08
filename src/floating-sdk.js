@@ -342,11 +342,11 @@ class FloatingButton {
             if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.co.kr')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-margin-left');
 
             this.button = document.createElement("div");
-            // if (this.isSmallResolution) {
-            //     this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : 'button-md'}`;
-            // } else {
-            //     this.button.className = `floating-button-common ${this.floatingZoom ? 'button-zoom' : null}`;
-            // }
+            if (this.isSmallResolution) {
+                this.button.className = `floating-button-common button-md`;
+            } else {
+                this.button.className = `floating-button-common`;
+            }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             this.buttonContainer.appendChild(this.dotLottiePlayer ? this.dotLottiePlayer : this.button);
