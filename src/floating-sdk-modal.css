@@ -71,6 +71,7 @@
 }
 
 .button-image-zoom {
+    display: flex;
     width: 120px;
     height: 120px;
     background-image: url('https://assets.gentooai.com/sdk/gentoo-anime-web-noloop.gif');
@@ -78,6 +79,7 @@
 }
 
 .button-image-md {
+    display: flex;
     width: 68px;
     height: 68px;
     background-repeat: no-repeat;
@@ -353,6 +355,7 @@
     justify-content: space-between;
     padding: 0 16px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .chat-header-text {
@@ -438,6 +441,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    position: relative;
 }
 
 .chat-header-profile-md {
@@ -469,6 +473,10 @@
     /* transform: rotate(-90deg); */
     /* background-image: url('https://assets.gentooai.com/sdk/sdk-bs-handler.png'); */
     background-image: url('/public/double_arrow_up.svg');
+    position: 'absolute';
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .chat-header-text-md {
@@ -576,6 +584,7 @@ input.chat-input {
     font-style: normal;
     line-height: 19px;
     color: #222;
+    box-shadow: none;
 }
 
 .gentoo-profile-image {
@@ -587,6 +596,7 @@ input.chat-input {
     background-repeat: no-repeat;
     background-image: var(--gentoo-profile-image, url('https://dev-avatar.gentooai.com/default/default-profile.png'));
     box-sizing: border-box;
+    display: block;
 }
 
 .chat-send-button {
@@ -598,6 +608,7 @@ input.chat-input {
     cursor: pointer;
     background-size: contain;
     background-repeat: no-repeat;
+    display: block;
 }
 
 .chat-send-button-active {
