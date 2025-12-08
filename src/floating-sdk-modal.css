@@ -399,17 +399,19 @@
     cursor: pointer;
 }
 
-.chat-close-button-icon {
+div.chat-close-button-icon {
     width: 20px;
     height: 20px;
     margin-right: 2px;
     background-size: contain;
     background-image: url('https://assets.gentooai.com/sdk/chat-shrink.png');
+    display: block;
 }
 
-.chat-close-button-icon-md {
+div.chat-close-button-icon-md {
     width: 20px;
     height: 20px;
+    display: block;
     background-size: contain;
     /* background-image: url('https://assets.gentooai.com/sdk/chat-shrink-md.png'); */
     background-image: url('/public/close.svg');
@@ -465,9 +467,10 @@
     background-image: var(--gentoo-profile-image, url('https://dev-avatar.gentooai.com/default/default-profile.png'));
 }
 
-.chat-handler-md {
+div.chat-handler-md {
     width: 40px;
     height: 20px;
+    display: block;
     background-size: contain;
     background-repeat: no-repeat;
     /* transform: rotate(-90deg); */
