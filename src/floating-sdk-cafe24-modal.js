@@ -46,6 +46,7 @@ class FloatingButton {
             return;
         }
 
+        this.lang = 'ko';
         this.partnerType = props.partnerType || 'cafe24';
         this.partnerId = props.partnerId;
         this.utm = props.utm;

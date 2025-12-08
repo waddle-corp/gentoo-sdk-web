@@ -71,6 +71,7 @@ class FloatingButton {
             );
         }
 
+        this.lang = 'en';
         this.partnerType = props.partnerType || 'shopify';
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;

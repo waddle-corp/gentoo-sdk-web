@@ -48,6 +48,7 @@ class FloatingButton {
             return;
         }
 
+        this.lang = 'ko';
         this.partnerType = props.partnerType || 'godomall';
         this.partnerId = props.partnerId;
         this.utm = props.utm;

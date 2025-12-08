@@ -210,7 +210,7 @@ export const createUIElementsModal = (
         context.sendButton = document.createElement("div");
         context.sendButton.className = "chat-send-button chat-send-button-active hide";
         context.input.className = "chat-input shrink-hide";
-        context.input.placeholder = "무엇이든 물어보세요";
+        context.input.placeholder = context.lang === 'ko' ? "무엇이든 물어보세요" : "Ask me anything";
         context.input.name = "gentoo-chat-input";
         context.input.type = "text";
         context.input.autocomplete = "off";

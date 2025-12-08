@@ -318,7 +318,7 @@ export const setupEventListenersModal = (context, position) => {
         context.redirectToCartPage();
         // add letter 관련 묶어야 됨
         setTimeout(() => {
-            context.floatingMessage = '궁금한 게 있으시면 언제든 다시 눌러주세요!';
+            context.floatingMessage = context.lang === 'ko' ? '궁금한 게 있으시면 언제든 다시 눌러주세요!' : 'Click me again anytime if you have any questions!';
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
             if (context.isSmallResolution) {
