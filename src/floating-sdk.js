@@ -3,7 +3,8 @@ import {
     getChatbotData,
     postChatUserId,
     getBootConfig,
-    postChatEventLog
+    postChatEventLog,
+    postChatEventLogLegacy
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 
@@ -564,12 +565,33 @@ class FloatingButton {
             }
         });
 
-        this.button?.addEventListener("click", buttonClickHandler);
-        this.button?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
-        this.dotLottiePlayer?.addEventListener("click", buttonClickHandler);
-        this.dotLottiePlayer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
-        this.expandedButtonWrapper?.addEventListener("click", buttonClickHandler);
-        this.expandedButtonWrapper?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        this.floatingContainer?.addEventListener("click", buttonClickHandler);
+        this.floatingContainer?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href })
+            postChatEventLog({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "gentoo_clicked",
+                context: {
+                    autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                    floatingText: this.bootConfig?.floating?.button?.comment,
+                },
+            });
+    
+            postChatEventLogLegacy({
+                eventCategory: 'SDKFloatingClicked',
+                partnerId: this.partnerId,
+                chatUserId: this.chatUserId,
+                products: [],
+            }, this.isMobileDevice);
+        });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
         this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
@@ -965,12 +987,6 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        postChatEventLog({
-            eventCategory: "SDKFloatingClicked",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
 
         this.sendPostMessageHandler({ enableMode: mode });
 
