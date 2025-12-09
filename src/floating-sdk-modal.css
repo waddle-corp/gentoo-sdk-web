@@ -356,6 +356,7 @@
     padding: 0 16px;
     box-sizing: border-box;
     position: relative;
+    z-index: 0;
 }
 
 .chat-header-text {
@@ -444,6 +445,7 @@ div.chat-close-button-icon-md {
     align-items: flex-start;
     justify-content: space-between;
     position: relative;
+    z-index: 0;
 }
 
 .chat-header-profile-md {
@@ -502,6 +504,7 @@ div.chat-handler-md {
     min-height: 40px;
     top: 0;
     right: 16px;
+    z-index: 1;
 }
 
 .chat-footer {

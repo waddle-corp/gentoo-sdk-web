@@ -307,10 +307,9 @@ export const setupEventListenersModal = (context, position) => {
     context.floatingContainer?.addEventListener("touchend", onTouchEnd);
     context.floatingContainer?.addEventListener("touchcancel", onTouchEnd);
 
-    context.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-    context.closeButtonContainer?.addEventListener("click", (e) => context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
-    context.closeButtonIcon?.addEventListener("click", buttonClickHandler);
     context.closeActionArea?.addEventListener("click", (e) => {
+        context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href })
+        context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href })
         postChatEventLog({
             experimentId: "flowlift_abctest_v1",
             partnerId: context.partnerId,
@@ -370,7 +369,6 @@ export const setupEventListenersModal = (context, position) => {
             }
         }, 500);
     });
-    context.closeActionArea?.addEventListener("click", (e) => context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
     context.customButton?.addEventListener("click", buttonClickHandler);
     context.customButton?.addEventListener("click", (e) => context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
     context.sendButton?.addEventListener("pointerdown", () => { context.isInteractingWithSend = true; });
