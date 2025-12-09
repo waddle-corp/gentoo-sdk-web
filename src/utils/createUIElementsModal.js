@@ -417,6 +417,7 @@ export const createUIElementsModal = (
                 godomallCVID: context.sessionId,
                 cafe24CVID: context?.cvid,
                 cafe24CVIDY: context?.cvid_y,
+                fbclid: context?.fbclid,
             }
         });
     }, 1000);

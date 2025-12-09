@@ -105,6 +105,15 @@ export const setupEventListenersModal = (context, position) => {
                 context.eventCallback?.formSubmitted(params);
             }
         }
+        if (e.data.preInputSubmittedState) {
+            if (context.eventCallback.preInputSubmitted !== null) {
+                if (e.data.step1) {
+                    context.eventCallback?.preInputSubmitted({ step1: e.data.step1 });
+                } else if (e.data.step2) {
+                    context.eventCallback?.preInputSubmitted({ step2: e.data.step2 });
+                }
+            }
+        }
         if (context.isSmallResolution && e.data.inputFocusState) {
             // context.enableChat("full");
         }

@@ -16,9 +16,17 @@
             if (w.GentooIOInitialized) { return }; 
             w.GentooIOInitialized = true; 
             var s = document.createElement("script"); 
+            var hostname = window.location.hostname;
             s.type = "text/javascript"; 
             s.async = true; 
-            s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
+            var isFastfive = hostname.includes('fastfive.co.kr');
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
+            var source = '';
+            source = isMobile && !isFastfive 
+                ? `https://sdk.gentooai.com/dist/gentoo-modal/floating-modal.js` 
+                : 'https://sdk.gentooai.com/dist/gentoo/floating.js';
+            s.src = source;
+            // s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
             // s.src = "./dist/gentoo/floating.js"; 
             s.onload = () => { 
