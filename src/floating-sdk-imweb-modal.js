@@ -160,6 +160,8 @@ class FloatingButton {
         }
 
         await injectLottie(document);
+        // Inject viewport meta tag to block ios zoom in
+        injectViewport(this, document);
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
 
@@ -207,8 +209,6 @@ class FloatingButton {
 
     openChat() {
         if (this.isDraggingFloating) return;
-        // Inject viewport meta tag to block ios zoom in
-        injectViewport(this, document);
         // Chat being visible
         this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
@@ -457,8 +457,6 @@ class FloatingButton {
     }
 
     hideChat() {
-        // Delete viewport meta tag
-        deleteViewport(this, document);
 
         if (this.button) {
             if (this.isSmallResolution) {
