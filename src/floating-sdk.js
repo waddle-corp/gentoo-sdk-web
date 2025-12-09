@@ -283,7 +283,41 @@ class FloatingButton {
         parentElem.appendChild(this.dimmedBackground);
         parentElem.appendChild(this.iframeContainer);
 
+        setTimeout(() => {
+            // gentoo static parameters to iframe
+            this.sendPostMessageHandler({
+                messageType: "gentoo-statics",
+                contentData: {
+                    experimentId: "flowlift_abctest_v1",
+                    partnerId: this.partnerId,
+                    variantId: this.variant,
+                    sessionId: this.sessionId || "sess-test",
+                    chatUserId: this.chatUserId,
+                    userType: this.userType,
+                    displayLocation: this.displayLocation,
+                    deviceType: this.isMobileDevice ? "mobile" : "web",
+                    fbclid: this.fbclid,
+                }
+            });
+        }, 1000)
+
         postChatEventLog({
+            experimentId: "flowlift_abctest_v1",
+            partnerId: this.partnerId,
+            variantId: this.variant,
+            sessionId: this.sessionId || "sess-test",
+            chatUserId: this.chatUserId,
+            userType: this.userType,
+            displayLocation: this.displayLocation,
+            deviceType: this.isMobileDevice ? "mobile" : "web",
+            timestamp: String(Date.now()),
+            eventCategory: "gentoo_displayed",
+            context: {
+                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+            },
+        });
+
+        postChatEventLogLegacy({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
@@ -1055,7 +1089,7 @@ class FloatingButton {
                 products: input.products,
             };
 
-            return postChatEventLog(payload, this.isMobileDevice);
+            return postChatEventLogLegacy(payload, this.isMobileDevice);
         } catch (error) {
             console.error("Failed to send log:", error);
             throw error;
