@@ -303,7 +303,7 @@ class FloatingButton {
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-                player.setAttribute('src', window.location.hostname.includes('dev.fastfive.co.kr') ? Ff_fab_nopad : selectedAsset);
+                player.setAttribute('src', this.partnerId === '67615284c5ff44110dbc6613' ? Ff_fab_nopad : selectedAsset);
 
                 // player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
                 // player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
@@ -323,24 +323,24 @@ class FloatingButton {
             this.buttonContainer.className = "button-container";
 
             // zoom button size
-            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.com')) || this.partnerId === '67516ecf103e7e29c75a621e') {
-                if (this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) {
+            if (this.partnerId === '67615284c5ff44110dbc6613') {
+                if (this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') {
                     this.buttonContainer.classList.add('button-zoom');
                 }
             } else if (this.isSmallResolution) {
-                if (this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) {
+                if (this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') {
                     this.buttonContainer.classList.add('button-zoom');
                 } else {
                     this.buttonContainer.classList.add('button-md');
                 }
             } else {
-                if (this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) {
+                if (this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') {
                     this.buttonContainer.classList.add('button-zoom');
                 }
             }
 
             // tmp for fastfive
-            if ((this.partnerId === '67615284c5ff44110dbc6613' && window.location.hostname.includes('dev.fastfive.co.kr')) || this.partnerId === '67516ecf103e7e29c75a621e') this.buttonContainer.classList.add('button-margin-left');
+            if (this.partnerId === '67615284c5ff44110dbc6613') this.buttonContainer.classList.add('button-margin-left');
 
             this.button = document.createElement("div");
             if (this.isSmallResolution) {
@@ -508,9 +508,9 @@ class FloatingButton {
                 );
                 if (this.button) {
                     if (this.isSmallResolution) {
-                        this.button.className = `floating-button-common ${this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr') ? 'button-zoom' : 'button-md'}`;
+                        this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : 'button-md'}`;
                     } else {
-                        this.button.className = `floating-button-common ${this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr') ? 'button-zoom' : null}`;
+                        this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : null}`;
                     }
                     this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
                     if (this.dotLottiePlayer) {
@@ -1018,9 +1018,9 @@ class FloatingButton {
 
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = `floating-button-common ${this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr') ? 'button-zoom' : 'button-md'}`;
+                this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : 'button-md'}`;
             } else {
-                this.button.className = `floating-button-common ${this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr') ? 'button-zoom' : null}`;
+                this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : null}`;
             }
         }
         if (this.dotLottiePlayer) {
