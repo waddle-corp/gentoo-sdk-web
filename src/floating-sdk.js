@@ -394,7 +394,7 @@ class FloatingButton {
                     return;
 
                 this.expandedButtonWrapper = document.createElement("div");
-                this.expandedButtonWrapper.className = `expanded-area-wrapper ${(this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+                this.expandedButtonWrapper.className = `expanded-area-wrapper ${(this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') ? 'expanded-area-wrapper-zoom' : this.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
                 this.expandedButton = document.createElement("div");
                 this.expandedText = document.createElement("p");
                 if (this.isSmallResolution) {
@@ -404,7 +404,7 @@ class FloatingButton {
                             !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                                 `expanded-area-md` :
                                 `expanded-area-md expanded-area-neutral-md`;
-                    this.expandedText.className = `${(this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
+                    this.expandedText.className = `${(this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') ? 'expanded-area-text-zoom-md' : 'expanded-area-text-md'}`;
                 } else {
                     this.expandedButton.className =
                         this.useBootConfigFloatingImage ?
@@ -412,7 +412,7 @@ class FloatingButton {
                             !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
                                 "expanded-area" :
                                 `expanded-area expanded-area-neutral`;
-                    this.expandedText.className = `${(this.floatingZoom && !window.location.hostname.includes('dev.fastfive.co.kr')) ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
+                    this.expandedText.className = `${(this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613') ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
 
                 this.expandedButtonWrapper.appendChild(this.expandedButton);
