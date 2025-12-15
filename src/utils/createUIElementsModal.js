@@ -175,7 +175,7 @@ export const createUIElementsModal = (
     }
 
     /* 모바일 채팅창 Modal UI 생성 */
-    if (context.isSmallResolution) {
+    if (context.isSmallResolution || context.isMobileDevice) {
         /* [Iframe] */
         context.iframe.className = `chat-iframe-md ${context.warningActivated ? 'footer-add-height-md' : ''}`;
         
