@@ -26,8 +26,8 @@ export const setupEventListenersModal = (context, position) => {
             context.inputContainer.classList.remove("hide");
             context.inputWrapper.classList.remove("shrink-hide");
             context.input.classList.remove("shrink-hide");
-            context.examFloatingGroup.classList.add("slide-up");
-            context.examFloatingGroup.classList.remove("hide");
+            context.examFloatingGroup?.classList.add("slide-up");
+            context.examFloatingGroup?.classList.remove("hide");
             context.sendButton.classList.remove("hide");
             context.profileImage.classList.remove("hide");
             if (context.expandedButton)
@@ -56,8 +56,8 @@ export const setupEventListenersModal = (context, position) => {
         context.inputContainer.classList.add("hide");
         context.inputWrapper.classList.add("shrink-hide");
         context.input.classList.add("shrink-hide");
-        context.examFloatingGroup.classList.remove("slide-up");
-        context.examFloatingGroup.classList.add("hide");
+        context.examFloatingGroup?.classList.remove("slide-up");
+        context.examFloatingGroup?.classList.add("hide");
         context.sendButton.classList.add("hide");
         context.profileImage.classList.add("hide");
 
@@ -125,8 +125,8 @@ export const setupEventListenersModal = (context, position) => {
                     context.inputContainer.classList.remove("hide");
                     context.inputWrapper.classList.remove("shrink-hide");
                     context.input.classList.remove("shrink-hide");
-                    context.examFloatingGroup.classList.add("slide-up");
-                    context.examFloatingGroup.classList.remove("hide");
+                    context.examFloatingGroup?.classList.add("slide-up");
+                    context.examFloatingGroup?.classList.remove("hide");
                     context.sendButton.classList.remove("hide");
                     context.profileImage.classList.remove("hide");
                     if (context.dimmedBackground) context.dimmedBackground.classList.remove('hide');
@@ -404,7 +404,7 @@ export const setupEventListenersModal = (context, position) => {
     context.examFloatingGroup?.addEventListener("pointerdown", () => { context.isInteractingWithSend = true; });
     context.examFloatingGroup?.addEventListener("mousedown", () => { context.isInteractingWithSend = true; });
     context.examFloatingGroup?.addEventListener("touchstart", () => { context.isInteractingWithSend = true; }, { passive: true });
-    context.examFloatingGroup.addEventListener("click", (e) => {
+    context.examFloatingGroup?.addEventListener("click", (e) => {
         //const button = e.target.closest('.exam-floating-button');
         const raw = e.target;
         const el = raw.nodeType === Node.TEXT_NODE ? raw.parentElement : raw; // Text면 부모 Element로 승격
