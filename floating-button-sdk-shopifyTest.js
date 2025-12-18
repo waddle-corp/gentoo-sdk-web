@@ -404,6 +404,12 @@ class FloatingButton {
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
+        this.iframe.addEventListener('load', () => {
+            if (!window.location.hostname.includes('7tmeab-ia.myshopify.com')) {
+                console.log('chat iframe loaded');
+            }
+            this.checkSearchTrigger();
+        });
 
         if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
             const player = document.createElement('dotlottie-wc');
@@ -798,6 +804,39 @@ class FloatingButton {
                 : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
         }
+    }
+
+    checkSearchTrigger() {
+        if (!window.location.hostname.includes('7tmeab-ia.myshopify.com')) {
+            console.log('not search trigger');
+            return;
+        }
+        if (this.isMobileDevice) {
+            console.log('mobile device');
+            return;
+        }
+
+        const url = new URL(window.location.href);
+        if (!url.pathname.includes('/search')) {
+            console.log('not search path');
+            return;
+        }
+
+        const searchQuery = url.searchParams.get('q');
+        if (!searchQuery) {
+            console.log('not search query');
+            return;
+        }
+
+        if (this.iframeContainer?.classList.contains('iframe-container-hide')) {
+            console.log('iframe container hide');
+            this.openChat();
+        }
+
+        this.iframe.contentWindow.postMessage({
+            type: 'userMessageAutoSend',
+            message: searchQuery
+        }, '*');
     }
 
     openChat() {
