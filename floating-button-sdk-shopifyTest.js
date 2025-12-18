@@ -329,6 +329,10 @@ class FloatingButton {
             const autoUserMessage = this.getAutoUserMessage();
             const autoUserMessageParam = autoUserMessage ? `&autoUserMessage=${encodeURIComponent(autoUserMessage)}` : '';
 
+            if (autoUserMessage) {
+                console.log('[Gentoo] chatUrl with autoUserMessage:', autoUserMessage);
+            }
+
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
                 this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
             }
@@ -411,6 +415,7 @@ class FloatingButton {
         this.iframe.addEventListener('load', () => {
             // 검색 자동 트리거: 채팅창 열기
             if (this.getAutoUserMessage()) {
+                console.log('[Gentoo] Auto-opening chat for search trigger');
                 this.openChat();
             }
         });
@@ -1770,13 +1775,23 @@ class FloatingButton {
     }
 
     getAutoUserMessage() {
-        if (!this.checkSearchAutoTrigger()) return null;
-        if (this.isMobileDevice) return null;
-
+        const isAutoTriggerStore = this.checkSearchAutoTrigger();
         const url = new URL(window.location.href);
-        if (!url.pathname.includes('/search')) return null;
+        const isSearchPage = url.pathname.includes('/search');
+        const searchQuery = url.searchParams.get('q');
 
-        return url.searchParams.get('q');
+        console.log('[Gentoo] AutoUserMessage check:', {
+            isAutoTriggerStore,
+            isMobile: this.isMobileDevice,
+            isSearchPage,
+            searchQuery
+        });
+
+        if (!isAutoTriggerStore) return null;
+        if (this.isMobileDevice) return null;
+        if (!isSearchPage) return null;
+
+        return searchQuery;
     }
 
     async checkTrainingProgress(partnerId) {
