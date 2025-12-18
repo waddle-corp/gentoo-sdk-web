@@ -325,16 +325,24 @@ class FloatingButton {
                 }
             }
 
+            // 검색 자동 트리거: autoUserMessage 파라미터 생성
+            const autoUserMessage = this.getAutoUserMessage();
+            const autoUserMessageParam = autoUserMessage ? `&autoUserMessage=${encodeURIComponent(autoUserMessage)}` : '';
+
+            if (autoUserMessage) {
+                console.log('[Gentoo] chatUrl with autoUserMessage:', autoUserMessage);
+            }
+
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } 
+                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
+            }
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } 
+                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
+            }
             else {
                 // 🎯 채팅 웹 애플리케이션 URL 생성 - SDK에서 iframe으로 로드할 URL
                 // 🛍️ Shopify 테스트용 - 기본적으로 영어(en)로 설정
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=en`;
+                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=en${autoUserMessageParam}`;
             }
 
             // Create UI elements after data is ready
@@ -405,10 +413,11 @@ class FloatingButton {
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
         this.iframe.addEventListener('load', () => {
-            if (!window.location.hostname.includes('7tmeab-ia.myshopify.com')) {
-                console.log('chat iframe loaded');
+            // 검색 자동 트리거: 채팅창 열기
+            if (this.getAutoUserMessage()) {
+                console.log('[Gentoo] Auto-opening chat for search trigger');
+                this.openChat();
             }
-            this.checkSearchTrigger();
         });
 
         if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
@@ -804,39 +813,6 @@ class FloatingButton {
                 : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
         }
-    }
-
-    checkSearchTrigger() {
-        if (!window.location.hostname.includes('7tmeab-ia.myshopify.com')) {
-            console.log('not search trigger');
-            return;
-        }
-        if (this.isMobileDevice) {
-            console.log('mobile device');
-            return;
-        }
-
-        const url = new URL(window.location.href);
-        if (!url.pathname.includes('/search')) {
-            console.log('not search path');
-            return;
-        }
-
-        const searchQuery = url.searchParams.get('q');
-        if (!searchQuery) {
-            console.log('not search query');
-            return;
-        }
-
-        if (this.iframeContainer?.classList.contains('iframe-container-hide')) {
-            console.log('iframe container hide');
-            this.openChat();
-        }
-
-        this.iframe.contentWindow.postMessage({
-            type: 'userMessageAutoSend',
-            message: searchQuery
-        }, '*');
     }
 
     openChat() {
@@ -1788,6 +1764,34 @@ class FloatingButton {
         const currentHostname = window.location.hostname;
         const isTarget = experimentStores.some(store => currentHostname.includes(store));
         return isTarget;
+    }
+
+    checkSearchAutoTrigger() {
+        const searchAutoTriggerStores = [
+            '7tmeab-ia.myshopify.com',  // 테스트 스토어
+        ];
+        const currentHostname = window.location.hostname;
+        return searchAutoTriggerStores.some(store => currentHostname.includes(store));
+    }
+
+    getAutoUserMessage() {
+        const isAutoTriggerStore = this.checkSearchAutoTrigger();
+        const url = new URL(window.location.href);
+        const isSearchPage = url.pathname.includes('/search');
+        const searchQuery = url.searchParams.get('q');
+
+        console.log('[Gentoo] AutoUserMessage check:', {
+            isAutoTriggerStore,
+            isMobile: this.isMobileDevice,
+            isSearchPage,
+            searchQuery
+        });
+
+        if (!isAutoTriggerStore) return null;
+        if (this.isMobileDevice) return null;
+        if (!isSearchPage) return null;
+
+        return searchQuery;
     }
 
     async checkTrainingProgress(partnerId) {
