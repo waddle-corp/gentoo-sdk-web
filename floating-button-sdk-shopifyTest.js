@@ -1764,6 +1764,8 @@ class FloatingButton {
     checkSearchAutoTrigger() {
         const searchAutoTriggerStores = [
             '7tmeab-ia.myshopify.com',  // 테스트 스토어
+            'vomfassghirardellisquare.com',
+            'dualtronusa.com',
         ];
         const currentHostname = window.location.hostname;
         return searchAutoTriggerStores.some(store => currentHostname.includes(store));
