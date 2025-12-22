@@ -1778,7 +1778,20 @@ class FloatingButton {
         const url = new URL(window.location.href);
         if (!url.pathname.includes('/search')) return null;
 
-        return url.searchParams.get('q');
+        const searchQuery = url.searchParams.get('q');
+        if (!searchQuery) return null;
+
+        // 이미 트리거된 검색어인지 확인
+        const triggeredSearches = JSON.parse(sessionStorage.getItem('gentoo_triggered_searches') || '[]');
+        if (triggeredSearches.includes(searchQuery)) {
+            return null;
+        }
+
+        // 트리거된 검색어 목록에 추가
+        triggeredSearches.push(searchQuery);
+        sessionStorage.setItem('gentoo_triggered_searches', JSON.stringify(triggeredSearches));
+
+        return searchQuery;
     }
 
     async checkTrainingProgress(partnerId) {
