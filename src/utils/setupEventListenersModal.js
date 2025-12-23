@@ -2,7 +2,8 @@ import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
 import { 
     updateFloatingContainerPosition, 
     addLetter,
-    logWindowWidth
+    logWindowWidth,
+    injectViewport
 } from "./floatingSdkUtils";
 
 export const setupEventListenersModal = (context, position) => {
@@ -15,6 +16,9 @@ export const setupEventListenersModal = (context, position) => {
             return;
         }
         context.floatingClicked = true;
+
+        // Inject viewport meta tag to block ios zoom in
+        injectViewport(context, document);
 
         if (context.messageExistence || context.displayLocation === 'PRODUCT_DETAIL') {
             context.openChat();

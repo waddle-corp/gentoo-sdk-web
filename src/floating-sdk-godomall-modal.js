@@ -5,15 +5,12 @@ import {
     postChatUserId, 
     getFloatingData, 
     getGodomallPartnerId, 
-    postChatEventLog, 
-    postChatEventLogLegacy,
     generateGuestUserToken,
     getBootConfig, 
 } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
 import { 
     injectLottie, 
-    injectViewport,
     deleteViewport,
     logWindowWidth,
     checkSDKExists,
@@ -192,8 +189,7 @@ class FloatingButton {
         }
 
         await injectLottie(document);
-        // Inject viewport meta tag to block ios zoom in
-        injectViewport(this, document);
+
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
 
@@ -532,6 +528,8 @@ class FloatingButton {
     }
 
     hideChat() {
+        // Delete viewport meta tag
+        deleteViewport(this, document);
 
         if (this.button) {
             if (this.isSmallResolution) {
