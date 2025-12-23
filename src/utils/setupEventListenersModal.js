@@ -3,7 +3,8 @@ import {
     updateFloatingContainerPosition, 
     addLetter,
     logWindowWidth,
-    injectViewport
+    injectViewport,
+    deleteViewport
 } from "./floatingSdkUtils";
 
 export const setupEventListenersModal = (context, position) => {
@@ -56,6 +57,9 @@ export const setupEventListenersModal = (context, position) => {
     };
 
     const performInputBlur = () => {
+        // Delete viewport meta tag
+        deleteViewport(context, document);
+
         if (context.dimmedBackground) context.dimmedBackground.classList.add('hide');
         context.inputContainer.classList.add("hide");
         context.inputWrapper.classList.add("shrink-hide");
