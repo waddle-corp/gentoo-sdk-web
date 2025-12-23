@@ -15,26 +15,26 @@ class FloatingButton {
         ];
 
         this.isExperimentTarget = this.checkExperimentTarget();
-        
+
         // Validate required props
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO constructor called twice, skipping second call.");
             return;
         }
-        
+
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
-        
+
         if (isInIframe && !isAllowedDomain) {
             console.warn("GentooIO instantiation attempted in iframe. SDK should only be instantiated in the top document.");
             window.__GentooInited = 'iframe_blocked';
             return;
         }
-        
+
         // Check for existing SDK elements
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
-            window.__GentooInited = 'created'; 
+            window.__GentooInited = 'created';
             return;
         }
         if (!props.partnerId || !props.authCode) {
@@ -104,7 +104,8 @@ class FloatingButton {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
+                log: "https://stage-api.gentooai.com/chat/api/v1/event/log",
+                logLegacy: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
                 console: "https://dev-api.gentooai.com",
@@ -116,7 +117,8 @@ class FloatingButton {
             this.hostSrc = "https://stage-demo.gentooai.com";
             this.domains = {
                 auth: "https://stage-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
+                log: "https://stage-api.gentooai.com/chat/api/v1/event/log",
+                logLegacy: "https://stage-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://stage-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://stage-api.gentooai.com/chat/api/v1/chat/floating",
                 console: "https://stage-api.gentooai.com",
@@ -125,7 +127,8 @@ class FloatingButton {
             this.hostSrc = "https://demo.gentooai.com";
             this.domains = {
                 auth: "https://api.gentooai.com/chat/api/v1/user",
-                log: "https://api.gentooai.com/chat/api/v1/event/userEvent",
+                log: "https://api.gentooai.com/chat/api/v1/event/log",
+                logLegacy: "https://api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://api.gentooai.com/chat/api/v1/chat/floating",
                 console: "https://api.gentooai.com",
@@ -147,9 +150,9 @@ class FloatingButton {
                     this.gentooSessionData.cuid = res;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 })
-                .catch(() => {
-                    this.chatUserId = 'test';
-                }),
+                    .catch(() => {
+                        this.chatUserId = 'test';
+                    }),
                 this.fetchChatbotData(this.partnerId).then((res) => {
                     if (!res) throw new Error("Failed to fetch chatbot data");
                     this.chatbotData = res;
@@ -174,7 +177,7 @@ class FloatingButton {
             console.warn("GentooIO init called twice, skipping second call.");
             return;
         }
-        
+
         const isInIframe = window !== window.top;
         const isAllowedDomain = this.isAllowedDomainForIframe();
         if (isInIframe && !isAllowedDomain) {
@@ -182,18 +185,18 @@ class FloatingButton {
             window.__GentooInited = 'iframe_blocked';
             return;
         }
-        
+
         if (this.checkSDKExists()) {
             console.warn("GentooIO UI elements already exist in the document, skipping initialization.");
             window.__GentooInited = 'created';
             return;
         }
-        
+
         // this.remove();
         await this.injectLottie();
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
-        
+
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -220,7 +223,7 @@ class FloatingButton {
                 let customMessage = null;
 
                 // 🎯 도메인별 커스텀 메시지 매칭
-                switch(hostname) {
+                switch (hostname) {
                     case 'dualtronusa.com':
                         customMessage = this.getDualtronUSAMessage(currentHref);
                         break;
@@ -256,8 +259,8 @@ class FloatingButton {
                     this.floatingData.comment = this.selectedCommentSet.floating;
                 }
                 else if (currentHref.includes('saranghello.com') &&
-                        currentHref.includes('search') &&
-                        document.querySelector('.grid-product__tag--sold-out')) {
+                    currentHref.includes('search') &&
+                    document.querySelector('.grid-product__tag--sold-out')) {
                     this.availableComments = [
                         {
                             "floating": "Is the item you want sold out?",
@@ -268,7 +271,7 @@ class FloatingButton {
                     this.floatingData.comment = this.selectedCommentSet.floating;
                 }
                 else if (currentHref.includes('olivethisolivethat.com') &&
-                        currentHref.includes('/collections/')) {
+                    currentHref.includes('/collections/')) {
 
                     const collectionMessages = {
                         'extra-virgin-olive-oil': {
@@ -327,10 +330,10 @@ class FloatingButton {
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
                 this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } 
+            }
             else if (this.partnerId === '676a4b3cac97386117d1838d') {
                 this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
-            } 
+            }
             else {
                 // 🎯 채팅 웹 애플리케이션 URL 생성 - SDK에서 iframe으로 로드할 URL
                 // 🛍️ Shopify 테스트용 - 기본적으로 영어(en)로 설정
@@ -383,11 +386,11 @@ class FloatingButton {
         this.dimmedBackground.className = "dimmed-background hide";
         this.dimmedBackground.setAttribute("data-gentoo-sdk", "true");
         this.dimmedBackground.appendChild(document.createTextNode('\u200B'));
-        
+
         this.iframeContainer = document.createElement("div");
         this.iframeContainer.className = "iframe-container iframe-container-hide";
         this.iframeContainer.setAttribute("data-gentoo-sdk", "true");
-        
+
         this.chatHeader = document.createElement("div");
         this.chatHandler = document.createElement("div");
         this.chatHeaderText = document.createElement("p");
@@ -400,7 +403,7 @@ class FloatingButton {
         this.footerText = document.createElement("p");
         this.footerText.className = "chat-footer-text";
         this.footer.appendChild(this.footerText);
-        
+
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
@@ -463,14 +466,28 @@ class FloatingButton {
         }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
-        
-        this.logEvent({
+
+        this.logEventLegacy({
             eventCategory: "SDKFloatingRendered",
             partnerId: this.partnerId,
             chatUserId: this.chatUserId,
             products: [],
         });
-        window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
+
+        this.logEvent({
+            partnerId: this.partnerId,
+            variantId: this.variant,
+            sessionId: this.sessionId || "sess-test",
+            chatUserId: this.chatUserId,
+            userType: this.userType,
+            displayLocation: this.displayLocation,
+            deviceType: this.isMobileDevice ? "mobile" : "web",
+            timestamp: String(Date.now()),
+            eventCategory: "gentoo_displayed",
+            context: {
+                autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+            },
+        });
 
         // Create floating button
         if (showGentooButton) {
@@ -493,7 +510,7 @@ class FloatingButton {
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
-            
+
             // 💬 플로팅 문구 최초 표시 (공통 함수 사용)
             if (!this.gentooSessionData?.redirectState && this.floatingData.comment && this.floatingData.comment.length > 0) {
                 this.createFloatingMessage(this.floatingData.comment, true);
@@ -560,18 +577,18 @@ class FloatingButton {
         // 🗨️ 플로팅 문구 UI 요소 생성 (기존 로직 그대로)
         this.expandedButton = document.createElement("div");
         this.expandedText = document.createElement("p");
-        
+
         if (this.isSmallResolution) {
-            this.expandedButton.className = 
+            this.expandedButton.className =
                 !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                "expanded-area-md" :
-                "expanded-area-md expanded-area-neutral-md";
+                    "expanded-area-md" :
+                    "expanded-area-md expanded-area-neutral-md";
             this.expandedText.className = "expanded-area-text-md";
         } else {
-            this.expandedButton.className = 
+            this.expandedButton.className =
                 !this.floatingAvatar || this.floatingAvatar?.floatingAsset.includes('default.lottie') ?
-                "expanded-area" :
-                "expanded-area expanded-area-neutral";
+                    "expanded-area" :
+                    "expanded-area expanded-area-neutral";
             this.expandedText.className = "expanded-area-text";
         }
         this.expandedButton.appendChild(this.expandedText);
@@ -604,7 +621,7 @@ class FloatingButton {
                 }
             };
             addLetter();
-            
+
             // 카운터 증가 (옵션)
             if (shouldIncrementCounter) {
                 this.floatingCount += 1;
@@ -647,10 +664,10 @@ class FloatingButton {
     safeRemoveExpandedButton() {
         // 타이핑 애니메이션 먼저 중단
         this.clearCurrentTyping();
-        
+
         try {
-            if (this.expandedButton && 
-                this.expandedButton.parentNode && 
+            if (this.expandedButton &&
+                this.expandedButton.parentNode &&
                 this.floatingContainer &&
                 this.expandedButton.parentNode === this.floatingContainer) {
                 this.floatingContainer.removeChild(this.expandedButton);
@@ -666,7 +683,7 @@ class FloatingButton {
             e.stopPropagation();
             e.preventDefault();
             this.floatingClicked = true;
-            
+
             // 채팅창이 숨겨진 상태라면 열기
             if (this.iframeContainer.classList.contains("iframe-container-hide")) {
                 if (this.expandedButton)
@@ -725,7 +742,7 @@ class FloatingButton {
                     this.gentooSessionData.redirectState = true;
                     sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
                 }
-                this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl});
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'carouselRedirect', currentPage: e.data.redirectUrl });
                 window.location.href = e.data.redirectUrl;
             }
             // 폼 제출 이벤트 처리
@@ -755,23 +772,56 @@ class FloatingButton {
             if (e.data.closeRequestState) {
                 this.hideChat();
             }
-            if (e.data.connectionId) {
-                window?.GentooLogListener?.log({ type: 'healthCheck', event: 'registered', connectionId: e.data.connectionId });
-            }
         });
 
         this.floatingContainer?.addEventListener("click", buttonClickHandler);
         this.floatingContainer?.addEventListener("click", (e) => {
-            this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href});
-            window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonClick', floatingMessage: this.floatingMessage });
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
+            this.logEventLegacy({
+                eventCategory: 'SDKFloatingClicked',
+                partnerId: this.partnerId,
+                chatUserId: this.chatUserId,
+                products: [],
+            });
+    
+            this.logEvent({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "gentoo_clicked",
+                context: {
+                    autoChatOpen: Boolean(this.bootConfig?.floating?.autoChatOpen),
+                    floatingText: this.bootConfig?.floating?.button?.comment,
+                },
+            });
         });
         this.closeButtonContainer?.addEventListener("click", buttonClickHandler);
-        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href}));
+        this.closeButtonContainer?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeButtonContainer', currentPage: window?.location?.href }));
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
-        this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href}));
+        this.closeActionArea?.addEventListener("click", (e) => {
+            this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href });
+            this.logEvent({
+                experimentId: "flowlift_abctest_v1",
+                partnerId: this.partnerId,
+                variantId: this.variant,
+                sessionId: this.sessionId || "sess-test",
+                chatUserId: this.chatUserId,
+                userType: this.userType,
+                displayLocation: this.displayLocation,
+                deviceType: this.isMobileDevice ? "mobile" : "web",
+                timestamp: String(Date.now()),
+                eventCategory: "chat_close_requested",
+            });
+        });
         this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href}));
+        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
 
         // Add event listener for the resize event
         window?.addEventListener("resize", () => {
@@ -805,7 +855,7 @@ class FloatingButton {
         this.injectViewport();
         // Chat being visible
         this.enableChat(this.isMobileDevice ? 'shrink' : 'full');
-        if (this.isMobileDevice) {history.pushState({ chatOpen: true }, '', window.location.href);}
+        if (this.isMobileDevice) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         this.dimmedBackground?.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -949,12 +999,12 @@ class FloatingButton {
         this.closeButtonIcon = null;
         this.closeButtonText = null;
         this.dotLottiePlayer = null;
-    
+
         this.chatUserId = null;
         this.floatingData = null;
         this.chatbotData = null;
         this.chatUrl = null;
-    
+
         this.isInitialized = false;
         this.floatingCount = 0;
         this.floatingClicked = false;
@@ -971,20 +1021,20 @@ class FloatingButton {
     // 🧹 리소스 정리 메서드 (멱등성 보장)
     cleanup() {
         if (this.isDestroyed) return; // 중복 실행 방지
-        
+
         // interval 정리
         if (this.floatingMessageIntervalId) {
             clearInterval(this.floatingMessageIntervalId);
             this.floatingMessageIntervalId = null;
         }
-        
+
         // 타이핑 애니메이션 정리
         this.clearCurrentTyping();
-        
+
         // 이벤트 리스너 정리
         window.removeEventListener('pagehide', this.handlePageUnload);
         window.removeEventListener('beforeunload', this.handlePageUnload);
-        
+
         this.isDestroyed = true;
     }
 
@@ -992,7 +1042,40 @@ class FloatingButton {
         this.pageList = pageList;
     }
 
+    // to be used
     async logEvent(payload) {
+        try {
+            const params = {
+                "experiment_id": String(payload.experimentId),
+                "partner_id": String(payload.partnerId),
+                "variant": String(payload.variantId),
+                "session_id": String(payload.sessionId),
+                "user_id": String(payload.chatUserId),
+                "user_type": String(payload.userType) || 'guest',
+                "display_location": String(payload.displayLocation) || undefined,
+                "device_type": String(payload.deviceType) || undefined,
+                "timestamp": String(payload.timestamp),
+                "event_name": String(payload.eventCategory),
+                "context": payload?.context || undefined,
+            }
+
+            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+            });
+
+            const res = await response.json();
+            return res;
+        } catch (error) {
+            console.error(`Error while calling logEvent API: ${error}`);
+        }
+    }
+
+    // to be deprecated
+    async logEventLegacy(payload) {
         try {
             const params = {
                 eventCategory: String(payload.eventCategory),
@@ -1002,7 +1085,7 @@ class FloatingButton {
                 products: payload?.products,
             };
 
-            const response = await fetch(`${this.domains.log}/${this.partnerId}`, {
+            const response = await fetch(`${this.domains.logLegacy}/${this.partnerId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1107,7 +1190,7 @@ class FloatingButton {
     // Function to inject viewport meta tag
     injectViewport() {
         if (this.viewportInjected) return;
-        
+
         try {
             // Check for existing viewport meta tag
             const existingViewport = document.querySelector('meta[name="viewport"]');
@@ -1130,7 +1213,7 @@ class FloatingButton {
     // Function to delete viewport meta tag
     deleteViewport() {
         if (!this.viewportInjected) return;
-        
+
         try {
             const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
             if (meta) {
@@ -1218,16 +1301,9 @@ class FloatingButton {
     }
 
     enableChat(mode) {
-        this.logEvent({
-            eventCategory: "SDKFloatingClicked",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        });
-
         // 📤 SDK → 채팅 웹 간 통신 함수
         // iframe 내의 채팅 애플리케이션으로 메시지 전송 (enableMode, buttonClickState 등)
-        this.sendPostMessageHandler({enableMode: mode});
+        this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {
             this.dimmedBackground.className = "dimmed-background";
@@ -1654,35 +1730,35 @@ class FloatingButton {
     // SDK가 이미 존재하는지 확인
     checkSDKExists() {
         const isInIframe = window !== window.top;
-        
+
         // 현재 document의 SDK set 
         const hasDimmedBackground = document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
         const hasIframeContainer = document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
         const hasFloatingContainer = document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-        
+
         if (hasDimmedBackground || hasIframeContainer || hasFloatingContainer) {
             return true;
         }
-        
+
         if (isInIframe) {
             try {
                 if (window.top.document) {
                     if (window.top.__GentooInited !== null && window.top.__GentooInited !== undefined) {
                         return true;
                     }
-                    
+
                     // 부모 document의 SDK set 
                     const parentHasDimmedBackground = window.top.document.querySelector('div[class^="dimmed-background"][data-gentoo-sdk="true"]') !== null;
                     const parentHasIframeContainer = window.top.document.querySelector('div[class^="iframe-container"][data-gentoo-sdk="true"]') !== null;
                     const parentHasFloatingContainer = window.top.document.querySelector('div[class^="floating-container"][data-gentoo-sdk="true"]') !== null;
-                    
+
                     return parentHasDimmedBackground || parentHasIframeContainer || parentHasFloatingContainer;
                 }
             } catch (e) {
                 console.warn("Cannot access parent document due to same-origin policy.");
             }
         }
-        
+
         return false;
     }
 
@@ -1690,17 +1766,17 @@ class FloatingButton {
         if (this.allowedDomainsForIframe.includes(hostname)) {
             return true;
         }
-        
+
         // Check wildcard patterns
         for (const pattern of this.allowedDomainsForIframe) {
             if (pattern.startsWith('*.')) {
-                const domain = pattern.substring(2); 
+                const domain = pattern.substring(2);
                 if (hostname.endsWith('.' + domain) || hostname === domain) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -1708,7 +1784,7 @@ class FloatingButton {
         if (this.isAllowedDomainPattern(window.location.hostname)) {
             return true;
         }
-        
+
         if (window !== window.top) {
             try {
                 const parentDomain = window.top.location.hostname;
