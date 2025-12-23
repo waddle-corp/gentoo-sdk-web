@@ -130,7 +130,6 @@ export const setupEventListenersModal = (context, position) => {
         }
         if (e.data.resetState) {
             if ((context.isMobileDevice || context.isSmallResolution) && context.iframeContainer) {
-                context.hideChat();
                 // open modal 로 묶어야 됨
                 if (context.inputContainer.classList.contains("hide")) {
                     context.inputContainer.classList.remove("hide");
@@ -140,6 +139,9 @@ export const setupEventListenersModal = (context, position) => {
                     context.examFloatingGroup?.classList.remove("hide");
                     context.sendButton.classList.remove("hide");
                     context.profileImage.classList.remove("hide");
+
+                    context.hideChat();
+                    
                     if (context.dimmedBackground) context.dimmedBackground.classList.remove('hide');
                     if (context.expandedButton)
                         context.expandedButton.classList.add('hide');

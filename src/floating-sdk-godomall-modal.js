@@ -540,7 +540,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
         }
-        if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
+        if (this.dotLottiePlayer && this.dotLottiePlayer.classList.contains('hide')) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
 
