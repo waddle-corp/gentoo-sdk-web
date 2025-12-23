@@ -11,6 +11,7 @@ import {
 import { createUIElementsModal } from './utils/createUIElementsModal';
 import { 
     injectLottie, 
+    injectViewport,
     deleteViewport,
     logWindowWidth,
     checkSDKExists,
@@ -237,6 +238,10 @@ class FloatingButton {
 
     openChat() {
         if (this.isDraggingFloating) return;
+
+        // Inject viewport meta tag to block ios zoom in
+        injectViewport(this, document);
+
         // Chat being visible
         this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
