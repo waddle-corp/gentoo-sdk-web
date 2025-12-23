@@ -193,8 +193,7 @@ class FloatingButton {
         }
 
         await injectLottie(document);
-        // Inject viewport meta tag to block ios zoom in
-        injectViewport(this, document);
+
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
 
@@ -353,6 +352,10 @@ class FloatingButton {
 
     openChat() {
         if (this.isDraggingFloating) return;
+
+        // Inject viewport meta tag to block ios zoom in
+        injectViewport(this, document);
+
         // Chat being visible
         this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
@@ -601,7 +604,6 @@ class FloatingButton {
     }
 
     hideChat() {
-
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
@@ -609,9 +611,14 @@ class FloatingButton {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
         }
-        if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
+        if (this.dotLottiePlayer && this.dotLottiePlayer.classList.contains('hide')) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
+
+        // Delete viewport meta tag if iframe AND input is hidden
+        if (this.iframeContainer.classList.contains("iframe-container-hide") && this.inputContainer.classList.contains("hide")) {
+            deleteViewport(this, document);
+        }
     }
 
     // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
