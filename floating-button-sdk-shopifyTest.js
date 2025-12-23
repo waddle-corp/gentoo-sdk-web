@@ -104,7 +104,7 @@ class FloatingButton {
             this.hostSrc = "https://dev-demo.gentooai.com";
             this.domains = {
                 auth: "https://dev-api.gentooai.com/chat/api/v1/user",
-                log: "https://stage-api.gentooai.com/chat/api/v1/event/log",
+                log: "https://dev-api.gentooai.com/chat/api/v1/event/log",
                 logLegacy: "https://dev-api.gentooai.com/chat/api/v1/event/userEvent",
                 chatbot: "https://dev-api.gentooai.com/chat/api/v1/chat/chatbot",
                 floating: "https://dev-api.gentooai.com/chat/api/v1/chat/floating",
