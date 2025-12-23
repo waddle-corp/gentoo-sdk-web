@@ -650,11 +650,6 @@ class FloatingButton {
     }
 
     hideChat() {
-        // Delete viewport meta tag if iframe AND input is hidden
-        if (this.iframeContainer.classList.contains("iframe-container-hide") && this.inputContainer.classList.contains("hide")) {
-            deleteViewport(this, document);
-        }
-
         if (this.button) {
             if (this.isSmallResolution) {
                 this.button.className = "floating-button-common button-image-md";
@@ -665,6 +660,11 @@ class FloatingButton {
         if (this.dotLottiePlayer) this.dotLottiePlayer.classList.remove('hide');
         if (this.expandedButton) this.expandedButton.className = "expanded-button hide";
         this.iframeContainer.className = "iframe-container iframe-container-hide";
+
+        // Delete viewport meta tag if iframe AND input is hidden
+        if (this.iframeContainer.classList.contains("iframe-container-hide") && this.inputContainer.classList.contains("hide")) {
+            deleteViewport(this, document);
+        }
     }
 
     redirectToCartPage() {
