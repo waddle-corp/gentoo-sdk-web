@@ -394,7 +394,6 @@ class FloatingButton {
         });
 
         this.logEvent({
-            experimentId: "flowlift_abctest_v1",
             partnerId: this.partnerId,
             variantId: this.variant,
             sessionId: this.sessionId || "sess-test",
