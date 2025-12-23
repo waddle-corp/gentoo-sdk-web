@@ -67,8 +67,8 @@ export const setupEventListenersModal = (context, position) => {
         context.sendButton.classList.add("hide");
         context.profileImage.classList.add("hide");
 
-        // Delete viewport meta tag if input is blurred and chat is hidden
-        if (context.iframeContainer.classList.contains("iframe-container-hide")) {
+        // Delete viewport meta tag if iframe AND input is hidden
+        if (context.iframeContainer.classList.contains("iframe-container-hide") && context.inputContainer.classList.contains("hide")) {
             deleteViewport(context, document);
         }
 

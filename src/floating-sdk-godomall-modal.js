@@ -533,8 +533,10 @@ class FloatingButton {
     }
 
     hideChat() {
-        // Delete viewport meta tag
-        deleteViewport(this, document);
+        // Delete viewport meta tag if iframe AND input is hidden
+        if (this.iframeContainer.classList.contains("iframe-container-hide") && this.inputContainer.classList.contains("hide")) {
+            deleteViewport(this, document);
+        }
 
         if (this.button) {
             if (this.isSmallResolution) {
