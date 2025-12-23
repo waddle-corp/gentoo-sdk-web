@@ -326,8 +326,8 @@ class FloatingButton {
             }
 
             // 검색 자동 트리거: autoUserMessage 파라미터 생성
-            const autoUserMessage = this.getAutoUserMessage();
-            const autoUserMessageParam = autoUserMessage ? `&autoUserMessage=${encodeURIComponent(autoUserMessage)}` : '';
+            this.autoUserMessage = this.getAutoUserMessage();
+            const autoUserMessageParam = this.autoUserMessage ? `&autoUserMessage=${encodeURIComponent(this.autoUserMessage)}` : '';
 
             if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
                 this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
@@ -408,6 +408,11 @@ class FloatingButton {
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
+        this.iframe.addEventListener('load', () => {
+            if (this.autoUserMessage) {
+                this.openChat();
+            }
+        });
 
         if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
             const player = document.createElement('dotlottie-wc');
