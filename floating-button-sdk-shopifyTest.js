@@ -408,12 +408,6 @@ class FloatingButton {
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
-        this.iframe.addEventListener('load', () => {
-            // 검색 자동 트리거: 채팅창 열기
-            if (this.getAutoUserMessage()) {
-                this.openChat();
-            }
-        });
 
         if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
             const player = document.createElement('dotlottie-wc');
@@ -1782,7 +1776,14 @@ class FloatingButton {
         if (!searchQuery) return null;
 
         // 이미 트리거된 검색어인지 확인
-        const triggeredSearches = JSON.parse(sessionStorage.getItem('gentoo_triggered_searches') || '[]');
+        let triggeredSearches = [];
+        try {
+            const data = JSON.parse(sessionStorage.getItem('gentoo_triggered_searches') || '[]');
+            triggeredSearches = Array.isArray(data) ? data : [];
+        } catch {
+            triggeredSearches = [];
+        }
+
         if (triggeredSearches.includes(searchQuery)) {
             return null;
         }
