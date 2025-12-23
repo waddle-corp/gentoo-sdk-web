@@ -57,8 +57,6 @@ export const setupEventListenersModal = (context, position) => {
     };
 
     const performInputBlur = () => {
-        // Delete viewport meta tag
-        deleteViewport(context, document);
 
         if (context.dimmedBackground) context.dimmedBackground.classList.add('hide');
         context.inputContainer.classList.add("hide");
@@ -68,6 +66,11 @@ export const setupEventListenersModal = (context, position) => {
         context.examFloatingGroup?.classList.add("hide");
         context.sendButton.classList.add("hide");
         context.profileImage.classList.add("hide");
+
+        // Delete viewport meta tag if input is blurred and chat is hidden
+        if (context.iframeContainer.classList.contains("iframe-container-hide")) {
+            deleteViewport(context, document);
+        }
 
         context.inputContainerTimeout = setTimeout(() => {
             if (context.iframeContainer.classList.contains("iframe-container-shrink")) return;
@@ -438,8 +441,8 @@ export const setupEventListenersModal = (context, position) => {
                 },
             });
             context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'sendButton', currentPage: window?.location?.href, requestMessage: button.innerText });
-            context.openChat();
             context.input.blur();
+            context.openChat();
         }
     });
 
