@@ -337,6 +337,7 @@ export const createUIElementsModal = (
             } else {
                 context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
             }
+            
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
 
@@ -362,6 +363,15 @@ export const createUIElementsModal = (
                 context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
             }
 
+            /* [Conditional Floating Alignment] */
+            if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+                context.expandedButton.classList.add('expanded-area-md-align-left');
+            } else {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+                context.expandedButton.classList.add('expanded-area-md-align-right');
+            }
+
             context.expandedButtonWrapper.appendChild(context.expandedButton);
             context.expandedButton.appendChild(context.expandedText);
 
@@ -369,6 +379,7 @@ export const createUIElementsModal = (
             if (context.floatingContainer && context.floatingContainer.parentNode) {
                 // expandedButtonWrapper를 먼저 append (왼쪽에 위치)
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
+                
                 addLetter(context, context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
 
                 // Remove expanded button after delay
