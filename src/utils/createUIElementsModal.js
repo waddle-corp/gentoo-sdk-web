@@ -36,7 +36,7 @@ const createDotLottiePlayer = (src, sizePx) => {
     player.setAttribute('autoplay', '');
     player.setAttribute('loop', '');
     player.setAttribute('mode', 'normal');
-    player.setAttribute('renderConfig', '{"devicePixelRatio": 1, "autoResize": true}');
+    player.setAttribute('renderConfig', '{"devicePixelRatio": 2, "autoResize": true}');
     player.setAttribute('src', src);
     player.style.width = '100%';
     player.style.height = '100%';
