@@ -32,7 +32,13 @@ const selectFloatingAsset = (context) => {
 };
 
 const createDotLottiePlayer = (src, sizePx) => {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'gentoo-dotlottie-canvas';
+    canvas.style.aspectRatio = '1/1';
+    canvas.style.flexShrink = '0';
+    canvas.appendChild(document.createTextNode('\u200B'));
     const player = document.createElement('dotlottie-wc');
+    player.canvas = document.querySelector('#gentoo-dotlottie-canvas');
     player.setAttribute('autoplay', '');
     player.setAttribute('loop', '');
     player.setAttribute('mode', 'normal');
