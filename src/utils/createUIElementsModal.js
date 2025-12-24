@@ -37,12 +37,15 @@ const createDotLottiePlayer = (src, sizePx) => {
     canvas.style.aspectRatio = '1/1';
     canvas.style.flexShrink = '0';
     canvas.appendChild(document.createTextNode('\u200B'));
+    if (!document.querySelector('#gentoo-dotlottie-canvas')) {
+        document.body.appendChild(canvas);
+    }
     const player = document.createElement('dotlottie-wc');
     player.canvas = document.querySelector('#gentoo-dotlottie-canvas');
     player.setAttribute('autoplay', '');
     player.setAttribute('loop', '');
     player.setAttribute('mode', 'normal');
-    player.setAttribute('render-config', '{"devicePixelRatio": 1}');
+    player.setAttribute('render-config', '{"devicePixelRatio": 1, "autoResize": true}');
     player.setAttribute('src', src);
     player.style.width = sizePx;
     player.style.height = sizePx;
