@@ -360,6 +360,7 @@ export const createUIElementsModal = (
             // Double check if floatingContainer still exists before appending
             if (context.floatingContainer && context.floatingContainer.parentNode) {
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
+                
                 addLetter(context, context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
 
                 // Remove expanded button after delay

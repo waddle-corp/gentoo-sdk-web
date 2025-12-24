@@ -182,6 +182,18 @@ export const setupEventListenersModal = (context, position) => {
                 if (context.floatingClicked || context.isDestroyed || !context.floatingContainer)
                     return;
                 context.floatingMessage = e.data.floatingMessage;
+                context.expandedButtonWrapper = document.createElement("div");
+                if (context.partnerType === 'cafe24') {
+                    context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.isSmallResolution ? 'expanded-area-wrapper-md' : context.floatingZoom ? 'expanded-area-wrapper-zoom' : ''}`;
+                } else {
+                    context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+                }
+                /* [Conditional Floating Alignment] */
+                if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
+                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+                } else {
+                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+                }
                 context.expandedButton = document.createElement("div");
                 context.expandedText = document.createElement("p");
                 
@@ -206,11 +218,12 @@ export const setupEventListenersModal = (context, position) => {
                                 `expanded-area expanded-area-neutral`;
                     context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
+                context.expandedButtonWrapper.appendChild(context.expandedButton);
                 context.expandedButton.appendChild(context.expandedText);
 
                 // Double check if floatingContainer still exists before appending
                 if (context.floatingContainer && context.floatingContainer.parentNode) {
-                    context.floatingContainer.appendChild(context.expandedButton);
+                    context.floatingContainer.appendChild(context.expandedButtonWrapper);
 
                     addLetter(context, context.bootConfig?.floating?.button?.comment || context.floatingData.comment, context.expandedText, () => context.isDestroyed);
                     context.floatingCount += 1;
@@ -218,10 +231,10 @@ export const setupEventListenersModal = (context, position) => {
                     setTimeout(() => {
                         if (
                             context.floatingContainer &&
-                            context.expandedButton &&
-                            context.expandedButton.parentNode === context.floatingContainer
+                            context.expandedButtonWrapper &&
+                            context.expandedButtonWrapper.parentNode === context.floatingContainer
                         ) {
-                            context.floatingContainer.removeChild(context.expandedButton);
+                            context.floatingContainer.removeChild(context.expandedButtonWrapper);
                         }
                     }, 7000);
                 }
@@ -357,6 +370,18 @@ export const setupEventListenersModal = (context, position) => {
         // add letter 관련 묶어야 됨
         setTimeout(() => {
             context.floatingMessage = context.lang === 'ko' ? '궁금한 게 있으면 언제든 눌러주세요!' : 'Click me again if you have any questions!';
+            context.expandedButtonWrapper = document.createElement("div");
+            if (context.partnerType === 'cafe24') {
+                context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.isSmallResolution ? 'expanded-area-wrapper-md' : context.floatingZoom ? 'expanded-area-wrapper-zoom' : ''}`;
+            } else {
+                context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
+            }
+            /* [Conditional Floating Alignment] */
+            if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+            } else {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+            }
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
             if (context.isSmallResolution) {
@@ -380,22 +405,24 @@ export const setupEventListenersModal = (context, position) => {
                             `expanded-area expanded-area-neutral`;
                 context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
             }
+            context.expandedButtonWrapper.appendChild(context.expandedButton);
             context.expandedButton.appendChild(context.expandedText);
+
             if (context.floatingContainer && context.floatingContainer.parentNode) {
-                context.floatingContainer.appendChild(context.expandedButton);
+                context.floatingContainer.appendChild(context.expandedButtonWrapper);
 
                 addLetter(context, context.floatingMessage, context.expandedText, () => context.isDestroyed);
                 context.floatingCount += 1;
 
-                /* setTimeout(() => {
+                setTimeout(() => {
                     if (
                         context.floatingContainer &&
-                        context.expandedButton &&
-                        context.expandedButton.parentNode === context.floatingContainer
+                        context.expandedButtonWrapper &&
+                        context.expandedButtonWrapper.parentNode === context.floatingContainer
                     ) {
-                        context.floatingContainer.removeChild(context.expandedButton);
+                        context.floatingContainer.removeChild(context.expandedButtonWrapper);
                     }
-                }, 7000); */
+                }, 7000);
             }
         }, 500);
     });
