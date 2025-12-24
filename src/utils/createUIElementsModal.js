@@ -304,26 +304,6 @@ export const createUIElementsModal = (
         context.button.style.backgroundImage =
             `url(${context.selectedFloatingImage})`;
 
-        /* [Lottie Floating Button] */
-        if (context.dotLottiePlayer) {
-            // Use requestAnimationFrame to ensure layout is calculated
-            requestAnimationFrame(() => {
-                // Double check buttonContainer is still in DOM
-                if (context.floatingContainer && context.floatingContainer.parentNode) {
-                    // Remove button if it exists, then append dotLottiePlayer
-                    if (context.button && context.button.parentNode === context.floatingContainer) {
-                        context.floatingContainer.removeChild(context.button);
-                    }
-                    context.floatingContainer.appendChild(context.dotLottiePlayer);
-
-                    // Apply object-fit: cover to canvas in shadow-root
-                    applyCanvasObjectFit(context.dotLottiePlayer);
-                }
-            });
-        } else {
-            context.floatingContainer.appendChild(context.button);
-        }
-
         if (Boolean(context.bootConfig?.floating?.autoChatOpen)) context.openChat();
         else if (!context.gentooSessionData?.redirectState && context.floatingCount < 2 && context.bootConfig?.floating?.button?.comment?.length > 0) {
             // Check if component is destroyed or clicked
@@ -367,6 +347,7 @@ export const createUIElementsModal = (
 
             // Double check if floatingContainer still exists before appending
             if (context.floatingContainer && context.floatingContainer.parentNode) {
+                // expandedButtonWrapper를 먼저 append (왼쪽에 위치)
                 context.floatingContainer.appendChild(context.expandedButtonWrapper);
                 addLetter(context, context.bootConfig?.floating?.button?.comment, context.expandedText, () => context.isDestroyed);
 
@@ -388,6 +369,26 @@ export const createUIElementsModal = (
                     context.showRandomFloatingMessage();
                 }, context.FLOATING_MESSAGE_INTERVAL_MS);
             }
+        }
+
+        /* [Lottie Floating Button] */
+        if (context.dotLottiePlayer) {
+            // expandedButtonWrapper가 먼저 append된 후, dotLottiePlayer를 append (오른쪽에 위치)
+            if (context.floatingContainer && context.floatingContainer.parentNode) {
+                // Remove button if it exists, then append dotLottiePlayer
+                if (context.button && context.button.parentNode === context.floatingContainer) {
+                    context.floatingContainer.removeChild(context.button);
+                }
+                context.floatingContainer.appendChild(context.dotLottiePlayer);
+            }
+            
+            // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
+            requestAnimationFrame(() => {
+                // Apply object-fit: cover to canvas in shadow-root
+                applyCanvasObjectFit(context.dotLottiePlayer);
+            });
+        } else {
+            context.floatingContainer.appendChild(context.button);
         }
     }
 
