@@ -75,8 +75,10 @@ export const setupEventListenersModal = (context, position) => {
         context.inputContainerTimeout = setTimeout(() => {
             if (context.iframeContainer.classList.contains("iframe-container-shrink")) return;
             if (context.button) {
-                if (context.isSmallResolution) {
-                    context.button.className = "floating-button-common button-image-md";
+                if (context.isSmallResolution && context.partnerType === 'cafe24') {
+                    context.button.className = `floating-button-common button-image-md`;
+                } else if (context.isSmallResolution) {
+                    context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
                 } else {
                     context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
                 }
@@ -188,12 +190,7 @@ export const setupEventListenersModal = (context, position) => {
                 } else {
                     context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
                 }
-                /* [Conditional Floating Alignment] */
-                if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
-                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
-                } else {
-                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
-                }
+                
                 context.expandedButton = document.createElement("div");
                 context.expandedText = document.createElement("p");
                 
@@ -218,6 +215,16 @@ export const setupEventListenersModal = (context, position) => {
                                 `expanded-area expanded-area-neutral`;
                     context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
                 }
+
+                /* [Conditional Floating Alignment] */
+                if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
+                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+                    context.expandedButton.classList.add('expanded-area-md-align-left');
+                } else {
+                    context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+                    context.expandedButton.classList.add('expanded-area-md-align-right');
+                }
+
                 context.expandedButtonWrapper.appendChild(context.expandedButton);
                 context.expandedButton.appendChild(context.expandedText);
 
@@ -317,15 +324,19 @@ export const setupEventListenersModal = (context, position) => {
             if (!context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-left')) {
                 if (context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-right')) {
                     context.expandedButtonWrapper.classList.remove('expanded-area-wrapper-md-align-right');
+                    context.expandedButton.classList.remove('expanded-area-md-align-right');
                 }
                 context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+                context.expandedButton.classList.add('expanded-area-md-align-left');
             }
         } else {
             if (!context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-right')) {
                 if (context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-left')) {
                     context.expandedButtonWrapper.classList.remove('expanded-area-wrapper-md-align-left');
+                    context.expandedButton.classList.remove('expanded-area-md-align-left');
                 }
                 context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+                context.expandedButton.classList.add('expanded-area-md-align-right');
             }
         }
         // Persist to position object and session
@@ -376,12 +387,7 @@ export const setupEventListenersModal = (context, position) => {
             } else {
                 context.expandedButtonWrapper.className = `expanded-area-wrapper ${context.floatingZoom ? 'expanded-area-wrapper-zoom' : context.isSmallResolution ? 'expanded-area-wrapper-md' : ''}`;
             }
-            /* [Conditional Floating Alignment] */
-            if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
-                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
-            } else {
-                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
-            }
+            
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
             if (context.isSmallResolution) {
@@ -405,6 +411,16 @@ export const setupEventListenersModal = (context, position) => {
                             `expanded-area expanded-area-neutral`;
                 context.expandedText.className = `${context.floatingZoom ? 'expanded-area-text-zoom' : 'expanded-area-text'}`;
             }
+
+            /* [Conditional Floating Alignment] */
+            if (context.currentFloatingPosition.mobile.right > window.innerWidth / 2) {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+                context.expandedButton.classList.add('expanded-area-md-align-left');
+            } else {
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+                context.expandedButton.classList.add('expanded-area-md-align-right');
+            }
+
             context.expandedButtonWrapper.appendChild(context.expandedButton);
             context.expandedButton.appendChild(context.expandedText);
 

@@ -456,7 +456,7 @@ class FloatingButton {
 
         if (this.button) {
             if (this.isSmallResolution) {
-                this.button.className = "floating-button-common button-image-md";
+                this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image-md'}`;
             } else {
                 this.button.className = `floating-button-common ${this.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
             }
