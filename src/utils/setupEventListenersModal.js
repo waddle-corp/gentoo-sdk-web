@@ -84,7 +84,7 @@ export const setupEventListenersModal = (context, position) => {
             }
             if (context.dotLottiePlayer) {
                 context.dotLottiePlayer.classList.remove('hide');
-                context.dotLottiePlayer.setAttribute('src', context.selectedFloatingImage);
+                context.dotLottiePlayer.__player.setAttribute('src', context.selectedFloatingImage);
             }
         }, 100);
         context.inputContainerTimeout = null;

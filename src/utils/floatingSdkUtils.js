@@ -18,7 +18,7 @@ export function addLetter(context, floatingMessage, expandedText, isDestroyed, i
         expandedText.innerText += floatingMessage[i];
         setTimeout(() => addLetter(context, floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
     }
-}
+}   
 
 export async function injectLottie(document) {
     return new Promise((resolve, reject) => {

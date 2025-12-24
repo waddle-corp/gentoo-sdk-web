@@ -36,12 +36,22 @@ const createDotLottiePlayer = (src, sizePx) => {
     player.setAttribute('autoplay', '');
     player.setAttribute('loop', '');
     player.setAttribute('mode', 'normal');
+    player.setAttribute('renderConfig', '{"devicePixelRatio": 1, "autoResize": true}');
     player.setAttribute('src', src);
-    player.style.width = sizePx;
-    player.style.height = sizePx;
+    player.style.width = '100%';
+    player.style.height = '100%';
     player.style.cursor = 'pointer';
     player.appendChild(document.createTextNode('\u200B'));
-    return player;
+
+    const playerWrapper = document.createElement('div');
+    playerWrapper.style.width = sizePx;
+    playerWrapper.style.height = sizePx;
+    playerWrapper.style.cursor = 'pointer';
+    playerWrapper.style.aspectRatio = '1/1';
+    playerWrapper.style.flexShrink = '0';
+    playerWrapper.appendChild(player);
+    playerWrapper._player = player;
+    return playerWrapper;
 };
 
 const logFloatingRendered = (context) => {
