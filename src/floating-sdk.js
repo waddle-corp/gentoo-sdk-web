@@ -336,6 +336,7 @@ class FloatingButton {
                 player.setAttribute('autoplay', '');
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
+                player.setAttribute('renderConfig', '{"displayPixelRatio": 1}');
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
                 player.setAttribute('src', this.partnerId === '67615284c5ff44110dbc6613' ? Ff_fab_nopad : selectedAsset);
 
