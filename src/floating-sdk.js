@@ -384,9 +384,27 @@ class FloatingButton {
             }
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
-            this.buttonContainer.appendChild(this.dotLottiePlayer ? this.dotLottiePlayer : this.button);
+            // Append button first (or placeholder for dotLottiePlayer)
+            if (!this.dotLottiePlayer) {
+                this.buttonContainer.appendChild(this.button);
+            }
             parentElem.appendChild(this.floatingContainer);
             this.floatingContainer.appendChild(this.buttonContainer);
+            
+            // Mount dotLottiePlayer after buttonContainer is in DOM and layout is settled
+            if (this.dotLottiePlayer) {
+                // Use requestAnimationFrame to ensure layout is calculated
+                requestAnimationFrame(() => {
+                    // Double check buttonContainer is still in DOM
+                    if (this.buttonContainer && this.buttonContainer.parentNode) {
+                        // Remove button if it exists, then append dotLottiePlayer
+                        if (this.button && this.button.parentNode === this.buttonContainer) {
+                            this.buttonContainer.removeChild(this.button);
+                        }
+                        this.buttonContainer.appendChild(this.dotLottiePlayer);
+                    }
+                });
+            }
             if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
             else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
                 // Check if component is destroyed or clicked
