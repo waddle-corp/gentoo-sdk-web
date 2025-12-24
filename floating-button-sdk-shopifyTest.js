@@ -1843,6 +1843,7 @@ class FloatingButton {
             'dualtronusa.com',
             'paper-tree.com',
             'saranghello.com',
+            'theauracasa.com',
         ];
         const currentHostname = window.location.hostname;
         return searchAutoTriggerStores.some(store => currentHostname.includes(store));
