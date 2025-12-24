@@ -298,6 +298,23 @@ export const setupEventListenersModal = (context, position) => {
         newBottom = Math.min(Math.max(newBottom, 0), maxBottom);
         context.floatingContainer.style.right = `${Math.round(newRight)}px`;
         context.floatingContainer.style.bottom = `${Math.round(newBottom)}px`;
+
+        // Check if the floating should be aligned left based on half of the screen width
+        if (newRight > vw / 2) {
+            if (!context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-left')) {
+                if (context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-right')) {
+                    context.expandedButtonWrapper.classList.remove('expanded-area-wrapper-md-align-right');
+                }
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-left');
+            }
+        } else {
+            if (!context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-right')) {
+                if (context.expandedButtonWrapper.classList.contains('expanded-area-wrapper-md-align-left')) {
+                    context.expandedButtonWrapper.classList.remove('expanded-area-wrapper-md-align-left');
+                }
+                context.expandedButtonWrapper.classList.add('expanded-area-wrapper-md-align-right');
+            }
+        }
         // Persist to position object and session
         position.mobile = position.mobile || {};
         position.mobile.right = Math.round(newRight);
@@ -339,7 +356,7 @@ export const setupEventListenersModal = (context, position) => {
         context.redirectToCartPage();
         // add letter 관련 묶어야 됨
         setTimeout(() => {
-            context.floatingMessage = context.lang === 'ko' ? '궁금한 게 있으시면 언제든 다시 눌러주세요!' : 'Click me again anytime if you have any questions!';
+            context.floatingMessage = context.lang === 'ko' ? '궁금한 게 있으면 언제든 눌러주세요!' : 'Click me again if you have any questions!';
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
             if (context.isSmallResolution) {
@@ -370,7 +387,7 @@ export const setupEventListenersModal = (context, position) => {
                 addLetter(context, context.floatingMessage, context.expandedText, () => context.isDestroyed);
                 context.floatingCount += 1;
 
-                setTimeout(() => {
+                /* setTimeout(() => {
                     if (
                         context.floatingContainer &&
                         context.expandedButton &&
@@ -378,7 +395,7 @@ export const setupEventListenersModal = (context, position) => {
                     ) {
                         context.floatingContainer.removeChild(context.expandedButton);
                     }
-                }, 7000);
+                }, 7000); */
             }
         }, 500);
     });
