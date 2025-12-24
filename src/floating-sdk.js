@@ -336,7 +336,8 @@ class FloatingButton {
                 player.setAttribute('autoplay', '');
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
-                player.setAttribute('renderConfig', '{"devicePixelRatio": 1}');
+                // renderConfig는 프로퍼티로 직접 객체 할당 (setAttribute의 JSON 문자열 방식보다 안전)
+                player.renderConfig = { devicePixelRatio: 1 };
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
                 player.setAttribute('src', this.partnerId === '67615284c5ff44110dbc6613' ? Ff_fab_nopad : selectedAsset);
 
