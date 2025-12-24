@@ -404,6 +404,9 @@ class FloatingButton {
                             this.buttonContainer.removeChild(this.button);
                         }
                         this.buttonContainer.appendChild(this.dotLottiePlayer);
+                        
+                        // Apply object-fit: cover to canvas in shadow-root
+                        this.applyCanvasObjectFit();
                     }
                 });
             }
@@ -911,6 +914,39 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = null;
+    }
+
+    // Function to apply object-fit: cover to canvas in shadow-root
+    applyCanvasObjectFit() {
+        if (!this.dotLottiePlayer) return;
+        
+        const tryApplyStyle = (retries = 10) => {
+            if (retries <= 0) {
+                console.warn('Failed to apply object-fit to dotLottiePlayer canvas: shadowRoot not ready');
+                return;
+            }
+            
+            const shadowRoot = this.dotLottiePlayer.shadowRoot;
+            if (shadowRoot) {
+                const canvas = shadowRoot.querySelector('canvas');
+                if (canvas) {
+                    canvas.style.objectFit = 'cover';
+                    canvas.style.width = '100%';
+                    canvas.style.height = '100%';
+                } else {
+                    // Canvas might not be ready yet, retry
+                    setTimeout(() => tryApplyStyle(retries - 1), 50);
+                }
+            } else {
+                // ShadowRoot not ready yet, retry
+                setTimeout(() => tryApplyStyle(retries - 1), 50);
+            }
+        };
+        
+        // Wait for shadowRoot to be ready
+        requestAnimationFrame(() => {
+            tryApplyStyle();
+        });
     }
 
     // Function to inject Lottie
