@@ -16,9 +16,15 @@ export function addLetter(context, floatingMessage, expandedText, isDestroyed, i
     context.floatingMessage = floatingMessage;
     if (i < floatingMessage.length && !isDestroyed()) {
         expandedText.innerText += floatingMessage[i];
+        requestAnimationFrame(() => {
+            const dotlottie = context.dotLottiePlayer?.dotLottie;
+            if (dotlottie) {
+                dotlottie.resize();
+            }
+        });
         setTimeout(() => addLetter(context, floatingMessage, expandedText, isDestroyed, i + 1), 1000 / floatingMessage.length);
     }
-}
+}   
 
 export async function injectLottie(document) {
     return new Promise((resolve, reject) => {

@@ -42,6 +42,7 @@ const createDotLottiePlayer = (src, sizePx) => {
     }
     const player = document.createElement('dotlottie-wc');
     player.canvas = document.querySelector('#gentoo-dotlottie-canvas');
+    player.id = 'gentoo-dotlottie-player';
     player.setAttribute('autoplay', '');
     player.setAttribute('loop', '');
     player.setAttribute('mode', 'normal');
