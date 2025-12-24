@@ -7,6 +7,7 @@ import {
     postChatEventLogLegacy
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
+import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 
 
 class FloatingButton {
@@ -336,8 +337,6 @@ class FloatingButton {
                 player.setAttribute('autoplay', '');
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
-                // renderConfig는 프로퍼티로 직접 객체 할당 (setAttribute의 JSON 문자열 방식보다 안전)
-                player.renderConfig = { devicePixelRatio: 1 };
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
                 player.setAttribute('src', this.partnerId === '67615284c5ff44110dbc6613' ? Ff_fab_nopad : selectedAsset);
 
@@ -406,7 +405,7 @@ class FloatingButton {
                         this.buttonContainer.appendChild(this.dotLottiePlayer);
                         
                         // Apply object-fit: cover to canvas in shadow-root
-                        this.applyCanvasObjectFit();
+                        applyCanvasObjectFit(this.dotLottiePlayer);
                     }
                 });
             }
@@ -914,39 +913,6 @@ class FloatingButton {
         this.floatingClicked = false;
 
         window.__GentooInited = null;
-    }
-
-    // Function to apply object-fit: cover to canvas in shadow-root
-    applyCanvasObjectFit() {
-        if (!this.dotLottiePlayer) return;
-        
-        const tryApplyStyle = (retries = 10) => {
-            if (retries <= 0) {
-                console.warn('Failed to apply object-fit to dotLottiePlayer canvas: shadowRoot not ready');
-                return;
-            }
-            
-            const shadowRoot = this.dotLottiePlayer.shadowRoot;
-            if (shadowRoot) {
-                const canvas = shadowRoot.querySelector('canvas');
-                if (canvas) {
-                    canvas.style.objectFit = 'cover';
-                    canvas.style.width = '100%';
-                    canvas.style.height = '100%';
-                } else {
-                    // Canvas might not be ready yet, retry
-                    setTimeout(() => tryApplyStyle(retries - 1), 50);
-                }
-            } else {
-                // ShadowRoot not ready yet, retry
-                setTimeout(() => tryApplyStyle(retries - 1), 50);
-            }
-        };
-        
-        // Wait for shadowRoot to be ready
-        requestAnimationFrame(() => {
-            tryApplyStyle();
-        });
     }
 
     // Function to inject Lottie

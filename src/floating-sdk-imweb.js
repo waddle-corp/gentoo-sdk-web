@@ -8,6 +8,7 @@ import {
     getImwebPartnerId,
     generateGuestUserToken
 } from './apis/chatConfig';
+import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 
 class FloatingButton {
     constructor(props) {
@@ -374,7 +375,20 @@ class FloatingButton {
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
-                this.floatingContainer.appendChild(this.dotLottiePlayer);
+                // Use requestAnimationFrame to ensure layout is calculated
+                requestAnimationFrame(() => {
+                    // Double check buttonContainer is still in DOM
+                    if (this.floatingContainer && this.floatingContainer.parentNode) {
+                        // Remove button if it exists, then append dotLottiePlayer
+                        if (this.button && this.button.parentNode === this.floatingContainer) {
+                            this.floatingContainer.removeChild(this.button);
+                        }
+                        this.floatingContainer.appendChild(this.dotLottiePlayer);
+
+                        // Apply object-fit: cover to canvas in shadow-root
+                        applyCanvasObjectFit(this.dotLottiePlayer);
+                    }
+                });
             } else {
                 this.floatingContainer.appendChild(this.button);
             }

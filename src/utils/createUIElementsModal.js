@@ -1,10 +1,11 @@
 import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
 import '../floating-sdk-modal.css';
 import { setupEventListenersModal } from "./setupEventListenersModal";
-import { 
-    updateFloatingContainerPosition, 
+import {
+    updateFloatingContainerPosition,
     addLetter,
-    checkSDKExists
+    checkSDKExists,
+    applyCanvasObjectFit
 } from "./floatingSdkUtils";
 
 // --- Small helpers for readability ---
@@ -83,29 +84,29 @@ const logFloatingRendered = (context) => {
 
 const getCurrentFloatingPosition = (context, position) => {
     const storedFloatingPosition = context.gentooSessionData?.floatingPosition || {};
-        let currentFloatingPosition = position ? JSON.parse(JSON.stringify(position)) : {};
-        if (!currentFloatingPosition.web) currentFloatingPosition.web = {};
-        if (!currentFloatingPosition.mobile) currentFloatingPosition.mobile = {};
-        if (context.isSmallResolution) {
-            if (storedFloatingPosition?.mobile) {
-                if (typeof storedFloatingPosition.mobile.bottom === 'number') currentFloatingPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
-                if (typeof storedFloatingPosition.mobile.right === 'number') currentFloatingPosition.mobile.right = storedFloatingPosition.mobile.right;
-            }
-        } else {
-            if (storedFloatingPosition?.web) {
-                if (typeof storedFloatingPosition.web.bottom === 'number') currentFloatingPosition.web.bottom = storedFloatingPosition.web.bottom;
-                if (typeof storedFloatingPosition.web.right === 'number') currentFloatingPosition.web.right = storedFloatingPosition.web.right;
-            }
+    let currentFloatingPosition = position ? JSON.parse(JSON.stringify(position)) : {};
+    if (!currentFloatingPosition.web) currentFloatingPosition.web = {};
+    if (!currentFloatingPosition.mobile) currentFloatingPosition.mobile = {};
+    if (context.isSmallResolution) {
+        if (storedFloatingPosition?.mobile) {
+            if (typeof storedFloatingPosition.mobile.bottom === 'number') currentFloatingPosition.mobile.bottom = storedFloatingPosition.mobile.bottom;
+            if (typeof storedFloatingPosition.mobile.right === 'number') currentFloatingPosition.mobile.right = storedFloatingPosition.mobile.right;
         }
+    } else {
+        if (storedFloatingPosition?.web) {
+            if (typeof storedFloatingPosition.web.bottom === 'number') currentFloatingPosition.web.bottom = storedFloatingPosition.web.bottom;
+            if (typeof storedFloatingPosition.web.right === 'number') currentFloatingPosition.web.right = storedFloatingPosition.web.right;
+        }
+    }
     return currentFloatingPosition;
 }
 
 // ------------------------------ Modal UI Creation ------------------------------
 export const createUIElementsModal = (
     context, // this 객체를 받는 인자
-    position, 
-    showGentooButton, 
-    isCustomButton = false, 
+    position,
+    showGentooButton,
+    isCustomButton = false,
     customButton,
     chatbotData,
 ) => {
@@ -131,7 +132,7 @@ export const createUIElementsModal = (
 
     // Fire "show" callback if provided (parity with legacy)
     if (context?.eventCallback?.show) {
-        try { context.eventCallback.show(); } catch {}
+        try { context.eventCallback.show(); } catch { }
     }
 
     /* [Dimmed Background] */
@@ -160,7 +161,7 @@ export const createUIElementsModal = (
     context.closeButtonContainer = document.createElement("div");
     context.closeButtonIcon = document.createElement("div");
     context.closeButtonText = document.createElement("p");
-    
+
     /* [Chat Footer] */
     context.footer = document.createElement("div");
     context.footer.className = "chat-footer";
@@ -188,7 +189,7 @@ export const createUIElementsModal = (
     if (context.isSmallResolution || context.isMobileDevice) {
         /* [Iframe] */
         context.iframe.className = `chat-iframe-md ${context.warningActivated ? 'footer-add-height-md' : ''}`;
-        
+
         /* [Chat Header] */
         context.chatHeader.className = "chat-header-md";
         context.chatHandler.className = "chat-handler-md";
@@ -196,21 +197,21 @@ export const createUIElementsModal = (
         context.chatHeaderProfile.className = "chat-header-profile-md";
         context.chatHeaderImage.className = "chat-header-image-md";
         context.chatHeaderImage.style.setProperty('--gentoo-profile-image', `url(${context.floatingAvatar?.profileAsset})`);
-        
+
         context.closeButtonContainer.className = "chat-close-button-container-md";
         context.closeButtonIcon.className = "chat-close-button-icon-md";
         context.closeActionArea = document.createElement("div");
         context.closeActionArea.className = "chat-close-action-area-md";
         context.closeButtonContainer.appendChild(context.closeButtonIcon);
         context.closeButtonContainer.appendChild(context.closeButtonText);
-        
+
         context.chatHeaderProfile.appendChild(context.chatHeaderImage);
         context.chatHeaderProfile.appendChild(context.chatHeaderText);
         context.chatHeader.appendChild(context.chatHeaderProfile);
         context.chatHeader.appendChild(context.chatHandler);
         context.chatHeader.appendChild(context.closeButtonContainer);
         context.iframeContainer.appendChild(context.closeActionArea);
-        
+
         /* [Input Container] */
         context.inputContainer = document.createElement("div");
         context.inputContainer.setAttribute("data-gentoo-sdk", "true");
@@ -289,7 +290,7 @@ export const createUIElementsModal = (
         /* [Floating Position] */
         context.currentFloatingPosition = getCurrentFloatingPosition(context, position);
         updateFloatingContainerPosition(context, context.currentFloatingPosition); // Set initial position
-        
+
         /* [non-lottie Floating Button] */
         context.button = document.createElement("div");
         if (context.isSmallResolution && context.partnerType === 'cafe24') {
@@ -300,12 +301,25 @@ export const createUIElementsModal = (
             context.button.className = `floating-button-common ${context.floatingZoom ? 'button-image-zoom' : 'button-image'}`;
         }
         context.button.type = "button";
-        context.button.style.backgroundImage = 
+        context.button.style.backgroundImage =
             `url(${context.selectedFloatingImage})`;
-        
+
         /* [Lottie Floating Button] */
         if (context.dotLottiePlayer) {
-            context.floatingContainer.appendChild(context.dotLottiePlayer);
+            // Use requestAnimationFrame to ensure layout is calculated
+            requestAnimationFrame(() => {
+                // Double check buttonContainer is still in DOM
+                if (context.floatingContainer && context.floatingContainer.parentNode) {
+                    // Remove button if it exists, then append dotLottiePlayer
+                    if (context.button && context.button.parentNode === context.floatingContainer) {
+                        context.floatingContainer.removeChild(context.button);
+                    }
+                    context.floatingContainer.appendChild(context.dotLottiePlayer);
+
+                    // Apply object-fit: cover to canvas in shadow-root
+                    applyCanvasObjectFit(context.dotLottiePlayer);
+                }
+            });
         } else {
             context.floatingContainer.appendChild(context.button);
         }
@@ -325,7 +339,7 @@ export const createUIElementsModal = (
             }
             context.expandedButton = document.createElement("div");
             context.expandedText = document.createElement("p");
-            
+
             if (context.isSmallResolution) {
                 context.expandedButton.className =
                     context.useBootConfigFloatingImage ?

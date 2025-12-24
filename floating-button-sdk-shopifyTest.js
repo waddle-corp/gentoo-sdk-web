@@ -515,7 +515,20 @@ class FloatingButton {
             this.button.appendChild(document.createTextNode('\u200B'));
             document.body.appendChild(this.floatingContainer);
             if (this.dotLottiePlayer) {
-                this.floatingContainer.appendChild(this.dotLottiePlayer);
+                // Use requestAnimationFrame to ensure layout is calculated
+                requestAnimationFrame(() => {
+                    // Double check buttonContainer is still in DOM
+                    if (this.floatingContainer && this.floatingContainer.parentNode) {
+                        // Remove button if it exists, then append dotLottiePlayer
+                        if (this.button && this.button.parentNode === this.floatingContainer) {
+                            this.floatingContainer.removeChild(this.button);
+                        }
+                        this.floatingContainer.appendChild(this.dotLottiePlayer);
+
+                        // Apply object-fit: cover to canvas in shadow-root
+                        applyCanvasObjectFit(this.dotLottiePlayer);
+                    }
+                });
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
@@ -792,7 +805,7 @@ class FloatingButton {
                 chatUserId: this.chatUserId,
                 products: [],
             });
-    
+
             this.logEvent({
                 experimentId: "flowlift_abctest_v1",
                 partnerId: this.partnerId,
@@ -1900,6 +1913,39 @@ class FloatingButton {
             console.log("Training progress check failed, proceeding with initialization.");
             return false;
         }
+    }
+
+    // Function to apply object-fit: cover to canvas in shadow-root
+    applyCanvasObjectFit(dotLottiePlayer) {
+        if (!dotLottiePlayer) return;
+
+        const tryApplyStyle = (dotLottiePlayer, retries = 10) => {
+            if (retries <= 0) {
+                console.warn('Failed to apply object-fit to dotLottiePlayer canvas: shadowRoot not ready');
+                return;
+            }
+
+            const shadowRoot = dotLottiePlayer.shadowRoot;
+            if (shadowRoot) {
+                const canvas = shadowRoot.querySelector('canvas');
+                if (canvas) {
+                    canvas.style.objectFit = 'cover';
+                    canvas.style.width = '100%';
+                    canvas.style.height = '100%';
+                } else {
+                    // Canvas might not be ready yet, retry
+                    setTimeout(() => tryApplyStyle(retries - 1), 50);
+                }
+            } else {
+                // ShadowRoot not ready yet, retry
+                setTimeout(() => tryApplyStyle(retries - 1), 50);
+            }
+        };
+
+        // Wait for shadowRoot to be ready
+        requestAnimationFrame(() => {
+            tryApplyStyle(dotLottiePlayer);
+        });
     }
 }
 

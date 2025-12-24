@@ -161,3 +161,36 @@ export function isAllowedDomainForIframe(context, window, document) {
     }
     return false;
 }
+
+// Function to apply object-fit: cover to canvas in shadow-root
+export function applyCanvasObjectFit(dotLottiePlayer) {
+    if (!dotLottiePlayer) return;
+
+    const tryApplyStyle = (dotLottiePlayer, retries = 10) => {
+        if (retries <= 0) {
+            console.warn('Failed to apply object-fit to dotLottiePlayer canvas: shadowRoot not ready');
+            return;
+        }
+
+        const shadowRoot = dotLottiePlayer.shadowRoot;
+        if (shadowRoot) {
+            const canvas = shadowRoot.querySelector('canvas');
+            if (canvas) {
+                canvas.style.objectFit = 'cover';
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+            } else {
+                // Canvas might not be ready yet, retry
+                setTimeout(() => tryApplyStyle(retries - 1), 50);
+            }
+        } else {
+            // ShadowRoot not ready yet, retry
+            setTimeout(() => tryApplyStyle(retries - 1), 50);
+        }
+    };
+
+    // Wait for shadowRoot to be ready
+    requestAnimationFrame(() => {
+        tryApplyStyle(dotLottiePlayer);
+    });
+}
