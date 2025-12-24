@@ -390,25 +390,22 @@ class FloatingButton {
                 this.buttonContainer.appendChild(this.button);
             }
             parentElem.appendChild(this.floatingContainer);
-            this.floatingContainer.appendChild(this.buttonContainer);
             
-            // Mount dotLottiePlayer after buttonContainer is in DOM and layout is settled
+            /* [Lottie Floating Button] - flex: row-reverse이므로 buttonContainer를 먼저 append해야 오른쪽에 렌더링됨 */
             if (this.dotLottiePlayer) {
-                // Use requestAnimationFrame to ensure layout is calculated
+                // Remove button if it exists, then append dotLottiePlayer synchronously
+                if (this.button && this.button.parentNode === this.buttonContainer) {
+                    this.buttonContainer.removeChild(this.button);
+                }
+                this.buttonContainer.appendChild(this.dotLottiePlayer);
+                
+                // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
                 requestAnimationFrame(() => {
-                    // Double check buttonContainer is still in DOM
-                    if (this.buttonContainer && this.buttonContainer.parentNode) {
-                        // Remove button if it exists, then append dotLottiePlayer
-                        if (this.button && this.button.parentNode === this.buttonContainer) {
-                            this.buttonContainer.removeChild(this.button);
-                        }
-                        this.buttonContainer.appendChild(this.dotLottiePlayer);
-                        
-                        // Apply object-fit: cover to canvas in shadow-root
-                        applyCanvasObjectFit(this.dotLottiePlayer);
-                    }
+                    // Apply object-fit: cover to canvas in shadow-root
+                    applyCanvasObjectFit(this.dotLottiePlayer);
                 });
             }
+            this.floatingContainer.appendChild(this.buttonContainer);
             if (Boolean(this.bootConfig?.floating?.autoChatOpen)) this.openChat();
             else if (!this.gentooSessionData?.redirectState && this.floatingCount < 2 && this.bootConfig?.floating?.button?.comment?.length > 0) {
                 // Check if component is destroyed or clicked
@@ -441,6 +438,7 @@ class FloatingButton {
                 this.expandedButton.appendChild(this.expandedText);
 
                 // Double check if floatingContainer still exists before appending
+                // expandedButtonWrapper를 나중에 append하면 flex: row-reverse에 의해 왼쪽에 렌더링됨
                 if (this.floatingContainer && this.floatingContainer.parentNode && !this.floatingContainer.classList.contains('hide-visibility')) {
                     this.floatingContainer.appendChild(this.expandedButtonWrapper);
                     this.addLetter(this.bootConfig, this.expandedText, () => this.isDestroyed);

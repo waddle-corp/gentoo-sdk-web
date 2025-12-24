@@ -514,26 +514,26 @@ class FloatingButton {
             this.button.style.backgroundImage = `url(${this.customFloatingImage || this.floatingData.imageUrl})`;
             this.button.appendChild(document.createTextNode('\u200B'));
             document.body.appendChild(this.floatingContainer);
+            
+            /* [Lottie Floating Button] - flex: row-reverse이므로 dotLottiePlayer를 먼저 append해야 오른쪽에 렌더링됨 */
             if (this.dotLottiePlayer) {
-                // Use requestAnimationFrame to ensure layout is calculated
+                // Remove button if it exists, then append dotLottiePlayer synchronously
+                if (this.button && this.button.parentNode === this.floatingContainer) {
+                    this.floatingContainer.removeChild(this.button);
+                }
+                this.floatingContainer.appendChild(this.dotLottiePlayer);
+                
+                // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
                 requestAnimationFrame(() => {
-                    // Double check buttonContainer is still in DOM
-                    if (this.floatingContainer && this.floatingContainer.parentNode) {
-                        // Remove button if it exists, then append dotLottiePlayer
-                        if (this.button && this.button.parentNode === this.floatingContainer) {
-                            this.floatingContainer.removeChild(this.button);
-                        }
-                        this.floatingContainer.appendChild(this.dotLottiePlayer);
-
-                        // Apply object-fit: cover to canvas in shadow-root
-                        applyCanvasObjectFit(this.dotLottiePlayer);
-                    }
+                    // Apply object-fit: cover to canvas in shadow-root
+                    applyCanvasObjectFit(this.dotLottiePlayer);
                 });
             } else {
                 this.floatingContainer.appendChild(this.button);
             }
 
             // 💬 플로팅 문구 최초 표시 (공통 함수 사용)
+            // expandedButton은 createFloatingMessage에서 나중에 append되므로 flex: row-reverse에 의해 왼쪽에 렌더링됨
             if (!this.gentooSessionData?.redirectState && this.floatingData.comment && this.floatingData.comment.length > 0) {
                 this.createFloatingMessage(this.floatingData.comment, true);
             }
