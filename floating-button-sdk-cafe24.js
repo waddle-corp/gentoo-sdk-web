@@ -424,20 +424,19 @@ class FloatingButton {
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             document.body.appendChild(this.floatingContainer);
+            
+            /* [Lottie Floating Button] - flex: row-reverse이므로 dotLottiePlayer를 먼저 append해야 오른쪽에 렌더링됨 */
             if (this.dotLottiePlayer) {
-                // Use requestAnimationFrame to ensure layout is calculated
+                // Remove button if it exists, then append dotLottiePlayer synchronously
+                if (this.button && this.button.parentNode === this.floatingContainer) {
+                    this.floatingContainer.removeChild(this.button);
+                }
+                this.floatingContainer.appendChild(this.dotLottiePlayer);
+                
+                // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
                 requestAnimationFrame(() => {
-                    // Double check buttonContainer is still in DOM
-                    if (this.floatingContainer && this.floatingContainer.parentNode) {
-                        // Remove button if it exists, then append dotLottiePlayer
-                        if (this.button && this.button.parentNode === this.floatingContainer) {
-                            this.floatingContainer.removeChild(this.button);
-                        }
-                        this.floatingContainer.appendChild(this.dotLottiePlayer);
-
-                        // Apply object-fit: cover to canvas in shadow-root
-                        applyCanvasObjectFit(this.dotLottiePlayer);
-                    }
+                    // Apply object-fit: cover to canvas in shadow-root
+                    applyCanvasObjectFit(this.dotLottiePlayer);
                 });
             } else {
                 this.floatingContainer.appendChild(this.button);
@@ -474,6 +473,7 @@ class FloatingButton {
                 this.expandedButton.appendChild(this.expandedText);
 
                 // Double check if floatingContainer still exists before appending
+                // expandedButtonWrapper를 나중에 append하면 flex: row-reverse에 의해 왼쪽에 렌더링됨
                 if (this.floatingContainer && this.floatingContainer.parentNode) {
                     this.floatingContainer.appendChild(this.expandedButtonWrapper);
 
@@ -1417,11 +1417,11 @@ class FloatingButton {
                     canvas.style.height = '100%';
                 } else {
                     // Canvas might not be ready yet, retry
-                    setTimeout(() => tryApplyStyle(retries - 1), 50);
+                    setTimeout(() => tryApplyStyle(dotLottiePlayer, retries - 1), 50);
                 }
             } else {
                 // ShadowRoot not ready yet, retry
-                setTimeout(() => tryApplyStyle(retries - 1), 50);
+                setTimeout(() => tryApplyStyle(dotLottiePlayer, retries - 1), 50);
             }
         };
 
