@@ -238,10 +238,10 @@
 }
 
 .expanded-area-text-zoom-md {
-    font-family: "pretendard";
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 17px;
+    font-family: "pretendard" !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 17px !important;
     letter-spacing: -0.35px;
     margin: 0;
     width: max-content;
@@ -256,10 +256,10 @@
 }
 
 .expanded-area-text-md {
-    font-family: "pretendard";
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 14px;
+    font-family: "pretendard" !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 14px !important;
     margin: 0;
     width: max-content;
     max-width: 90px;
