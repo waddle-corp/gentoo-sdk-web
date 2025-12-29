@@ -375,10 +375,10 @@
 .chat-header-text {
     width: fit-content;
     text-wrap: nowrap;
-    font-family: "pretendard";
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 14px;
+    font-family: "pretendard" !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 14px !important;
     color: #C0C0C0;
 }
 
@@ -430,19 +430,19 @@
 }
 
 .chat-close-button-text {
-    font-family: "pretendard";
-    font-size: 14px;
-    font-weight: 600;
+    font-family: "pretendard" !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
     color: #444;
 }
 
 .chat-close-button-text-md {
-    font-family: "pretendard";
-    font-size: 14px;
-    font-weight: 600;
+    font-family: "pretendard" !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
     color: #999;
     margin: 0;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.025em !important;
 }
 
 .chat-header-md {
@@ -466,10 +466,10 @@
 .chat-header-text-md {
     width: fit-content;
     text-wrap: nowrap;
-    font-family: "pretendard";
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 17px;
+    font-family: "pretendard" !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 17px !important;
     margin: 0;
     color: #C0C0C0;
 }
