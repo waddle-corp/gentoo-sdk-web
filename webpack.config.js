@@ -23,7 +23,8 @@ module.exports = (env, argv) => {
         { name: 'floating-godomall-modal', entry: './src/floating-sdk-godomall-modal.js', output: 'godomall-modal' },
         { name: 'floating-imweb-modal', entry: './src/floating-sdk-imweb-modal.js', output: 'imweb-modal' },
         { name: 'floating-shopify-modal', entry: './src/floating-sdk-shopify-modal.js', output: 'shopify-modal' },
-        { name: 'floating-modal', entry: './src/floating-sdk-modal.js', output: 'gentoo-modal' }
+        { name: 'floating-modal', entry: './src/floating-sdk-modal.js', output: 'gentoo-modal' },
+        { name: 'dom-scanner', entry: './src/dom-scanner.js', output: 'dom-scanner' }
     ];
 
     return targets.map(t => ({
