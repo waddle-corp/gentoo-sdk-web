@@ -1,11 +1,13 @@
 (
     function (global, document) {
         var w = global;
+        var ptid;
         if (w.GentooIO) { 
             return w.console.error("GentooIO script included twice"); 
         }; 
         var ge = function () { 
             ge.c(arguments); 
+            ptid = arguments[0] === 'boot' && arguments[1].partnerId;
         }; 
         ge.q = []; 
         ge.c = function (args) { 
@@ -19,7 +21,7 @@
             var hostname = window.location.hostname;
             s.type = "text/javascript"; 
             s.async = true; 
-            var isFastfive = hostname.includes('fastfive.co.kr');
+            var isFastfive = hostname.includes('fastfive.co.kr') || ptid === '67615284c5ff44110dbc6613';
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
             source = isMobile && !isFastfive 
