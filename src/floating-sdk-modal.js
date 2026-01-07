@@ -120,9 +120,11 @@ class FloatingButton {
                 this.floatingAvatar = res?.avatar || null;
                 const warningMessageData = this.chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
                 const floatingZoom = this.chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
+                const csInquiry = this.chatbotData?.experimentalData?.find(item => item.key === "csInquiry");
                 this.warningMessage = warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
                 this.floatingZoom = floatingZoom?.activated;
+                this.csInquiry = csInquiry?.activated;
             }),
             getBootConfig(this.chatUserId, window.location.href, this.displayLocation, this.itemId, this.partnerId).then((res) => {
                 if (!res) throw new Error("Failed to fetch boot config");

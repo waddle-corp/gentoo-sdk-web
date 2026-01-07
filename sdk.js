@@ -30,7 +30,7 @@
             s.src = source;
             // s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
-            // s.src = "./dist/gentoo-modal/floating-modal.js"; 
+            s.src = "./dist/gentoo-modal/floating-modal.js"; 
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
             }; 

@@ -240,7 +240,15 @@ export const createUIElementsModal = (
         /* [Exam Floating Group] */
         context.examFloatingGroup = document.createElement("div");
         context.examFloatingGroup.className = "exam-floating-group hide";
-        chatbotData?.examples?.forEach(example => {
+        /* 실험실 기능 '고객 문의' 버튼 생성 */
+        if (context.csInquiry) {
+            const csInquiryButton = document.createElement("div");
+            csInquiryButton.className = "cs-inquiry-floating-button";
+            csInquiryButton.innerText = context.lang === 'ko' ? "고객 센터 문의" : "Customer Service Inquiry";
+            csInquiryButton.style.setProperty('--gentoo-color-1', context.chatbotData?.colorCode[0]?.hex);
+            context.examFloatingGroup.appendChild(csInquiryButton);
+        }
+        chatbotData?.examples?.slice(0, 3)?.forEach(example => {    // 모바일에서는 최대 3개까지만 표시
             const examFloatingButton = document.createElement("div");
             examFloatingButton.className = "exam-floating-button";
             examFloatingButton.innerText = example;
@@ -261,7 +269,7 @@ export const createUIElementsModal = (
         context.closeButtonContainer.className = "chat-close-button-container";
         context.closeButtonIcon.className = "chat-close-button-icon";
         context.closeButtonText.className = "chat-close-button-text";
-        context.closeButtonText.innerText = "채팅창 축소";
+        context.closeButtonText.innerText = context.lang === 'ko' ? "채팅창 축소" : "Minimize";
         context.closeButtonContainer.appendChild(context.closeButtonIcon);
         context.closeButtonContainer.appendChild(context.closeButtonText);
         context.chatHeader.appendChild(context.chatHeaderText);

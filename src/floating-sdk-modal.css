@@ -690,6 +690,27 @@ div.chat-send-button {
     }
 }
 
+.cs-inquiry-floating-button {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--gentoo-color-1, #154cca);
+    border-radius: 999px;
+    padding: 5px 14px;
+    cursor: pointer;
+
+    p {
+        font-family: 'pretendard', sans-serif;
+        font-size: 15px;
+        line-height: 19px;
+        letter-spacing: -0.375px;
+        font-weight: 400;
+        color: #fff;
+    }
+}
+
 /* Ensure example floating buttons use their injected colors even under the global [data-gentoo-sdk] color rule */
 [data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button,
 [data-gentoo-sdk="true"] .exam-floating-group .exam-floating-button * {
@@ -699,6 +720,16 @@ div.chat-send-button {
     letter-spacing: -0.375px;
     font-weight: 400;
     color: var(--gentoo-color-1, #154cca);
+}
+
+[data-gentoo-sdk="true"] .exam-floating-group .cs-inquiry-floating-button,
+[data-gentoo-sdk="true"] .exam-floating-group .cs-inquiry-floating-button * {
+    font-family: 'pretendard', sans-serif;
+    font-size: 15px;
+    line-height: 19px;
+    letter-spacing: -0.375px;
+    font-weight: 400;
+    color: #fff;
 }
 
 .footer-add-height {
