@@ -160,6 +160,8 @@ class FloatingButton {
                     this.floatingAvatar = chatbotData?.avatar;
                     const floatingZoom = chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                     this.floatingZoom = floatingZoom?.activated;
+                    const csInquiry = chatbotData?.experimentalData?.find(item => item.key === "csInquiry");
+                    this.csInquiry = csInquiry?.activated;
                     resolve();
                 })
                 .catch(error => {
@@ -236,14 +238,14 @@ class FloatingButton {
 
     // Seperate event listener set up into its own method for clarity (setupEventListenersModal)
 
-    openChat() {
+    openChat(mode = null) {
         if (this.isDraggingFloating) return;
 
         // Inject viewport meta tag to block ios zoom in
         injectViewport(this, document);
 
         // Chat being visible
-        this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
+        this.enableChat(mode || ((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full'));
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         // Prevent native scroll gestures interfering with drag-resize on header

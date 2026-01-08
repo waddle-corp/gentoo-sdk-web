@@ -150,8 +150,10 @@ class FloatingButton {
                     this.chatbotData = res;
                     this.floatingAvatar = res?.avatar || null;
                     const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
+                    const csInquiry = this.chatbotData?.experimentalData?.find(item => item.key === "csInquiry");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
+                    this.csInquiry = csInquiry?.activated;
                 }),
                 getFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId).then((res) => {
                     if (!res) throw new Error("Failed to fetch floating data");
@@ -350,14 +352,14 @@ class FloatingButton {
 
     // Seperate event listener set up into its own method for clarity (setupEventListenersModal)
 
-    openChat() {
+    openChat(mode = null) {
         if (this.isDraggingFloating) return;
 
         // Inject viewport meta tag to block ios zoom in
         injectViewport(this, document);
 
         // Chat being visible
-        this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
+        this.enableChat(mode || ((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full'));
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         // Prevent native scroll gestures interfering with drag-resize on header
