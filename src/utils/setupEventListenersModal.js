@@ -166,6 +166,10 @@ export const setupEventListenersModal = (context, position) => {
         if (e.data.closeRequestState) {
             context.hideChat();
         }
+        if (e.data.enableChatMode) {
+            const mode = e.data.enableChatMode;
+            context.enableChat(mode);
+        }
         if (e.data.userSentMessageState) {
             if (context.eventCallback.userSentMessage !== null) {
                 try { context.eventCallback?.userSentMessage(); } catch {}
@@ -481,6 +485,15 @@ export const setupEventListenersModal = (context, position) => {
         //const button = e.target.closest('.exam-floating-button');
         const raw = e.target;
         const el = raw.nodeType === Node.TEXT_NODE ? raw.parentElement : raw; // Text면 부모 Element로 승격
+        /* '고객 문의' 버튼 클릭한 경우 */
+        if (context.csInquiry) {
+            if (el?.classList?.contains('cs-inquiry-floating-button')) {
+                context.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'csInquiryButton', currentPage: window?.location?.href });
+                context.input.blur();
+                context.openChat('full');
+                return;
+            }
+        }
         const button = el?.closest?.('.exam-floating-button');
         if (button) {
             context.iframeContainer.style.height = "400px";

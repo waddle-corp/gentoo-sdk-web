@@ -176,8 +176,8 @@ class FloatingButton {
 
             this.isInitialized = true;
 
-            // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
             this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
+            // this.chatUrl = `https://gentoo-chat-web-git-feat-seo-5014-waddle.vercel.app/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&mode=modal&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}`;
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
@@ -203,14 +203,14 @@ class FloatingButton {
 
     // Seperate event listener set up into its own method for clarity (setupEventListenersModal)
 
-    openChat() {
+    openChat(mode = null) {
         if (this.isDraggingFloating) return;
 
         // Inject viewport meta tag to block ios zoom in
         injectViewport(this, document);
 
         // Chat being visible
-        this.enableChat((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full');
+        this.enableChat(mode || ((this.isMobileDevice || this.isSmallResolution) ? 'shrink' : 'full'));
         if (this.isMobileDevice || this.isSmallResolution) { history.pushState({ chatOpen: true }, '', window.location.href); }
 
         // Prevent native scroll gestures interfering with drag-resize on header
