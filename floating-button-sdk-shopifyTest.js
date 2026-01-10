@@ -579,6 +579,9 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+
+        // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 SDK 준비 완료 알림
+        window.dispatchEvent(new Event('GentooIO:ready'));
     }
 
     // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
