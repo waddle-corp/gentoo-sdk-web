@@ -331,7 +331,7 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-            } else { 
+            } else {
                 createUIElementsModal(
                     this, // this 객체를 첫 번째 인자로 전달
                     position,
@@ -340,6 +340,9 @@ class FloatingButton {
                     this.customButton,
                     this.chatbotData,
                 );
+
+                // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 SDK 준비 완료 알림
+                window.dispatchEvent(new Event('GentooIO:ready'));
             }
 
         } catch (error) {
