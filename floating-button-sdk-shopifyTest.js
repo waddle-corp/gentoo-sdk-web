@@ -579,6 +579,9 @@ class FloatingButton {
             }, 500);
         }
         window.__GentooInited = 'created';
+
+        // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 Floating UI 생성 완료 알림
+        window.dispatchEvent(new Event('GentooIO:UIElementsCreated'));
     }
 
     // 🎯 플로팅 메시지 생성 공통 함수 (기존 로직 기반)
@@ -2040,6 +2043,18 @@ window.FloatingButton = FloatingButton;
                         Promise.resolve(fb.openChat()).catch((error) => {
                             console.error("Failed to open GentooIO chat:", error);
                         });
+                    }
+                    break;
+                case "openWithMessage":
+                    if (typeof fb.openChat === "function") {
+                        fb.openChat();
+                        setTimeout(() => {
+                            fb.sendPostMessageHandler({
+                                buttonClickState: true,
+                                clickedElement: 'sendButton',
+                                requestMessage: params.message,
+                            });
+                        }, 500);
                     }
                     break;
                 case "unmount":

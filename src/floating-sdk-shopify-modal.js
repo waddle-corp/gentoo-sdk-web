@@ -331,7 +331,7 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-            } else { 
+            } else {
                 createUIElementsModal(
                     this, // this 객체를 첫 번째 인자로 전달
                     position,
@@ -340,6 +340,9 @@ class FloatingButton {
                     this.customButton,
                     this.chatbotData,
                 );
+
+                // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 Floating UI 생성 완료 알림
+                window.dispatchEvent(new Event('GentooIO:UIElementsCreated'));
             }
 
         } catch (error) {
@@ -905,6 +908,18 @@ window.FloatingButton = FloatingButton;
                         Promise.resolve(fb.openChat()).catch((error) => {
                             console.error("Failed to open GentooIO chat:", error);
                         });
+                    }
+                    break;
+                case "openWithMessage":
+                    if (typeof fb.openChat === "function") {
+                        fb.openChat();
+                        setTimeout(() => {
+                            fb.sendPostMessageHandler({
+                                buttonClickState: true,
+                                clickedElement: 'sendButton',
+                                requestMessage: params.message,
+                            });
+                        }, 500);
                     }
                     break;
                 case "unmount":
