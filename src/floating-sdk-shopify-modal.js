@@ -341,8 +341,8 @@ class FloatingButton {
                     this.chatbotData,
                 );
 
-                // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 SDK 준비 완료 알림
-                window.dispatchEvent(new Event('GentooIO:ready'));
+                // Gentoo Powered Blocks (Ask Gentoo, Notify Me 등)에 Floating UI 생성 완료 알림
+                window.dispatchEvent(new Event('GentooIO:UIElementsCreated'));
             }
 
         } catch (error) {
