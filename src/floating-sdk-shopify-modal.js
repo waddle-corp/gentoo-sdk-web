@@ -910,6 +910,18 @@ window.FloatingButton = FloatingButton;
                         });
                     }
                     break;
+                case "openWithMessage":
+                    if (typeof fb.openChat === "function") {
+                        fb.openChat();
+                        setTimeout(() => {
+                            fb.sendPostMessageHandler({
+                                buttonClickState: true,
+                                clickedElement: 'sendButton',
+                                requestMessage: params.message,
+                            });
+                        }, 500);
+                    }
+                    break;
                 case "unmount":
                     if (typeof fb.destroy === "function") {
                         Promise.resolve(fb.destroy()).catch((error) => {
