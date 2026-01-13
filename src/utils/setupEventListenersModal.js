@@ -288,9 +288,11 @@ export const setupEventListenersModal = (context, position) => {
             products: [],
         }, context.isMobileDevice);
     });
+
     /* Mobile touch-drag for floatingContainer */
     const onTouchStart = (e) => {
         if (!context.isSmallResolution || !context.floatingContainer) return;
+        if (context?.partnerId === '67f487a8db6583cc1d270858') return;  // 종근당건강은 draggable gentoo 기능 예외처리
         const touch = e.touches && e.touches[0];
         if (!touch) return;
         const cs = window.getComputedStyle(context.floatingContainer);
@@ -299,8 +301,10 @@ export const setupEventListenersModal = (context, position) => {
         context._dragStart = { x: touch.clientX, y: touch.clientY, right, bottom };
         context._dragMoved = false;
     };
+
     const onTouchMove = (e) => {
         if (!context.isSmallResolution || !context.floatingContainer) return;
+        if (context?.partnerId === '67f487a8db6583cc1d270858') return;  // 종근당건강은 draggable gentoo 기능 예외처리
         const touch = e.touches && e.touches[0];
         if (!touch) return;
         context.isDraggingFloating = true;
@@ -352,14 +356,17 @@ export const setupEventListenersModal = (context, position) => {
         context.gentooSessionData.floatingPosition.mobile = { right: position.mobile.right, bottom: position.mobile.bottom };
         sessionStorage.setItem('gentoo', JSON.stringify(context.gentooSessionData));
     };
+
     const onTouchEnd = (e) => {
         if (!context.isSmallResolution) return;
+        if (context?.partnerId === '67f487a8db6583cc1d270858') return;  // 종근당건강은 draggable gentoo 기능 예외처리
         if (context._dragMoved) {
             e.preventDefault();
         }
         context.isDraggingFloating = false;
         context._dragMoved = false;
     };
+    
     context.floatingContainer?.addEventListener("touchstart", onTouchStart, { passive: true });
     context.floatingContainer?.addEventListener("touchmove", onTouchMove, { passive: false });
     context.floatingContainer?.addEventListener("touchend", onTouchEnd);
