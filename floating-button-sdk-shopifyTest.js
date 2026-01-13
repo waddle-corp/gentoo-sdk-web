@@ -973,10 +973,11 @@ class FloatingButton {
         this.deleteViewport();
 
         // Remove all known DOM elements
+        // fallback: 인스턴스 참조가 없어도 DOM에서 직접 찾아서 제거
         const elemsToRemove = [
-            this.floatingContainer,
-            this.iframeContainer,
-            this.dimmedBackground,
+            this.floatingContainer || document.querySelector('.floating-container[data-gentoo-sdk="true"]'),
+            this.iframeContainer || document.querySelector('.iframe-container[data-gentoo-sdk="true"]'),
+            this.dimmedBackground || document.querySelector('.dimmed-background[data-gentoo-sdk="true"]'),
             this.button,
             this.expandedButton,
             this.dotLottiePlayer,
@@ -997,17 +998,6 @@ class FloatingButton {
                 "click",
                 this.expandedButtonClickHandler
             );
-        }
-
-        // Remove all DOM elements
-        if (this.floatingContainer && this.floatingContainer.parentNode) {
-            this.floatingContainer.parentNode.removeChild(this.floatingContainer);
-        }
-        if (this.iframeContainer && this.iframeContainer.parentNode) {
-            this.iframeContainer.parentNode.removeChild(this.iframeContainer);
-        }
-        if (this.dimmedBackground && this.dimmedBackground.parentNode) {
-            this.dimmedBackground.parentNode.removeChild(this.dimmedBackground);
         }
 
         // Reset all properties

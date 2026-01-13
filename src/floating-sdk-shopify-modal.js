@@ -445,18 +445,19 @@ class FloatingButton {
         }
 
         // Remove all DOM elements
-        if (this.button && this.button.parentNode) {
-            this.button.parentNode.removeChild(this.button);
-        }
-        if (this.expandedButton && this.expandedButton.parentNode) {
-            this.expandedButton.parentNode.removeChild(this.expandedButton);
-        }
-        if (this.floatingContainer && this.floatingContainer.parentNode) {
-            this.floatingContainer.parentNode.removeChild(this.floatingContainer);
-        }
-        if (this.iframeContainer && this.iframeContainer.parentNode) {
-            this.iframeContainer.parentNode.removeChild(this.iframeContainer);
-        }
+        // fallback: 인스턴스 참조가 없어도 DOM에서 직접 찾아서 제거
+        const elemsToRemove = [
+            this.floatingContainer || document.querySelector('.floating-container[data-gentoo-sdk="true"]'),
+            this.iframeContainer || document.querySelector('.iframe-container[data-gentoo-sdk="true"]'),
+            this.dimmedBackground || document.querySelector('.dimmed-background[data-gentoo-sdk="true"]'),
+            this.button,
+            this.expandedButton,
+        ];
+        elemsToRemove.forEach((el) => {
+            if (el && el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
 
         // Reset all properties
         this.button = null;
@@ -464,6 +465,7 @@ class FloatingButton {
         this.expandedText = null;
         this.iframeContainer = null;
         this.floatingContainer = null;
+        this.dimmedBackground = null;
         this.chatHeader = null;
         this.iframe = null;
         this.chatHandler = null;
