@@ -70,6 +70,8 @@ class FloatingButton {
         this.cvid = gentooGetCookie('CVID');
         this.cvid_y = gentooGetCookie('CVID_Y');
 
+        this.testParameter = window.location.search.split('?')[1]; // debugging for exup
+
         if (window.location.hostname === 'localhost') {
             this.hostSrc = 'http://localhost:3000';
             this.domains = {
@@ -257,6 +259,9 @@ class FloatingButton {
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
+            else if (this.testParameter && this.testParameter.includes('gentoo')) {
+                this.createUIElements(position, showGentooButton, isCustomButton);
+            }
             else if (!this.bootConfig?.floating?.isVisible) {
                 // console.log('not creating ui elements: isVisible is ', this.bootConfig?.floating?.isVisible);
             } else {
