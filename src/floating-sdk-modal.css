@@ -614,6 +614,8 @@ input.chat-input {
     line-height: 19px;
     color: #222;
     box-shadow: none;
+    position: static;
+    top: auto;
 }
 
 div.gentoo-profile-image {
