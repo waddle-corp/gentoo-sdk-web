@@ -328,21 +328,11 @@ class FloatingButton {
                 }
             }
 
-            // 검색 자동 트리거: autoUserMessage 파라미터 생성
             this.autoUserMessage = this.getAutoUserMessage();
-            const autoUserMessageParam = this.autoUserMessage ? `&autoUserMessage=${encodeURIComponent(this.autoUserMessage)}` : '';
 
-            if (this.partnerId === '676a4cef7efd43d2d6a93cd7') {
-                this.chatUrl = `${this.hostSrc}/chat/49/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
-            }
-            else if (this.partnerId === '676a4b3cac97386117d1838d') {
-                this.chatUrl = `${this.hostSrc}/chat/153/${this.chatUserId}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}${autoUserMessageParam}`;
-            }
-            else {
-                // 🎯 채팅 웹 애플리케이션 URL 생성 - SDK에서 iframe으로 로드할 URL
-                // 🛍️ Shopify 테스트용 - 기본적으로 영어(en)로 설정
-                this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=en${autoUserMessageParam}`;
-            }
+            // 🎯 채팅 웹 애플리케이션 URL 생성 - SDK에서 iframe으로 로드할 URL
+            // 🛍️ Shopify - 기본적으로 영어(en)로 설정
+            this.chatUrl = `${this.hostSrc}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=en`;
 
             // Create UI elements after data is ready
             if (!this.isDestroyed) this.createUIElements(position, showGentooButton, isCustomButton);
@@ -413,7 +403,10 @@ class FloatingButton {
         this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
         this.iframe.addEventListener('load', () => {
             if (this.autoUserMessage) {
-                this.openChat();
+                setTimeout(() => {
+                    this.openChat();
+                    this.sendPostMessageHandler({ autoUserMessage: this.autoUserMessage });
+                }, 500);
             }
         });
 
