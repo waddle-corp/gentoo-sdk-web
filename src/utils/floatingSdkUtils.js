@@ -33,6 +33,20 @@ export async function injectLottie(document) {
     });
 }
 
+// Pinned version for Shopify - v0.9.0+ breaks due to bare import of lit/decorators.js
+export async function injectLottiePinned(document) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.3/dist/dotlottie-wc.js';
+        script.onload = () => {
+            resolve();
+        };
+        script.onerror = () => reject(new Error("DotLottiePlayer load failed"));
+        document.head.appendChild(script);
+    });
+}
+
 // Function to inject viewport meta tag
 export function injectViewport(context, document) {
     if (context.viewportInjected) return;

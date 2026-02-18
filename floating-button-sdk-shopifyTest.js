@@ -1186,7 +1186,7 @@ class FloatingButton {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.type = 'module';
-            script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js';
+            script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.3/dist/dotlottie-wc.js';
             script.onload = () => {
                 resolve();
             };
