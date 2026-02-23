@@ -40,8 +40,21 @@ class FloatingButton {
         this.variant = new URLSearchParams(window.location.search).get('variant');
         this.partnerType = props.partnerType || 'gentoo';
         this.partnerId = props.partnerId;
-        this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
+        if (props.utm && typeof props.utm === 'object') {
+            const keysToCheck = Object.keys(props.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
+            const allEmpty = keysToCheck.every(key => {
+                const value = props.utm[key];
+                return value === null || value === undefined || value === '';
+            });
+            if (!allEmpty) {
+                this.gentooSessionData.utm = props.utm;
+            }
+        } else {
+            this.gentooSessionData.utm = props.utm;
+        }
+        this.utm = JSON.parse(JSON.stringify(this.gentooSessionData.utm));
         this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
         if (!this.gentooSessionData?.sessionId) {
             this.gentooSessionData.sessionId = this.sessionId;
@@ -272,7 +285,7 @@ class FloatingButton {
             player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
             player.style.cursor = 'pointer';
             player.appendChild(document.createTextNode('\u200B'));
-            
+
             this.dotLottiePlayer = player;
         }
 
@@ -374,7 +387,7 @@ class FloatingButton {
             this.button.type = "button";
             this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
             document.body.appendChild(this.floatingContainer);
-            
+
             /* [Lottie Floating Button] - flex: row-reverse이므로 dotLottiePlayer를 먼저 append해야 오른쪽에 렌더링됨 */
             if (this.dotLottiePlayer) {
                 // Remove button if it exists, then append dotLottiePlayer synchronously
@@ -382,7 +395,7 @@ class FloatingButton {
                     this.floatingContainer.removeChild(this.button);
                 }
                 this.floatingContainer.appendChild(this.dotLottiePlayer);
-                
+
                 // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
                 requestAnimationFrame(() => {
                     // Apply object-fit: cover to canvas in shadow-root
@@ -577,7 +590,7 @@ class FloatingButton {
                     floatingText: this.bootConfig?.floating?.button?.comment,
                 },
             }, this.isMobileDevice);
-    
+
             postChatEventLogLegacy({
                 eventCategory: 'SDKFloatingClicked',
                 partnerId: this.partnerId,

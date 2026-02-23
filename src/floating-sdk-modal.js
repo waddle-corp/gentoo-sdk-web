@@ -1,16 +1,16 @@
 import '../global.css'
 import './floating-sdk-modal.css';
-import { 
-    getChatbotData, 
-    postChatUserId, 
-    getFloatingData, 
-    getPartnerId, 
-    postChatEventLog, 
-    getBootConfig, 
+import {
+    getChatbotData,
+    postChatUserId,
+    getFloatingData,
+    getPartnerId,
+    postChatEventLog,
+    getBootConfig,
 } from './apis/chatConfig';
 import { createUIElementsModal } from './utils/createUIElementsModal';
-import { 
-    injectLottie, 
+import {
+    injectLottie,
     injectViewport,
     deleteViewport,
     logWindowWidth,
@@ -54,8 +54,21 @@ class FloatingButton {
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
-        this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
+        if (props.utm && typeof props.utm === 'object') {
+            const keysToCheck = Object.keys(props.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
+            const allEmpty = keysToCheck.every(key => {
+                const value = props.utm[key];
+                return value === null || value === undefined || value === '';
+            });
+            if (!allEmpty) {
+                this.gentooSessionData.utm = props.utm;
+            }
+        } else {
+            this.gentooSessionData.utm = props.utm;
+        }
+        this.utm = JSON.parse(JSON.stringify(this.gentooSessionData.utm));
         this.sessionId = this.gentooSessionData?.sessionId || `sess-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
         if (!this.gentooSessionData?.sessionId) {
             this.gentooSessionData.sessionId = this.sessionId;
@@ -96,8 +109,8 @@ class FloatingButton {
             if (!document || !document.cookie) return null;
             const pairs = document.cookie.split('; ');
             for (const pair of pairs) {
-              const [k, ...rest] = pair.split('=');
-              if (k === name) return decodeURIComponent(rest.join('='));
+                const [k, ...rest] = pair.split('=');
+                if (k === name) return decodeURIComponent(rest.join('='));
             }
             return null;
         }
@@ -182,7 +195,7 @@ class FloatingButton {
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
             else if (!this.bootConfig?.floating?.isVisible) {
-            } else { 
+            } else {
                 createUIElementsModal(
                     this, // this 객체를 첫 번째 인자로 전달
                     position,
@@ -410,7 +423,7 @@ class FloatingButton {
 
     enableChat(mode) {
         if (this.isDraggingFloating) return;
-        
+
         this.sendPostMessageHandler({ enableMode: mode });
 
         if (this.isSmallResolution) {

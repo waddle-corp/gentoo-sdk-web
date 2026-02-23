@@ -40,6 +40,19 @@ class FloatingButton {
         this.udid = props.udid || "";
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
+        if (this.utm && typeof this.utm === 'object') {
+            const keysToCheck = Object.keys(this.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
+            const allEmpty = keysToCheck.every(key => {
+                const value = this.utm[key];
+                return value === null || value === undefined || value === '';
+            });
+            if (!allEmpty) {
+                this.gentooSessionData.utm = this.utm;
+            }
+        } else {
+            this.gentooSessionData.utm = this.utm;
+        }
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
