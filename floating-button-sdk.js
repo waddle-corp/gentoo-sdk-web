@@ -38,21 +38,33 @@ class FloatingButton {
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
-        this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
-        if (this.utm && typeof this.utm === 'object') {
-            const keysToCheck = Object.keys(this.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
+        // 단, transitionPage(tp)는 항상 최신 값으로 갱신
+        if (props.utm && typeof props.utm === 'object') {
+            const keysToCheck = Object.keys(props.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
             const allEmpty = keysToCheck.every(key => {
-                const value = this.utm[key];
+                const value = props.utm[key];
                 return value === null || value === undefined || value === '';
             });
             if (!allEmpty) {
-                this.gentooSessionData.utm = this.utm;
+                this.gentooSessionData.utm = props.utm;
+            } else {
+                // 다른 키들은 비어있지만 transitionPage는 항상 갱신
+                if (!this.gentooSessionData.utm) {
+                    this.gentooSessionData.utm = {};
+                }
+                if (props.utm.tp !== undefined) {
+                    this.gentooSessionData.utm.tp = props.utm.tp;
+                }
+                if (props.utm.transitionPage !== undefined) {
+                    this.gentooSessionData.utm.transitionPage = props.utm.transitionPage;
+                }
             }
         } else {
-            this.gentooSessionData.utm = this.utm;
+            this.gentooSessionData.utm = props.utm;
         }
+        this.utm = JSON.parse(JSON.stringify(this.gentooSessionData.utm));
         this.chatUserId = this.gentooSessionData?.cuid || null;
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();

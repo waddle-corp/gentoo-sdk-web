@@ -42,6 +42,7 @@ class FloatingButton {
         this.partnerId = props.partnerId;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
+        // 단, transitionPage(tp)는 항상 최신 값으로 갱신
         if (props.utm && typeof props.utm === 'object') {
             const keysToCheck = Object.keys(props.utm).filter(key => key !== 'tp' && key !== 'transitionPage');
             const allEmpty = keysToCheck.every(key => {
@@ -50,6 +51,17 @@ class FloatingButton {
             });
             if (!allEmpty) {
                 this.gentooSessionData.utm = props.utm;
+            } else {
+                // 다른 키들은 비어있지만 transitionPage는 항상 갱신
+                if (!this.gentooSessionData.utm) {
+                    this.gentooSessionData.utm = {};
+                }
+                if (props.utm.tp !== undefined) {
+                    this.gentooSessionData.utm.tp = props.utm.tp;
+                }
+                if (props.utm.transitionPage !== undefined) {
+                    this.gentooSessionData.utm.transitionPage = props.utm.transitionPage;
+                }
             }
         } else {
             this.gentooSessionData.utm = props.utm;
