@@ -50,8 +50,7 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.fastfivePartnerId = '67615284c5ff44110dbc6613';
         this.isFastfive = window.location.hostname.includes('fastfive.co.kr') || this.partnerId === this.fastfivePartnerId;
-        // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
-        this.isDevFastfiveHost = true;
+        this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
         this.fastfiveFloatingVariant = this.getFastfiveFloatingVariant();
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
