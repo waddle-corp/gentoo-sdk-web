@@ -7,6 +7,7 @@ import {
     postChatEventLogLegacy
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
+import Ff_fab_variantA from '../public/Ff_fab_variantA.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 
 
@@ -47,6 +48,11 @@ class FloatingButton {
         this.partnerType = props.partnerType || "gentoo";
         this.partnerId = props.partnerId;
         this.authCode = props.authCode;
+        this.fastfivePartnerId = '67615284c5ff44110dbc6613';
+        this.isFastfive = window.location.hostname.includes('fastfive.co.kr') || this.partnerId === this.fastfivePartnerId;
+        // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
+        this.isDevFastfiveHost = true;
+        this.fastfiveFloatingVariant = this.getFastfiveFloatingVariant();
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
@@ -113,6 +119,7 @@ class FloatingButton {
             return null;
         }
 
+        // fbclid 쿠키 가져오기 for fastfive
         this.fbclid = gentooGetCookie('_fbc');
 
 
@@ -145,6 +152,18 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
+    }
+
+    getFastfiveFloatingVariant() {
+        if (!(this.isDevFastfiveHost && this.isFastfive)) return null;
+        const lastDigitMatch = String(this.authCode).match(/(\d)(?!.*\d)/);
+        if (!lastDigitMatch) return "Control";
+        return Number(lastDigitMatch[1]) % 2 === 0 ? "VariantA" : "Control";
+    }
+
+    getFastfiveFloatingAsset(defaultAsset) {
+        if (!(this.isDevFastfiveHost && this.isFastfive)) return defaultAsset;
+        return this.fastfiveFloatingVariant === "VariantA" ? Ff_fab_variantA : Ff_fab_nopad;
     }
 
     async init(params) {
@@ -192,7 +211,7 @@ class FloatingButton {
             // if (!this.floatingData) {
             //     throw new Error("Failed to fetch floating data");
             // }
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}&variant=${this.fastfiveFloatingVariant}`;
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
@@ -357,13 +376,14 @@ class FloatingButton {
             const avatarAsset = this.floatingAvatar?.floatingAsset;
             this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
             const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
+            const floatingAssetForRender = this.getFastfiveFloatingAsset(selectedAsset);
             if (selectedAsset?.includes('lottie')) {
                 const player = document.createElement('dotlottie-wc');
                 player.setAttribute('autoplay', '');
                 player.setAttribute('loop', '');
                 player.setAttribute('mode', 'normal');
                 // bootConfig 우선 순위로 변경 - 단, bootConfig가 default.lottie 라면 floatingAvatar 적용
-                player.setAttribute('src', this.partnerId === '67615284c5ff44110dbc6613' ? Ff_fab_nopad : selectedAsset);
+                player.setAttribute('src', floatingAssetForRender);
 
                 // player.style.width = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
                 // player.style.height = this.floatingZoom ? '120px' : this.isSmallResolution ? '68px' : '94px';
@@ -409,7 +429,7 @@ class FloatingButton {
                 this.button.className = `floating-button-common`;
             }
             this.button.type = "button";
-            this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
+            this.button.style.backgroundImage = `url(${floatingAssetForRender})`;
             // Append button first (or placeholder for dotLottiePlayer)
             if (!this.dotLottiePlayer) {
                 this.buttonContainer.appendChild(this.button);
@@ -576,7 +596,7 @@ class FloatingButton {
                 }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
-                    this.eventCallback.click();
+                    this.eventCallback.click({ variant: this.fastfiveFloatingVariant });
                 }
             } else {
                 this.hideChat(
@@ -591,7 +611,8 @@ class FloatingButton {
                     } else {
                         this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : null}`;
                     }
-                    this.button.style.backgroundImage = `url(${this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset})`;
+                    const selectedAsset = this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset;
+                    this.button.style.backgroundImage = `url(${this.getFastfiveFloatingAsset(selectedAsset)})`;
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
