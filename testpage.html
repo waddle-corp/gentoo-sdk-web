@@ -36,8 +36,9 @@
         // Initialize GentooIO parameters
         GentooIO('boot', {
             udid: 'test-udid', // optional, only for dlst
-            authCode: 'test-auth-code',
-            partnerId: '68f6d753165ff8db3d070faf', // product team test dev
+            authCode: '1231231322',
+            // partnerId: '68f6d753165ff8db3d070faf', // product team test dev
+            partnerId: '67615284c5ff44110dbc6613', // fastfive prod
             // partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
             // partnerId: '69310e7775aff78bb3569681', // sanc dev
             itemId: '', // optional, only @PRODUCT_DETAIL page
@@ -75,8 +76,8 @@
         });
 
         GentooIO('getGentooClickEvent', {
-            callback: () => {
-                console.log('getGentooClickEvent called');
+            callback: (params) => {
+                console.log('getGentooClickEvent called', params);
             }
         });
 
