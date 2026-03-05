@@ -50,7 +50,6 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.fastfivePartnerId = '67615284c5ff44110dbc6613';
         this.isFastfive = window.location.hostname.includes('fastfive.co.kr') || this.partnerId === this.fastfivePartnerId;
-        console.log('isFastfive', this.isFastfive);
         // for fastfive dev test
         // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
         this.fastfiveFloatingVariant = this.getFastfiveFloatingVariant();
@@ -156,7 +155,6 @@ class FloatingButton {
     }
 
     getFastfiveFloatingVariant() {
-        console.log('getFastfiveFloatingVariant', this.isFastfive, this.authCode);
         if (!this.isFastfive) return null;
         const lastDigitMatch = String(this.authCode).match(/(\d)(?!.*\d)/);
         if (!lastDigitMatch) return "Control";
