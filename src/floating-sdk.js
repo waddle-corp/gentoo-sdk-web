@@ -50,7 +50,8 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.fastfivePartnerId = '67615284c5ff44110dbc6613';
         this.isFastfive = window.location.hostname.includes('fastfive.co.kr') || this.partnerId === this.fastfivePartnerId;
-        this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
+        // for fastfive dev test
+        // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
         this.fastfiveFloatingVariant = this.getFastfiveFloatingVariant();
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
@@ -154,14 +155,14 @@ class FloatingButton {
     }
 
     getFastfiveFloatingVariant() {
-        if (!(this.isDevFastfiveHost && this.isFastfive)) return null;
+        if (!this.isFastfive) return null;
         const lastDigitMatch = String(this.authCode).match(/(\d)(?!.*\d)/);
         if (!lastDigitMatch) return "Control";
         return Number(lastDigitMatch[1]) % 2 === 0 ? "VariantA" : "Control";
     }
 
     getFastfiveFloatingAsset(defaultAsset) {
-        if (!(this.isDevFastfiveHost && this.isFastfive)) return defaultAsset;
+        if (!this.isFastfive) return defaultAsset;
         return this.fastfiveFloatingVariant === "VariantA" ? Ff_fab_variantA : Ff_fab_nopad;
     }
 
