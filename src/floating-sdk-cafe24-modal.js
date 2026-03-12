@@ -11,6 +11,7 @@ import {
 import { createUIElementsModal } from './utils/createUIElementsModal';
 import {
     injectLottie,
+    injectLottiePinned,
     deleteViewport,
     injectViewport,
     logWindowWidth,
@@ -214,7 +215,7 @@ class FloatingButton {
             return;
         }
 
-        await injectLottie(document);
+        await injectLottiePinned(document);
 
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false } = params;
