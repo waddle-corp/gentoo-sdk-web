@@ -1,6 +1,7 @@
 import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
 import { 
     updateFloatingContainerPosition, 
+    updateIframeHeightByFooter,
     addLetter,
     logWindowWidth,
     injectViewport,
@@ -563,6 +564,7 @@ export const setupEventListenersModal = (context, position) => {
         context.browserWidth = logWindowWidth(window);
         context.isSmallResolution = context.browserWidth < 601;
         updateFloatingContainerPosition(context, position); // Update position on resize
+        updateIframeHeightByFooter(context);
     });
 
     window?.addEventListener('popstate', () => {

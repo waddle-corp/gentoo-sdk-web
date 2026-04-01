@@ -385,6 +385,7 @@ class FloatingButton {
         }
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
+        requestAnimationFrame(() => this.updateIframeHeightByFooter());
 
         this.logEventLegacy({
             eventCategory: "SDKFloatingRendered",
@@ -697,6 +698,7 @@ class FloatingButton {
             this.browserWidth = this.logWindowWidth();
             this.isSmallResolution = this.browserWidth < 601;
             this.updateFloatingContainerPosition(position); // Update position on resize
+            this.updateIframeHeightByFooter();
         });
 
         window?.addEventListener('popstate', () => {
@@ -717,6 +719,20 @@ class FloatingButton {
                 : (position?.web?.right || this.chatbotData.position.right)
                 }px`;
         }
+    }
+
+    updateIframeHeightByFooter() {
+        if (!this.warningActivated || !this.iframe || !this.footer || !this.chatHeader) return;
+
+        const headerHeight = this.chatHeader.offsetHeight || (this.isSmallResolution ? 44 : 56);
+        const footerHeight = this.footer.offsetHeight;
+
+        if (!footerHeight) {
+            requestAnimationFrame(() => this.updateIframeHeightByFooter());
+            return;
+        }
+
+        this.iframe.style.height = `calc(100% - ${headerHeight + footerHeight}px)`;
     }
 
     openChat() {

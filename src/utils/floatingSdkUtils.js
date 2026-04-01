@@ -11,6 +11,46 @@ export function updateFloatingContainerPosition(context, position) {
     }
 }
 
+export function updateIframeHeightByFooter(context) {
+    if (!context?.warningActivated || !context?.iframe || !context?.footer || !context?.chatHeader) return;
+
+    const headerHeight = context.chatHeader.offsetHeight || (context.isSmallResolution ? 44 : 56);
+    const footerHeight = context.footer.offsetHeight;
+
+    if (!footerHeight) {
+        requestAnimationFrame(() => updateIframeHeightByFooter(context));
+        return;
+    }
+
+    context.iframe.style.height = `calc(100% - ${headerHeight + footerHeight}px)`;
+}
+
+export function setupWarningLayoutObserver(context, document) {
+    if (!context?.warningActivated || !context?.footer || !context?.chatHeader) return;
+
+    if (context.warningLayoutObserver) {
+        context.warningLayoutObserver.disconnect();
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+        const observer = new ResizeObserver(() => updateIframeHeightByFooter(context));
+        observer.observe(context.footer);
+        observer.observe(context.chatHeader);
+        if (context.footerText) observer.observe(context.footerText);
+        context.warningLayoutObserver = observer;
+    }
+
+    if (document?.fonts?.ready) {
+        document.fonts.ready
+            .then(() => updateIframeHeightByFooter(context))
+            .catch(() => {});
+    }
+
+    requestAnimationFrame(() => updateIframeHeightByFooter(context));
+    setTimeout(() => updateIframeHeightByFooter(context), 120);
+    setTimeout(() => updateIframeHeightByFooter(context), 320);
+}
+
 export function addLetter(context, floatingMessage, expandedText, isDestroyed, i = 0) {
     if (!floatingMessage || floatingMessage.length === 0) return;
     context.floatingMessage = floatingMessage;

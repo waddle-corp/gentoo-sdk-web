@@ -3,6 +3,8 @@ import '../floating-sdk-modal.css';
 import { setupEventListenersModal } from "./setupEventListenersModal";
 import {
     updateFloatingContainerPosition,
+    updateIframeHeightByFooter,
+    setupWarningLayoutObserver,
     addLetter,
     checkSDKExists,
     applyCanvasObjectFit
@@ -284,6 +286,8 @@ export const createUIElementsModal = (
     }
     document.body.appendChild(context.dimmedBackground);
     document.body.appendChild(context.iframeContainer);
+    requestAnimationFrame(() => updateIframeHeightByFooter(context));
+    setupWarningLayoutObserver(context, document);
 
     logFloatingRendered(context);
 

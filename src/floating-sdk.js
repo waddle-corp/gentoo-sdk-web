@@ -13,6 +13,8 @@ import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 
 class FloatingButton {
     constructor(props) {
+        this.overrideWarningPartnerId = '68f6d753165ff8db3d070faf';
+        this.overrideWarningMessage = '젠투와의 모든 대화는 AI가 제공하는 일반 정보로, 참고용으로만 활용해주세요! 구매 결정 전 제품의 표기 내용 확인을 권장드립니다.';
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
         this.allowedDomainsForIframe = [
             'admin.shopify.com',
@@ -140,7 +142,9 @@ class FloatingButton {
                 this.floatingAvatar = res?.avatar || null;
                 const warningMessageData = this.chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
                 const floatingZoom = this.chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
-                this.warningMessage = warningMessageData?.extra?.message;
+                this.warningMessage = this.partnerId === this.overrideWarningPartnerId
+                    ? this.overrideWarningMessage
+                    : warningMessageData?.extra?.message;
                 this.warningActivated = warningMessageData?.activated;
                 this.floatingZoom = floatingZoom?.activated;
             }),
@@ -327,6 +331,7 @@ class FloatingButton {
         }
         parentElem.appendChild(this.dimmedBackground);
         parentElem.appendChild(this.iframeContainer);
+        requestAnimationFrame(() => this.updateIframeHeightByFooter());
 
         setTimeout(() => {
             // gentoo static parameters to iframe
@@ -772,6 +777,7 @@ class FloatingButton {
             this.browserWidth = this.logWindowWidth();
             this.isSmallResolution = this.browserWidth < 601;
             this.updateFloatingContainerPosition(position); // Update position on resize
+            this.updateIframeHeightByFooter();
         });
 
         window?.addEventListener('popstate', () => {
@@ -797,6 +803,20 @@ class FloatingButton {
             //     this.floatingContainer.style.right = Math.max(setUpPositionRightValue - 28, 0) + 'px';
             // }
         }
+    }
+
+    updateIframeHeightByFooter() {
+        if (!this.warningActivated || !this.iframe || !this.footer || !this.chatHeader) return;
+
+        const headerHeight = this.chatHeader.offsetHeight || (this.isSmallResolution ? 44 : 56);
+        const footerHeight = this.footer.offsetHeight;
+
+        if (!footerHeight) {
+            requestAnimationFrame(() => this.updateIframeHeightByFooter());
+            return;
+        }
+
+        this.iframe.style.height = `calc(100% - ${headerHeight + footerHeight}px)`;
     }
 
     updateFloatingContainerVisibility(visibility = 'flex') {
