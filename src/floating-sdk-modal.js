@@ -22,7 +22,7 @@ import {
 /* excludes fastfive.co.kr due to pre-question scenario */
 class FloatingButton {
     constructor(props) {
-        this.overrideWarningPartnerId = '68f6d753165ff8db3d070faf';
+        this.overrideWarningPartnerId = '67f487a8db6583cc1d270858';
         this.overrideWarningMessage = '젠투와의 모든 대화는 AI가 제공하는 일반 정보로, 참고용으로만 활용해주세요! 구매 결정 전 제품의 표기 내용 확인을 권장드립니다.';
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
         this.allowedDomainsForIframe = [
