@@ -24,13 +24,9 @@
             var isFastfive = hostname.includes('fastfive.co.kr') || ptid === '67615284c5ff44110dbc6613';
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
-            // source = isMobile && !isFastfive 
-            // ? `https://sdk.gentooai.com/dist/gentoo-modal/floating-modal.js` 
-            // : 'https://sdk.gentooai.com/dist/gentoo/floating.js';
-            // s.src = source;
             source = isMobile && !isFastfive 
-            ? `./dist/gentoo-modal/floating-modal.js` 
-            : './dist/gentoo/floating.js';
+            ? `https://dev-sdk.gentooai.com/dist/gentoo-modal/floating-modal.js` 
+            : 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js';
             s.src = source;
             // s.src = "https://sdk.gentooai.com/dist/gentoo/floating.js"; 
             // s.src = 'https://dev-sdk.gentooai.com/dist/gentoo/floating.js'; // dev
