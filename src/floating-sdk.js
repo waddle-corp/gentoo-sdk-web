@@ -792,10 +792,9 @@ class FloatingButton {
             const directions = ['top', 'bottom', 'left', 'right'];
             const platformPos = this.isSmallResolution ? position?.mobile : position?.web;
             const fallback = this.isSmallResolution ? this.chatbotData.mobilePosition : this.chatbotData.position;
-            const pos = platformPos ?? fallback;
 
             directions.forEach((dir) => {
-                const value = pos?.[dir];
+                const value = platformPos?.[dir] ?? fallback?.[dir];
                 this.floatingContainer.style[dir] = value != null ? `${value}px` : 'auto';
             });
         }
