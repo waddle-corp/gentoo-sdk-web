@@ -767,14 +767,15 @@ class FloatingButton {
 
     updateFloatingContainerPosition(position) {
         if (this.floatingContainer) {
-            this.floatingContainer.style.bottom = `${this.isSmallResolution
-                ? (position?.mobile?.bottom || this.chatbotData.mobilePosition.bottom)
-                : (position?.web?.bottom || this.chatbotData.position.bottom)
-                }px`;
-            this.floatingContainer.style.right = `${this.isSmallResolution
-                ? (position?.mobile?.right || this.chatbotData.mobilePosition.right)
-                : (position?.web?.right || this.chatbotData.position.right)
-                }px`;
+            const directions = ['top', 'bottom', 'left', 'right'];
+            const platformPos = this.isSmallResolution ? position?.mobile : position?.web;
+            const fallback = this.isSmallResolution ? this.chatbotData.mobilePosition : this.chatbotData.position;
+            const pos = platformPos ?? fallback;
+
+            directions.forEach((dir) => {
+                const value = pos?.[dir];
+                this.floatingContainer.style[dir] = value != null ? `${value}px` : 'auto';
+            });
         }
     }
 
