@@ -789,19 +789,15 @@ class FloatingButton {
 
     updateFloatingContainerPosition(position) {
         if (this.floatingContainer) {
-            this.floatingContainer.style.bottom = `${this.isSmallResolution
-                ? (position?.mobile?.bottom || this.chatbotData.mobilePosition.bottom)
-                : (position?.web?.bottom || this.chatbotData.position.bottom)
-                }px`;
-            this.floatingContainer.style.right = `${this.isSmallResolution
-                ? (position?.mobile?.right || this.chatbotData.mobilePosition.right)
-                : (position?.web?.right || this.chatbotData.position.right)
-                }px`;
-            // // custom branch for fastfive
-            // if (this.partnerId === '67615284c5ff44110dbc6613' && !this.isSmallResolution && this.browserWidth < 1200) {
-            //     const setUpPositionRightValue = position?.web?.right || this.chatbotData.position.right;
-            //     this.floatingContainer.style.right = Math.max(setUpPositionRightValue - 28, 0) + 'px';
-            // }
+            const directions = ['top', 'bottom', 'left', 'right'];
+            const platformPos = this.isSmallResolution ? position?.mobile : position?.web;
+            const fallback = this.isSmallResolution ? this.chatbotData.mobilePosition : this.chatbotData.position;
+            const pos = platformPos ?? fallback;
+
+            directions.forEach((dir) => {
+                const value = pos?.[dir];
+                this.floatingContainer.style[dir] = value != null ? `${value}px` : 'auto';
+            });
         }
     }
 

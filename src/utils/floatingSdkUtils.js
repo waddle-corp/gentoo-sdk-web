@@ -1,13 +1,14 @@
 export function updateFloatingContainerPosition(context, position) {
     if (context.floatingContainer) {
-        context.floatingContainer.style.bottom = `${context.isSmallResolution
-            ? (position?.mobile?.bottom || context.chatbotData.mobilePosition.bottom)
-            : (position?.web?.bottom || context.chatbotData.position.bottom)
-            }px`;
-        context.floatingContainer.style.right = `${context.isSmallResolution
-            ? (position?.mobile?.right || context.chatbotData.mobilePosition.right)
-            : (position?.web?.right || context.chatbotData.position.right)
-            }px`;
+        const directions = ['top', 'bottom', 'left', 'right'];
+        const platformPos = context.isSmallResolution ? position?.mobile : position?.web;
+        const fallback = context.isSmallResolution ? context.chatbotData.mobilePosition : context.chatbotData.position;
+        const pos = platformPos ?? fallback;
+
+        directions.forEach((dir) => {
+            const value = pos?.[dir];
+            context.floatingContainer.style[dir] = value != null ? `${value}px` : 'auto';
+        });
     }
 }
 
