@@ -3,10 +3,9 @@ export function updateFloatingContainerPosition(context, position) {
         const directions = ['top', 'bottom', 'left', 'right'];
         const platformPos = context.isSmallResolution ? position?.mobile : position?.web;
         const fallback = context.isSmallResolution ? context.chatbotData.mobilePosition : context.chatbotData.position;
-        const pos = platformPos ?? fallback;
 
         directions.forEach((dir) => {
-            const value = pos?.[dir];
+            const value = platformPos?.[dir] ?? fallback?.[dir];
             context.floatingContainer.style[dir] = value != null ? `${value}px` : 'auto';
         });
     }
