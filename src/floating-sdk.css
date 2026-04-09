@@ -393,6 +393,7 @@
     width: 100%;
     height: calc(100% - 44px);
     border: none;
+    display: block;
 
     @media screen and (min-width: 600px) {
         border-radius: 0 0 10px 10px;
@@ -403,6 +404,7 @@
     width: 100%;
     height: calc(100% - 56px);
     border: none;
+    display: block;
 
     @media screen and (min-width: 600px) {
         border-radius: 0 0 10px 10px;
