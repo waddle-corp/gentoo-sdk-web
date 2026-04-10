@@ -7,7 +7,6 @@ import {
     postChatEventLogLegacy
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
-import Ff_fab_variantA from '../public/Ff_fab_variantA.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 
 
@@ -54,7 +53,6 @@ class FloatingButton {
         this.isFastfive = window.location.hostname.includes('fastfive.co.kr') || this.partnerId === this.fastfivePartnerId;
         // for fastfive dev test
         // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
-        this.fastfiveFloatingVariant = this.getFastfiveFloatingVariant();
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
@@ -158,18 +156,6 @@ class FloatingButton {
         });
     }
 
-    getFastfiveFloatingVariant() {
-        if (!this.isFastfive) return null;
-        const lastDigitMatch = String(this.authCode).match(/(\d)(?!.*\d)/);
-        if (!lastDigitMatch) return "Control";
-        return Number(lastDigitMatch[1]) % 2 === 0 ? "VariantA" : "Control";
-    }
-
-    getFastfiveFloatingAsset(defaultAsset) {
-        if (!this.isFastfive) return defaultAsset;
-        return this.fastfiveFloatingVariant === "VariantA" ? Ff_fab_variantA : Ff_fab_nopad;
-    }
-
     async init(params) {
         if (window.__GentooInited !== null && window.__GentooInited !== undefined) {
             console.warn("GentooIO init called twice, skipping second call.");
@@ -215,7 +201,7 @@ class FloatingButton {
             // if (!this.floatingData) {
             //     throw new Error("Failed to fetch floating data");
             // }
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}&variant=${this.fastfiveFloatingVariant}`;
+            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
@@ -381,7 +367,7 @@ class FloatingButton {
             const avatarAsset = this.floatingAvatar?.floatingAsset;
             this.useBootConfigFloatingImage = !!(bootImage && !bootImage.includes('default.lottie'));
             const selectedAsset = this.useBootConfigFloatingImage ? bootImage : avatarAsset;
-            const floatingAssetForRender = this.getFastfiveFloatingAsset(selectedAsset);
+            const floatingAssetForRender = this.isFastfive ? Ff_fab_nopad : selectedAsset;
             if (selectedAsset?.includes('lottie')) {
                 const player = document.createElement('dotlottie-wc');
                 player.setAttribute('autoplay', '');
@@ -610,7 +596,7 @@ class FloatingButton {
                 }
                 this.openChat(e, this.elems);
                 if (this.eventCallback.click !== null) {
-                    this.eventCallback.click({ variant: this.fastfiveFloatingVariant });
+                    this.eventCallback.click();
                 }
             } else {
                 this.hideChat(
@@ -626,7 +612,7 @@ class FloatingButton {
                         this.button.className = `floating-button-common ${this.floatingZoom && !this.partnerId === '67615284c5ff44110dbc6613' ? 'button-zoom' : null}`;
                     }
                     const selectedAsset = this.useBootConfigFloatingImage ? this.bootConfig?.floating?.button?.imageUrl : this.floatingAvatar?.floatingAsset;
-                    this.button.style.backgroundImage = `url(${this.getFastfiveFloatingAsset(selectedAsset)})`;
+                    this.button.style.backgroundImage = `url(${this.isFastfive ? Ff_fab_nopad : selectedAsset})`;
                     if (this.dotLottiePlayer) {
                         this.dotLottiePlayer.classList.remove('hide');
                     }
