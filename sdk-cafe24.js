@@ -21,8 +21,8 @@
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
             source = isMobile 
-                ? `https://sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js` 
-                : 'https://sdk.gentooai.com/floating-button-sdk-cafe24.js';
+                ? `https://dev-sdk.gentooai.com/dist/cafe24-modal/floating-cafe24-modal.js` 
+                : 'https://dev-sdk.gentooai.com/floating-button-sdk-cafe24.js';
             s.src = source;
             // s.src = "./floating-button-sdk-cafe24.js"; 
             s.onload = () => { 
