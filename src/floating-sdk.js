@@ -392,10 +392,6 @@ class FloatingButton {
             // parentElem이 document.body가 아닐 때(즉, parentClassName이 지정되어 실제 요소를 찾은 경우)
             // floating-container를 부모 기준 상대 배치로 전환. fastfive는 기존 fixed 동작 유지.
             if (parentElem !== document.body && !this.isFastfive) {
-                const parentPosition = window.getComputedStyle(parentElem).position;
-                if (parentPosition === 'static') {
-                    parentElem.style.position = 'relative';
-                }
                 this.floatingContainer.style.position = 'absolute';
             }
             this.updateFloatingContainerPosition(position); // Set initial position
