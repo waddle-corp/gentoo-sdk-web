@@ -87,6 +87,9 @@ class Logger {
                         if (payload.type === 'healthCheck') {
                             sendEventLogShopify(payload.event, this.basicPayload, { connectionId: payload.connectionId });
                         }
+                        if (payload.type === 'hypoEvent') {
+                            sendEventLogShopify(payload.event, this.basicPayload, payload?.hypoData);
+                        }
                     }
                 }
 
