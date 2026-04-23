@@ -76,8 +76,43 @@ class Logger {
                 } else if (this.searchKeyword) {
                     sendEventLogShopify("PageTransition", this.basicPayload, { searchKeyword: this.searchKeyword });
                 } else {
-                    sendEventLogShopify("PageTransition", this.basicPayload); 
+                    sendEventLogShopify("PageTransition", this.basicPayload);
                 }
+
+                // Shopify의 필터 UI는 history.replaceState로 URL만 바꾸고 페이지 리빌드를 하지 않음.
+                // history API를 훅해서 filter.* 쿼리 파라미터 변화를 FilterChange 이벤트로 기록.
+                let lastLoggedUrl = window.location.href;
+                const emitLocationChange = () => {
+                    if (window.location.href === lastLoggedUrl) return;
+                    lastLoggedUrl = window.location.href;
+
+                    const url = new URL(window.location.href);
+                    const filters = {};
+                    for (const [k, v] of url.searchParams.entries()) {
+                        if (k.startsWith('filter.')) {
+                            (filters[k] ||= []).push(v);
+                        }
+                    }
+                    const pageNumber = url.searchParams.get('page') || null;
+                    this.basicPayload.pageLocation = url.href;
+                    this.basicPayload.pageNumber = pageNumber;
+
+                    if (Object.keys(filters).length > 0) {
+                        sendEventLogShopify('FilterUsage', this.basicPayload, { filters, pageNumber });
+                    }
+                };
+
+                // popstate는 제외: 테마가 재fetch 핸들러를 안 달아놓는 경우가 많아
+                // URL은 바뀌어도 UI 상 필터가 실제로 변경되지 않아 부정확한 로그가 발생함.
+                ['pushState', 'replaceState'].forEach((m) => {
+                    const original = history[m];
+                    history[m] = function (...args) {
+                        const ret = original.apply(this, args);
+                        window.dispatchEvent(new Event('gentoo:locationchange'));
+                        return ret;
+                    };
+                });
+                window.addEventListener('gentoo:locationchange', emitLocationChange);
 
                 window.GentooLogListener = {
                     log: (payload) => {
