@@ -163,6 +163,9 @@ class FloatingButton {
                     this.floatingZoom = floatingZoom?.activated;
                     const csInquiry = chatbotData?.experimentalData?.find(item => item.key === "csInquiry");
                     this.csInquiry = csInquiry?.activated;
+                    const memberOnlyAccessData = chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                    this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                    this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                     resolve();
                 })
                 .catch(error => {

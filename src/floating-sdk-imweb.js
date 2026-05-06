@@ -9,6 +9,7 @@ import {
     generateGuestUserToken
 } from './apis/chatConfig';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
+import { buildGuestAccessBlockView, isGuestAccessBlocked } from './utils/guestAccessBlock';
 
 class FloatingButton {
     constructor(props) {
@@ -136,7 +137,13 @@ class FloatingButton {
                 }
             }
 
-            getImwebPartnerId(imwebMallUnitCode)
+            if (props.testPartnerId) {
+                console.warn('[Gentoo SDK] testPartnerId is for testing only — skipping getImwebPartnerId lookup');
+            }
+            const partnerIdPromise = props.testPartnerId
+                ? Promise.resolve(props.testPartnerId)
+                : getImwebPartnerId(imwebMallUnitCode);
+            partnerIdPromise
                 .then((partnerId) => {
                     this.imwebUserId = imwebMemberUid;
                     this.partnerId = partnerId;
@@ -163,6 +170,9 @@ class FloatingButton {
                     this.floatingAvatar = chatbotData?.avatar;
                     const floatingZoom = chatbotData?.experimentalData?.find(item => item.key === "floatingZoom");
                     this.floatingZoom = floatingZoom?.activated;
+                    const memberOnlyAccessData = chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                    this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                    this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                     resolve();
                 })
                 .catch(error => {
@@ -279,7 +289,11 @@ class FloatingButton {
         this.footerText.className = "chat-footer-text";
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+        if (isGuestAccessBlocked(this)) {
+            this.iframe.style.display = 'none';
+        } else {
+            this.iframe.src = this.chatUrl;
+        }
 
         // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
         const bootImage = this.bootConfig?.floating?.button?.imageUrl;
@@ -338,7 +352,9 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (this.warningActivated) {
+        if (isGuestAccessBlocked(this)) {
+            this.iframeContainer.appendChild(buildGuestAccessBlockView(this.memberOnlyAccessLoginUrl, { isSmallResolution: this.isSmallResolution }));
+        } else if (this.warningActivated) {
             this.footerText.innerText = this.warningMessage;
             this.iframeContainer.appendChild(this.footer);
         }
