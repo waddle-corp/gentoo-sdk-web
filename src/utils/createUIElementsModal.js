@@ -9,6 +9,7 @@ import {
     checkSDKExists,
     applyCanvasObjectFit
 } from "./floatingSdkUtils";
+import { buildGuestAccessBlockView, isGuestAccessBlocked } from "./guestAccessBlock";
 
 // --- Small helpers for readability ---
 const hasValidChatbotData = (chatbotData) => {
@@ -150,7 +151,11 @@ export const createUIElementsModal = (
 
     /* [Iframe] */
     context.iframe = document.createElement("iframe");
-    context.iframe.src = context.chatUrl;
+    if (isGuestAccessBlocked(context)) {
+        context.iframe.style.display = 'none';
+    } else {
+        context.iframe.src = context.chatUrl;
+    }
 
     /* [Chat Header] */
     context.chatHeader = document.createElement("div");
@@ -259,7 +264,9 @@ export const createUIElementsModal = (
             context.examFloatingGroup.appendChild(examFloatingButton);
         });
         context.inputContainer.appendChild(context.examFloatingGroup);
-        document.body.appendChild(context.inputContainer);
+        if (!isGuestAccessBlocked(context)) {
+            document.body.appendChild(context.inputContainer);
+        }
     } else {
         /* 데스크탑 채팅창 일반 UI 생성 */
         /* [Iframe] */
@@ -280,7 +287,9 @@ export const createUIElementsModal = (
 
     context.iframeContainer.appendChild(context.chatHeader);
     context.iframeContainer.appendChild(context.iframe);
-    if (context.warningActivated) {
+    if (isGuestAccessBlocked(context)) {
+        context.iframeContainer.appendChild(buildGuestAccessBlockView(context.memberOnlyAccessLoginUrl, { isSmallResolution: context.isSmallResolution, lang: context.lang }));
+    } else if (context.warningActivated) {
         context.footerText.innerText = context.warningMessage;
         context.iframeContainer.appendChild(context.footer);
     }

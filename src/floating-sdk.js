@@ -397,6 +397,7 @@ class FloatingButton {
                     parentElem.style.position = 'relative';
                 }
                 this.floatingContainer.style.position = 'absolute';
+                this.floatingContainer.style.width = 'max-content';
             }
             this.updateFloatingContainerPosition(position); // Set initial position
             this.buttonContainer = document.createElement("div");

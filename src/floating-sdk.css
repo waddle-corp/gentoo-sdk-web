@@ -72,6 +72,7 @@
 .button-container {
     width: 94px;
     height: 94px;
+    flex-shrink: 0;
     /* padding: 8px; */
 }
 

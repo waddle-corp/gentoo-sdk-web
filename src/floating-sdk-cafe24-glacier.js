@@ -1,11 +1,12 @@
 import './floating-sdk-cafe24-glacier.css';
-import { 
-    getChatbotData, 
-    postChatUserId, 
-    getFloatingData, 
-    getPartnerId, 
-    postChatEventLog 
+import {
+    getChatbotData,
+    postChatUserId,
+    getFloatingData,
+    getPartnerId,
+    postChatEventLog
 } from './apis/chatConfig';
+import { buildGuestAccessBlockView, isGuestAccessBlocked } from './utils/guestAccessBlock';
 
 class FloatingButton {
     constructor(props) {
@@ -115,8 +116,10 @@ class FloatingButton {
                     .then(res => {
                         if (res.id.member_id) {
                             this.cafe24UserId = res.id.member_id;
+                            this.userType = "member";
                         } else {
                             this.cafe24UserId = res.id['guest_id'];
+                            this.userType = "guest";
                         }
 
                         // 1. chatUserId 먼저 받아오기 (for floating/chatbot AB test)
@@ -142,6 +145,9 @@ class FloatingButton {
                         this.warningActivated = warningMessageData?.activated;
                         this.floatingZoom = floatingZoom?.activated;
                         this.floatingAvatar = chatbotData?.avatar;
+                        const memberOnlyAccessData = chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                        this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                        this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                         resolve();
                     })
                     .catch(error => {
@@ -255,7 +261,11 @@ class FloatingButton {
         this.footerText.className = "chat-footer-text";
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+        if (isGuestAccessBlocked(this)) {
+            this.iframe.style.display = 'none';
+        } else {
+            this.iframe.src = this.chatUrl;
+        }
         if (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie')) {
             const player = document.createElement('dotlottie-wc');
             player.setAttribute('autoplay', '');
@@ -305,7 +315,9 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (this.warningActivated) {
+        if (isGuestAccessBlocked(this)) {
+            this.iframeContainer.appendChild(buildGuestAccessBlockView(this.memberOnlyAccessLoginUrl, { isSmallResolution: this.isSmallResolution }));
+        } else if (this.warningActivated) {
             this.footerText.innerText = this.warningMessage;
             this.iframeContainer.appendChild(this.footer);
         }
