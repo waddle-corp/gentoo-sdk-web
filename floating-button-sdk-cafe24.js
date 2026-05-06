@@ -201,6 +201,9 @@ class FloatingButton {
                         this.warningActivated = warningMessageData?.activated;
                         this.floatingZoom = floatingZoom?.activated;
                         this.floatingAvatar = chatbotData?.avatar;
+                        const memberOnlyAccessData = chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                        this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                        this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                         resolve();
                     })
                     .catch(error => {
@@ -320,7 +323,11 @@ class FloatingButton {
         this.footerText.className = "chat-footer-text";
         this.footer.appendChild(this.footerText);
         this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl;
+        if (this.isGuestAccessBlocked()) {
+            this.iframe.style.display = 'none';
+        } else {
+            this.iframe.src = this.chatUrl;
+        }
 
         // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
         const bootImage = this.bootConfig?.floating?.button?.imageUrl;
@@ -379,7 +386,9 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (this.warningActivated) {
+        if (this.isGuestAccessBlocked()) {
+            this.iframeContainer.appendChild(this.buildGuestAccessBlockView());
+        } else if (this.warningActivated) {
             this.footerText.innerText = this.warningMessage;
             this.iframeContainer.appendChild(this.footer);
         }
@@ -803,6 +812,38 @@ class FloatingButton {
         this.button = null;
         this.expandedButtonWrapper = null;
         this.iframeContainer = null;
+    }
+
+    isGuestAccessBlocked() {
+        return this.userType === 'guest' && Boolean(this.memberOnlyAccessActivated);
+    }
+
+    buildGuestAccessBlockView() {
+        const wrapper = document.createElement('div');
+        wrapper.className = `guest-access-block${this.isSmallResolution ? ' guest-access-block-md' : ''}`;
+        wrapper.setAttribute('data-gentoo-sdk', 'true');
+
+        const title = document.createElement('p');
+        title.className = 'guest-access-block-title';
+        title.innerText = '로그인 후 사용 가능합니다';
+
+        const description = document.createElement('p');
+        description.className = 'guest-access-block-description';
+        description.innerText = '로그인하시면 AI 챗봇을 이용하실 수 있어요.';
+
+        const loginButton = document.createElement('button');
+        loginButton.type = 'button';
+        loginButton.className = 'guest-access-block-login-button';
+        loginButton.innerText = '로그인 하기';
+        const loginUrl = this.memberOnlyAccessLoginUrl;
+        loginButton.addEventListener('click', () => {
+            window.location.href = loginUrl || window.location.href;
+        });
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(description);
+        wrapper.appendChild(loginButton);
+        return wrapper;
     }
 
     destroy() {

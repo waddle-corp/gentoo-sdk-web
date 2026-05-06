@@ -288,7 +288,7 @@ export const createUIElementsModal = (
     context.iframeContainer.appendChild(context.chatHeader);
     context.iframeContainer.appendChild(context.iframe);
     if (isGuestAccessBlocked(context)) {
-        context.iframeContainer.appendChild(buildGuestAccessBlockView(context.memberOnlyAccessLoginUrl, { isSmallResolution: context.isSmallResolution }));
+        context.iframeContainer.appendChild(buildGuestAccessBlockView(context.memberOnlyAccessLoginUrl, { isSmallResolution: context.isSmallResolution, lang: context.lang }));
     } else if (context.warningActivated) {
         context.footerText.innerText = context.warningMessage;
         context.iframeContainer.appendChild(context.footer);
