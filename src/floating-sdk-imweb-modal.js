@@ -102,7 +102,13 @@ class FloatingButton {
                 }
             }
 
-            getImwebPartnerId(imwebMallUnitCode)
+            if (props.testPartnerId) {
+                console.warn('[Gentoo SDK] testPartnerId is for testing only — skipping getImwebPartnerId lookup');
+            }
+            const partnerIdPromise = props.testPartnerId
+                ? Promise.resolve(props.testPartnerId)
+                : getImwebPartnerId(imwebMallUnitCode);
+            partnerIdPromise
                 .then((partnerId) => {
                     this.imwebUserId = imwebMemberUid;
                     this.partnerId = partnerId;
@@ -133,6 +139,9 @@ class FloatingButton {
                     this.floatingZoom = floatingZoom?.activated;
                     const csInquiry = chatbotData?.experimentalData?.find(item => item.key === "csInquiry");
                     this.csInquiry = csInquiry?.activated;
+                    const memberOnlyAccessData = chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                    this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                    this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                     resolve();
                 })
                 .catch(error => {

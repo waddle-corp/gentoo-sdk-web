@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imweb SDK Test - Guest Access Block</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #fafafa;
+        }
+
+        .test-controls {
+            background: #fff;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .test-controls h2 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+        }
+
+        .current-state {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            font-family: monospace;
+            margin-bottom: 12px;
+        }
+
+        .test-controls button {
+            padding: 10px 16px;
+            margin: 4px 8px 4px 0;
+            border: 1px solid #222;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .test-controls button.active {
+            background: #222;
+            color: #fff;
+        }
+
+        .test-controls button:hover {
+            background: #f5f5f5;
+        }
+
+        .test-controls button.active:hover {
+            background: #444;
+        }
+
+        .test-controls .desc {
+            font-size: 13px;
+            color: #666;
+            margin: 8px 0;
+        }
+
+        .sample {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sample .box {
+            background: skyblue;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .sample .box.tall {
+            height: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-controls">
+        <h2>Imweb SDK Test — Guest Access Block</h2>
+        <div class="current-state" id="state-display"></div>
+        <p class="desc">URL 쿼리 파라미터로 제어: <code>?mode=guestBlocked|guest|member</code>, <code>?partnerId=...</code> (테스트 스토어 partnerId). 로그인 URL은 백엔드 <code>experimentalData[memberOnlyAccess].value</code> 그대로 통과. 비어있으면 SDK가 현재 페이지 URL로 fallback 처리.</p>
+        <button data-mode="guestBlocked" onclick="setMode('guestBlocked')">Guest + Block ON</button>
+        <button data-mode="guest" onclick="setMode('guest')">Guest + Block OFF</button>
+        <button data-mode="member" onclick="setMode('member')">Member</button>
+        <p class="desc">검증 포인트:</p>
+        <ul class="desc">
+            <li><strong>Guest + Block ON</strong>: 플로팅 버튼 클릭 시 채팅 자리에 "로그인 후 사용 가능합니다" 화면 + "로그인 하기" 버튼이 표시</li>
+            <li><strong>Guest + Block OFF</strong>: 일반 채팅 iframe이 로드 (chat web 응답에 따라 달라질 수 있음)</li>
+            <li><strong>Member</strong>: 일반 채팅이 정상 노출, 블락 화면 없음</li>
+        </ul>
+    </div>
+
+    <div class="sample">
+        <div class="box">상품 카드 영역 (mock)</div>
+        <div class="box">콘텐츠 영역</div>
+        <div class="box tall">긴 스크롤 영역</div>
+    </div>
+
+    <script>
+        // ===== Test mode handling =====
+        const params = new URLSearchParams(window.location.search);
+        const TEST_MODE = params.get('mode') || 'guestBlocked';
+        const TEST_PARTNER_ID = params.get('partnerId') || '68f6d753165ff8db3d070faf';
+
+        document.getElementById('state-display').innerText =
+            `mode = ${TEST_MODE}    partnerId = ${TEST_PARTNER_ID}`;
+        document.querySelectorAll('[data-mode]').forEach(btn => {
+            if (btn.dataset.mode === TEST_MODE) btn.classList.add('active');
+        });
+
+        function setMode(mode) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('mode', mode);
+            // 매 전환마다 sessionStorage clear (gentooGuest, gentoo 등)
+            try { sessionStorage.clear(); } catch (e) { }
+            window.location.href = url.toString();
+        }
+
+        // ===== Imweb identity =====
+        // testPartnerId 사용으로 UNIT_CODE 기반 lookup은 스킵됨. MEMBER_UID만 게스트/회원 판별에 영향
+        window.UNIT_CODE = 'test-mall-unit-code';
+        window.MEMBER_UID = TEST_MODE === 'member' ? 'test-imweb-member-uid-001' : '';
+
+        // ===== Fetch wrapper =====
+        // chatbot/bootconfig/floating 응답에 memberOnlyAccess 주입 + 누락 필드 폴백
+        // 그 외 endpoint(api/v1/user, api/v1/event/* 등)는 real backend로 통과
+        const originalFetch = window.fetch.bind(window);
+        const ensureField = (obj, key, fallback) => { if (obj[key] == null) obj[key] = fallback; };
+        const fetchJsonOrEmpty = async (input, init) => {
+            try {
+                const resp = await originalFetch(input, init);
+                return await resp.json();
+            } catch (e) {
+                console.warn('[testImweb] real fetch failed, using fallback only', e);
+                return {};
+            }
+        };
+        const jsonResponse = (data) => new Response(
+            JSON.stringify(data),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+
+        window.fetch = async function (input, init) {
+            const url = typeof input === 'string' ? input : (input && input.url) || '';
+
+            // Chatbot data: real fetch + memberOnlyAccess 주입 + 필수 필드 폴백
+            if (url.includes('/api/v1/chat/chatbot/')) {
+                const data = await fetchJsonOrEmpty(input, init);
+                ensureField(data, 'name', 'Gentoo Test');
+                ensureField(data, 'avatar', {
+                    floatingAsset: 'https://assets.gentooai.com/sdk/sdk-floating-close.png',
+                    profileAsset: 'https://assets.gentooai.com/sdk/sdk-floating-close.png',
+                });
+                ensureField(data, 'position', { web: { bottom: 100, right: 100 }, mobile: { bottom: 60, right: 0 } });
+                ensureField(data, 'mobilePosition', { bottom: 60, right: 0 });
+                ensureField(data, 'colorCode', [{ hex: '#222' }, { hex: '#444' }, { hex: '#666' }]);
+                ensureField(data, 'examples', ['배송 문의', '환불 정책', '제품 추천']);
+                const existingLoginUrl = (data.experimentalData || []).find(item => item.key === 'memberOnlyAccess')?.value;
+                data.experimentalData = (data.experimentalData || []).filter(item => item.key !== 'memberOnlyAccess');
+                data.experimentalData.push({
+                    key: 'memberOnlyAccess',
+                    activated: TEST_MODE === 'guestBlocked',
+                    value: existingLoginUrl,
+                });
+                return jsonResponse(data);
+            }
+
+            // Boot config: real fetch + 필수 필드 폴백
+            if (url.includes('/api/sdk/boot')) {
+                const data = await fetchJsonOrEmpty(input, init);
+                ensureField(data, 'floating', {});
+                if (data.floating.isVisible !== true && data.floating.isVisible !== false) data.floating.isVisible = true;
+                ensureField(data.floating, 'button', {});
+                ensureField(data.floating.button, 'imageUrl', 'https://assets.gentooai.com/sdk/sdk-floating-close.png');
+                ensureField(data.floating.button, 'comment', '안녕하세요 Gentoo입니다');
+                ensureField(data, 'greeting', { comment: [] });
+                return jsonResponse(data);
+            }
+
+            // Floating data (legacy, mobile): real fetch + 필수 필드 폴백
+            if (url.includes('/api/v1/chat/floating/')) {
+                const data = await fetchJsonOrEmpty(input, init);
+                ensureField(data, 'imageUrl', 'https://assets.gentooai.com/sdk/sdk-floating-close.png');
+                ensureField(data, 'comment', '안녕하세요 Gentoo입니다');
+                return jsonResponse(data);
+            }
+
+            // 그 외(api/v1/user, api/v1/event/* 등): real backend 통과
+            return originalFetch(input, init);
+        };
+    </script>
+
+    <!-- SDK loader (loads ./dist/imweb/* on localhost) -->
+    <script src="./sdk-imweb-test.js"></script>
+
+    <!-- Boot SDK -->
+    <script>
+        GentooIO('boot', { partnerType: 'imweb', testPartnerId: '68f6d753165ff8db3d070faf' });
+        GentooIO('init', {
+            position: {
+                web: { bottom: 100, right: 100 },
+                mobile: { bottom: 60, right: 0 },
+            },
+            showGentooButton: true,
+            isCustomButton: false,
+        });
+    </script>
+</body>
+
+</html>

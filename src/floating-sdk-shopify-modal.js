@@ -77,6 +77,7 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
+        this.userType = props.userType;
         this.udid = props.udid || "";
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
@@ -154,6 +155,9 @@ class FloatingButton {
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
                     this.csInquiry = csInquiry?.activated;
+                    const memberOnlyAccessData = this.chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                    this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                    this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                 }),
                 getFloatingData(this.partnerId, this.displayLocation, this.itemId, this.chatUserId).then((res) => {
                     if (!res) throw new Error("Failed to fetch floating data");
