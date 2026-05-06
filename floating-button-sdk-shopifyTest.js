@@ -48,6 +48,7 @@ class FloatingButton {
         this.authCode = props.authCode;
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
+        this.userType = props.userType;
         this.udid = props.udid || "";
         this.utm = props.utm;
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
@@ -160,6 +161,9 @@ class FloatingButton {
                     const warningMessageData = this.chatbotData?.experimentalData.find(item => item.key === "warningMessage");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
+                    const memberOnlyAccessData = this.chatbotData?.experimentalData?.find(item => item.key === "memberOnlyAccess");
+                    this.memberOnlyAccessActivated = memberOnlyAccessData?.activated;
+                    this.memberOnlyAccessLoginUrl = memberOnlyAccessData?.value;
                 }),
             ]);
         }).catch((error) => {
@@ -400,15 +404,19 @@ class FloatingButton {
 
         // 🖼️ 채팅 iframe 생성 - 실제 채팅 인터페이스가 로드될 iframe 요소
         this.iframe = document.createElement("iframe");
-        this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
-        this.iframe.addEventListener('load', () => {
-            if (this.autoUserMessage) {
-                setTimeout(() => {
-                    this.openChat();
-                    this.sendPostMessageHandler({ autoUserMessage: this.autoUserMessage });
-                }, 500);
-            }
-        });
+        if (this.isGuestAccessBlocked()) {
+            this.iframe.style.display = 'none';
+        } else {
+            this.iframe.src = this.chatUrl; // 위에서 생성한 chatUrl로 채팅 웹 애플리케이션 로드
+            this.iframe.addEventListener('load', () => {
+                if (this.autoUserMessage) {
+                    setTimeout(() => {
+                        this.openChat();
+                        this.sendPostMessageHandler({ autoUserMessage: this.autoUserMessage });
+                    }, 500);
+                }
+            });
+        }
 
         if (!this.customFloatingImage && (this.floatingAvatar?.floatingAsset || this.floatingData.imageUrl.includes('gentoo-anime-web-default.lottie'))) {
             const player = document.createElement('dotlottie-wc');
@@ -462,7 +470,9 @@ class FloatingButton {
 
         this.iframeContainer.appendChild(this.chatHeader);
         this.iframeContainer.appendChild(this.iframe);
-        if (this.warningActivated) {
+        if (this.isGuestAccessBlocked()) {
+            this.iframeContainer.appendChild(this.buildGuestAccessBlockView());
+        } else if (this.warningActivated) {
             this.footerText.innerText = this.warningMessage;
             this.iframeContainer.appendChild(this.footer);
         }
@@ -948,6 +958,38 @@ class FloatingButton {
         this.expandedButton = null;
         this.iframeContainer = null;
         this.dimmedBackground = null;
+    }
+
+    isGuestAccessBlocked() {
+        return this.userType === 'guest' && Boolean(this.memberOnlyAccessActivated);
+    }
+
+    buildGuestAccessBlockView() {
+        const wrapper = document.createElement('div');
+        wrapper.className = `guest-access-block${this.isSmallResolution ? ' guest-access-block-md' : ''}`;
+        wrapper.setAttribute('data-gentoo-sdk', 'true');
+
+        const title = document.createElement('p');
+        title.className = 'guest-access-block-title';
+        title.innerText = 'Login required';
+
+        const description = document.createElement('p');
+        description.className = 'guest-access-block-description';
+        description.innerText = 'Log in to use the AI chatbot.';
+
+        const loginButton = document.createElement('button');
+        loginButton.type = 'button';
+        loginButton.className = 'guest-access-block-login-button';
+        loginButton.innerText = 'Log in';
+        const loginUrl = this.memberOnlyAccessLoginUrl;
+        loginButton.addEventListener('click', () => {
+            window.location.href = loginUrl || window.location.href;
+        });
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(description);
+        wrapper.appendChild(loginButton);
+        return wrapper;
     }
 
     destroy() {
