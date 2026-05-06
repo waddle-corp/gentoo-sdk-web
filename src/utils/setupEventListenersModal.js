@@ -1,12 +1,13 @@
 import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
-import { 
-    updateFloatingContainerPosition, 
+import {
+    updateFloatingContainerPosition,
     updateIframeHeightByFooter,
     addLetter,
     logWindowWidth,
     injectViewport,
     deleteViewport
 } from "./floatingSdkUtils";
+import { isGuestAccessBlocked } from "./guestAccessBlock";
 
 export const setupEventListenersModal = (context, position) => {
     // Button click event
@@ -22,7 +23,7 @@ export const setupEventListenersModal = (context, position) => {
         // Inject viewport meta tag to block ios zoom in
         injectViewport(context, document);
 
-        if (context.messageExistence || context.displayLocation === 'PRODUCT_DETAIL') {
+        if (context.messageExistence || context.displayLocation === 'PRODUCT_DETAIL' || isGuestAccessBlocked(context)) {
             context.openChat();
             if (context?.eventCallback?.click) {
                 try { context.eventCallback.click(); } catch {}
