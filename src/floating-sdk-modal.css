@@ -816,7 +816,7 @@ div.chat-send-button {
     white-space: pre-line;
 }
 
-.guest-access-block-login-button {
+[data-gentoo-sdk="true"] .guest-access-block-login-button {
     font-family: "pretendard";
     font-size: 14px;
     font-weight: 600;
@@ -831,7 +831,7 @@ div.chat-send-button {
     transition: background 0.2s ease;
 }
 
-.guest-access-block-login-button:hover {
+[data-gentoo-sdk="true"] .guest-access-block-login-button:hover {
     background: #444;
 }
 
