@@ -55,6 +55,8 @@ class FloatingButton {
         // this.isDevFastfiveHost = window.location.hostname === 'dev.fastfive.co.kr';
         this.itemId = props.itemId || null;
         this.displayLocation = props.displayLocation || "HOME";
+        this.pagePath = window.location.pathname || '';
+        this.entry = this.mapPagePathToEntry(this.pagePath);
         this.udid = props.udid || "";
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
         // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
@@ -201,7 +203,9 @@ class FloatingButton {
             // if (!this.floatingData) {
             //     throw new Error("Failed to fetch floating data");
             // }
-            this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}`;
+            const entryParam = this.entry ? `&entry=${encodeURIComponent(this.entry)}` : '';
+            // this.chatUrl = `${process.env.API_CHAT_HOST_URL}/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}${entryParam}`;
+            this.chatUrl = `http://localhost:3000/chatroute/${this.partnerType}?ptid=${this.partnerId}&ch=${this.isMobileDevice}&cuid=${this.chatUserId}&dp=${this.displayLocation}&it=${this.itemId}&utms=${this.utm.utms}&utmm=${this.utm.utmm}&utmca=${this.utm.utmcp}&utmco=${this.utm.utmct}&utmt=${this.utm.utmt}&tp=${this.utm.tp}&lang=${this.partnerType === 'shopify' ? 'en' : 'ko'}${entryParam}`;
 
             // Create UI elements after data is ready
             if (this.isDestroyed) this.destroy();
@@ -1151,6 +1155,30 @@ class FloatingButton {
     logWindowWidth() {
         const width = window.innerWidth;
         return width;
+    }
+
+    // window.location.pathname → 채팅 시나리오 entry 값 매핑
+    //   /shared-office     → office
+    //   /office-interior   → interior
+    //   /office-solution   → building
+    //   /individual-office → private
+    //   /lounge-membership → lounge
+    //   그 외 (홈 등)      → '' (entry query 미포함)
+    mapPagePathToEntry(pagePath) {
+        if (!pagePath) return '';
+        const map = [
+            { prefix: '/shared-office', entry: 'office' },
+            { prefix: '/office-interior', entry: 'interior' },
+            { prefix: '/office-solution', entry: 'building' },
+            { prefix: '/individual-office', entry: 'private' },
+            { prefix: '/lounge-membership', entry: 'lounge' },
+        ];
+        for (const { prefix, entry } of map) {
+            if (pagePath === prefix || pagePath.startsWith(prefix + '/')) {
+                return entry;
+            }
+        }
+        return '';
     }
 
     async sendLog(input) {
