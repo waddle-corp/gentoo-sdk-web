@@ -92,18 +92,19 @@ export function injectViewport(context, document) {
     if (context.viewportInjected) return;
 
     try {
-        // Check for existing viewport meta tag
-        const existingViewport = document.querySelector('meta[name="viewport"]');
-        if (existingViewport) {
-            context.originalViewport = existingViewport.cloneNode(true);
-            existingViewport.remove();
-        }
-
+        // Append our own viewport tag at the end of <head> WITHOUT touching the
+        // host/React-owned viewport meta. When multiple viewport tags exist the
+        // browser applies the last-declared value per property, so our complete
+        // spec (incl. maximum-scale/user-scalable) wins and blocks iOS zoom.
+        // Removing/replacing the host tag would detach a node React holds a live
+        // reference to, causing a "Cannot read properties of null (reading
+        // 'removeChild')" crash on the next route change.
         const meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
         meta.setAttribute('data-gentoo-injected', 'true');
         document.head.appendChild(meta);
+        context.injectedViewport = meta;
         context.viewportInjected = true;
     } catch (error) {
         console.error('Failed to inject viewport meta tag:', error);
@@ -115,16 +116,15 @@ export function deleteViewport(context, document) {
     if (!context.viewportInjected) return;
 
     try {
-        const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
-        if (meta) {
-            meta.remove();
+        // Remove ONLY our own injected tag. The host/React-owned viewport was never
+        // touched, so it simply takes effect again once ours is gone.
+        if (context.injectedViewport && context.injectedViewport.parentNode) {
+            context.injectedViewport.parentNode.removeChild(context.injectedViewport);
+        } else {
+            const meta = document.querySelector('meta[name="viewport"][data-gentoo-injected="true"]');
+            if (meta) meta.remove();
         }
-
-        // Restore original viewport tag if it exists
-        if (context.originalViewport) {
-            document.head.appendChild(context.originalViewport);
-            context.originalViewport = null;
-        }
+        context.injectedViewport = null;
     } catch (error) {
         console.error('Failed to delete viewport meta tag:', error);
     } finally {
