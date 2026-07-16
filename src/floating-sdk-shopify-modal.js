@@ -106,7 +106,7 @@ class FloatingButton {
         this.customFloatingImage = null;
         this.iframeHeightState;
         this.viewportInjected = false;
-        this.originalViewport = null;
+        this.injectedViewport = null;
         this.isInteractingWithSend = false;
         /* 플로팅 버튼 드래그하여 위치 변동 기능 */
         this.isDraggingFloating = false;
