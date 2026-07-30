@@ -21,6 +21,7 @@ import {
     checkSDKExists,
     isAllowedDomainForIframe
 } from './utils/floatingSdkUtils';
+import { resolveChatDisplayLocation } from './utils/chatDisplayLocation.mjs';
 
 class FloatingButton {
     constructor(props) {
@@ -131,6 +132,7 @@ class FloatingButton {
                     this.chatbotData = chatbotData;
                     this.floatingData = floatingData;
                     this.bootConfig = bootConfig;
+                    this.displayLocation = resolveChatDisplayLocation(bootConfig, this.displayLocation);
                     const warningMessageData = chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;

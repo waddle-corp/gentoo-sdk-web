@@ -10,6 +10,7 @@ import {
 } from './apis/chatConfig';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 import { buildGuestAccessBlockView, isGuestAccessBlocked } from './utils/guestAccessBlock';
+import { resolveChatDisplayLocation } from './utils/chatDisplayLocation.mjs';
 
 class FloatingButton {
     constructor(props) {
@@ -164,6 +165,7 @@ class FloatingButton {
                 .then(([chatbotData, bootConfig]) => {
                     this.chatbotData = chatbotData;
                     this.bootConfig = bootConfig;
+                    this.displayLocation = resolveChatDisplayLocation(bootConfig, this.displayLocation);
                     const warningMessageData = chatbotData?.experimentalData?.find(item => item.key === "warningMessage");
                     this.warningMessage = warningMessageData?.extra?.message;
                     this.warningActivated = warningMessageData?.activated;
