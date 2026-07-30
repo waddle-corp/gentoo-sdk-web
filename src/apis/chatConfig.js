@@ -178,7 +178,7 @@ export const postChatEventLogLegacy = async (payload, isMobileDevice) => {
 
 export async function getBootConfig(chatUserId, currentUrl, displayLocation, itemId, partnerId) {
     try {
-        const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_BOOTCONFIG_ENDPOINT}?chatUserId=${chatUserId}&url=${currentUrl}&displayLocation=${displayLocation}&itemId=${itemId}`, {
+        const response = await fetch(`${process.env.API_CHAT_BASE_URL}${process.env.API_BOOTCONFIG_ENDPOINT}?chatUserId=${chatUserId}&url=${encodeURIComponent(currentUrl)}&displayLocation=${displayLocation}&itemId=${itemId}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${partnerId}`,
