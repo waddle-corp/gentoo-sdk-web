@@ -2,6 +2,7 @@
   "homepage": "https://waddle-corp.github.io/sdk-js-web/",
   "scripts": {
     "deploy": "gh-pages -d public",
+    "test": "node --test test/*.test.mjs",
     "build": "cross-env SDK_ENV=production webpack --config webpack.config.js --mode production",
     "build:dev": "cross-env SDK_ENV=development webpack --config webpack.config.js --mode development",
     "build:stage": "cross-env SDK_ENV=stage webpack --config webpack.config.js --mode development",
