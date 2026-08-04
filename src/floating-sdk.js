@@ -59,6 +59,7 @@ class FloatingButton {
         this.entry = this.mapPagePathToEntry(this.pagePath);
         this.udid = props.udid || "";
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.leadTracking = this.updateLeadTracking();
         // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
         // 단, transitionPage(tp)는 항상 최신 값으로 갱신
         if (props.utm && typeof props.utm === 'object') {
@@ -90,7 +91,8 @@ class FloatingButton {
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
-        this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.leadDeviceType = this.getLeadDeviceType();
+        this.isMobileDevice = this.leadDeviceType !== 'pc';
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
@@ -156,6 +158,47 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
+    }
+
+    getLeadDeviceType() {
+        const userAgent = navigator.userAgent || '';
+        const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        const isTablet = isIPadOS
+            || /iPad|Tablet|PlayBook|Silk/i.test(userAgent)
+            || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent));
+
+        if (isTablet) return 'tablet';
+        if (/iPhone|iPod|Android|Mobile/i.test(userAgent)) return 'mobile';
+        return 'pc';
+    }
+
+    updateLeadTracking() {
+        const currentPage = window.location.pathname || '/';
+        const searchParams = new URLSearchParams(window.location.search);
+        const previousTracking = this.gentooSessionData.leadTracking || {};
+        const previousPage = previousTracking.conversionPage;
+        const leadTracking = {
+            landing: previousTracking.landing || currentPage,
+            conversionPage: currentPage,
+            prevConversionPage: previousTracking.prevConversionPage || '',
+            referrer: previousTracking.referrer ?? document.referrer ?? '',
+            gclid: searchParams.get('gclid') || previousTracking.gclid || '',
+        };
+
+        if (previousPage && previousPage !== currentPage) {
+            leadTracking.prevConversionPage = previousPage;
+        }
+
+        this.gentooSessionData.leadTracking = leadTracking;
+        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        return leadTracking;
+    }
+
+    getLeadTrackingPayload() {
+        return {
+            ...this.leadTracking,
+            deviceType: this.leadDeviceType,
+        };
     }
 
     async init(params) {
@@ -337,6 +380,7 @@ class FloatingButton {
                     displayLocation: this.displayLocation,
                     deviceType: this.isMobileDevice ? "mobile" : "web",
                     fbclid: this.fbclid,
+                    leadTracking: this.getLeadTrackingPayload(),
                 }
             });
         }, 1000)
@@ -560,6 +604,7 @@ class FloatingButton {
                     displayLocation: this.displayLocation,
                     deviceType: this.isMobileDevice ? "mobile" : "web",
                     fbclid: this.fbclid,
+                    leadTracking: this.getLeadTrackingPayload(),
                 }
             });
         }, 1000);
@@ -1341,8 +1386,7 @@ window.FloatingButton = FloatingButton;
 
             // Add UTM parameters
             const parsedUrl = new URL(window.location.href);
-            const pathSegments = parsedUrl.pathname.split("/");
-            const transitionPage = "/" + pathSegments[1];
+            const transitionPage = parsedUrl.pathname || "/";
             const searchParams = new URLSearchParams(window.location.search);
             const utm = {
                 utms: searchParams.get("utm_source"),
