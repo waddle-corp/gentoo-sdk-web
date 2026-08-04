@@ -8,6 +8,7 @@ import {
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
+import { resolveLeadDeviceType, resolveLeadTracking } from './utils/leadTracking.mjs';
 
 
 class FloatingButton {
@@ -91,7 +92,7 @@ class FloatingButton {
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
-        this.leadDeviceType = this.getLeadDeviceType();
+        this.leadDeviceType = resolveLeadDeviceType(navigator);
         this.isMobileDevice = this.leadDeviceType !== 'pc';
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
@@ -160,38 +161,59 @@ class FloatingButton {
         });
     }
 
-    getLeadDeviceType() {
-        const userAgent = navigator.userAgent || '';
-        const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-        const isTablet = isIPadOS
-            || /iPad|Tablet|PlayBook|Silk/i.test(userAgent)
-            || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent));
-
-        if (isTablet) return 'tablet';
-        if (/iPhone|iPod|Android|Mobile/i.test(userAgent)) return 'mobile';
-        return 'pc';
-    }
-
     updateLeadTracking() {
-        const currentPage = window.location.pathname || '/';
-        const searchParams = new URLSearchParams(window.location.search);
-        const previousTracking = this.gentooSessionData.leadTracking || {};
-        const previousPage = previousTracking.conversionPage;
-        const leadTracking = {
-            landing: previousTracking.landing || currentPage,
-            conversionPage: currentPage,
-            prevConversionPage: previousTracking.prevConversionPage || '',
-            referrer: previousTracking.referrer ?? document.referrer ?? '',
-            gclid: searchParams.get('gclid') || previousTracking.gclid || '',
-        };
-
-        if (previousPage && previousPage !== currentPage) {
-            leadTracking.prevConversionPage = previousPage;
-        }
+        const leadTracking = resolveLeadTracking(
+            this.gentooSessionData.leadTracking,
+            window.location,
+            document.referrer,
+        );
 
         this.gentooSessionData.leadTracking = leadTracking;
         sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
         return leadTracking;
+    }
+
+    setupLeadTrackingListeners() {
+        if (this.handleLeadLocationChange) return;
+
+        this.handleLeadLocationChange = () => {
+            this.leadTracking = this.updateLeadTracking();
+            if (!this.iframe?.contentWindow) return;
+
+            this.sendPostMessageHandler({
+                messageType: 'gentoo-statics',
+                contentData: { leadTracking: this.getLeadTrackingPayload() },
+            });
+        };
+        this.originalPushState = history.pushState;
+        this.originalReplaceState = history.replaceState;
+        this.patchedPushState = (...args) => {
+            const result = this.originalPushState.apply(history, args);
+            this.handleLeadLocationChange();
+            return result;
+        };
+        this.patchedReplaceState = (...args) => {
+            const result = this.originalReplaceState.apply(history, args);
+            this.handleLeadLocationChange();
+            return result;
+        };
+
+        history.pushState = this.patchedPushState;
+        history.replaceState = this.patchedReplaceState;
+        window.addEventListener('popstate', this.handleLeadLocationChange);
+    }
+
+    removeLeadTrackingListeners() {
+        if (!this.handleLeadLocationChange) return;
+
+        window.removeEventListener('popstate', this.handleLeadLocationChange);
+        if (history.pushState === this.patchedPushState) {
+            history.pushState = this.originalPushState;
+        }
+        if (history.replaceState === this.patchedReplaceState) {
+            history.replaceState = this.originalReplaceState;
+        }
+        this.handleLeadLocationChange = null;
     }
 
     getLeadTrackingPayload() {
@@ -364,6 +386,7 @@ class FloatingButton {
         }
         parentElem.appendChild(this.dimmedBackground);
         parentElem.appendChild(this.iframeContainer);
+        this.setupLeadTrackingListeners();
         requestAnimationFrame(() => this.updateIframeHeightByFooter());
 
         setTimeout(() => {
@@ -976,6 +999,7 @@ class FloatingButton {
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
+        this.removeLeadTrackingListeners();
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
