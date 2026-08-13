@@ -8,6 +8,7 @@ import {
 } from './apis/chatConfig';
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
+import { resolveLeadDeviceType, resolveLeadTracking } from './utils/leadTracking.mjs';
 
 
 class FloatingButton {
@@ -57,6 +58,7 @@ class FloatingButton {
         this.displayLocation = props.displayLocation || "HOME";
         this.udid = props.udid || "";
         this.gentooSessionData = JSON.parse(sessionStorage.getItem('gentoo')) || {};
+        this.leadTracking = this.updateLeadTracking();
         // transitionPage(tp)를 제외한 모든 key가 null | undefined | ""이면 갱신 스킵
         // 단, transitionPage(tp)는 항상 최신 값으로 갱신
         if (props.utm && typeof props.utm === 'object') {
@@ -88,7 +90,8 @@ class FloatingButton {
         this.chatbotData;
         this.browserWidth = this.logWindowWidth();
         this.isSmallResolution = this.browserWidth < 601;
-        this.isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.leadDeviceType = resolveLeadDeviceType(navigator);
+        this.isMobileDevice = this.leadDeviceType !== 'pc';
         this.isDestroyed = false;
         this.isInitialized = false; // Add flag to track initialization
         this.floatingCount = 0;
@@ -154,6 +157,68 @@ class FloatingButton {
             console.error(`Error during initialization: ${error}`);
             throw error;
         });
+    }
+
+    updateLeadTracking() {
+        const leadTracking = resolveLeadTracking(
+            this.gentooSessionData.leadTracking,
+            window.location,
+            document.referrer,
+        );
+
+        this.gentooSessionData.leadTracking = leadTracking;
+        sessionStorage.setItem('gentoo', JSON.stringify(this.gentooSessionData));
+        return leadTracking;
+    }
+
+    setupLeadTrackingListeners() {
+        if (this.handleLeadLocationChange) return;
+
+        this.handleLeadLocationChange = () => {
+            this.leadTracking = this.updateLeadTracking();
+            if (!this.iframe?.contentWindow) return;
+
+            this.sendPostMessageHandler({
+                messageType: 'gentoo-statics',
+                contentData: { leadTracking: this.getLeadTrackingPayload() },
+            });
+        };
+        this.originalPushState = history.pushState;
+        this.originalReplaceState = history.replaceState;
+        this.patchedPushState = (...args) => {
+            const result = this.originalPushState.apply(history, args);
+            this.handleLeadLocationChange();
+            return result;
+        };
+        this.patchedReplaceState = (...args) => {
+            const result = this.originalReplaceState.apply(history, args);
+            this.handleLeadLocationChange();
+            return result;
+        };
+
+        history.pushState = this.patchedPushState;
+        history.replaceState = this.patchedReplaceState;
+        window.addEventListener('popstate', this.handleLeadLocationChange);
+    }
+
+    removeLeadTrackingListeners() {
+        if (!this.handleLeadLocationChange) return;
+
+        window.removeEventListener('popstate', this.handleLeadLocationChange);
+        if (history.pushState === this.patchedPushState) {
+            history.pushState = this.originalPushState;
+        }
+        if (history.replaceState === this.patchedReplaceState) {
+            history.replaceState = this.originalReplaceState;
+        }
+        this.handleLeadLocationChange = null;
+    }
+
+    getLeadTrackingPayload() {
+        return {
+            ...this.leadTracking,
+            deviceType: this.leadDeviceType,
+        };
     }
 
     async init(params) {
@@ -317,6 +382,7 @@ class FloatingButton {
         }
         parentElem.appendChild(this.dimmedBackground);
         parentElem.appendChild(this.iframeContainer);
+        this.setupLeadTrackingListeners();
         requestAnimationFrame(() => this.updateIframeHeightByFooter());
 
         setTimeout(() => {
@@ -333,6 +399,7 @@ class FloatingButton {
                     displayLocation: this.displayLocation,
                     deviceType: this.isMobileDevice ? "mobile" : "web",
                     fbclid: this.fbclid,
+                    leadTracking: this.getLeadTrackingPayload(),
                 }
             });
         }, 1000)
@@ -556,6 +623,7 @@ class FloatingButton {
                     displayLocation: this.displayLocation,
                     deviceType: this.isMobileDevice ? "mobile" : "web",
                     fbclid: this.fbclid,
+                    leadTracking: this.getLeadTrackingPayload(),
                 }
             });
         }, 1000);
@@ -927,6 +995,7 @@ class FloatingButton {
 
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
+        this.removeLeadTrackingListeners();
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
@@ -1313,8 +1382,7 @@ window.FloatingButton = FloatingButton;
 
             // Add UTM parameters
             const parsedUrl = new URL(window.location.href);
-            const pathSegments = parsedUrl.pathname.split("/");
-            const transitionPage = "/" + pathSegments[1];
+            const transitionPage = parsedUrl.pathname || "/";
             const searchParams = new URLSearchParams(window.location.search);
             const utm = {
                 utms: searchParams.get("utm_source"),
