@@ -11,6 +11,13 @@ import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 import { resolveLeadDeviceType, resolveLeadTracking } from './utils/leadTracking.mjs';
 import { findCustomButton } from './utils/customButton.mjs';
 
+if (!window.__GentooCustomButtonClickCapture) {
+    window.__GentooCustomButtonClickCapture = (e) => {
+        if (findCustomButton(e.target)) window.__GentooPendingCustomButtonClick = true;
+    };
+    document.addEventListener("click", window.__GentooCustomButtonClickCapture, true);
+}
+
 
 class FloatingButton {
     constructor(props) {
@@ -253,6 +260,7 @@ class FloatingButton {
                 if (!customButton) return;
 
                 this.customButton = customButton;
+                window.__GentooPendingCustomButtonClick = false;
                 if (!this.customButtonReadyHandler) {
                     this.pendingCustomButtonClick = true;
                     return;
@@ -786,8 +794,9 @@ class FloatingButton {
                 buttonClickHandler(e);
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
             };
-            if (this.pendingCustomButtonClick) {
+            if (this.pendingCustomButtonClick || window.__GentooPendingCustomButtonClick) {
                 this.pendingCustomButtonClick = false;
+                window.__GentooPendingCustomButtonClick = false;
                 this.customButtonReadyHandler({ stopPropagation() { }, preventDefault() { } });
             }
         }
