@@ -780,7 +780,7 @@ class FloatingButton {
                 buttonClickHandler(e);
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
             };
-            document.addEventListener("click", this.customButtonClickHandler);
+            document.addEventListener("click", this.customButtonClickHandler, true);
         }
 
         // scroll event listener
@@ -1011,7 +1011,7 @@ class FloatingButton {
         window.removeEventListener("resize", this.handleResize);
         this.removeLeadTrackingListeners();
         if (this.customButtonClickHandler) {
-            document.removeEventListener("click", this.customButtonClickHandler);
+            document.removeEventListener("click", this.customButtonClickHandler, true);
             this.customButtonClickHandler = null;
         }
         if (this.button) {
