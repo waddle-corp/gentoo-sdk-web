@@ -9,6 +9,7 @@ import {
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 import { resolveLeadDeviceType, resolveLeadTracking } from './utils/leadTracking.mjs';
+import { findCustomButton } from './utils/customButton.mjs';
 
 
 class FloatingButton {
@@ -770,8 +771,17 @@ class FloatingButton {
         this.closeButtonIcon?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
-        this.customButton?.addEventListener("click", buttonClickHandler);
-        this.customButton?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href }));
+        if (isCustomButton) {
+            this.customButtonClickHandler = (e) => {
+                const customButton = findCustomButton(e.target);
+                if (!customButton) return;
+
+                this.customButton = customButton;
+                buttonClickHandler(e);
+                this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
+            };
+            document.addEventListener("click", this.customButtonClickHandler);
+        }
 
         // scroll event listener
         const onScroll = (() => {
@@ -1000,6 +1010,10 @@ class FloatingButton {
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
         this.removeLeadTrackingListeners();
+        if (this.customButtonClickHandler) {
+            document.removeEventListener("click", this.customButtonClickHandler);
+            this.customButtonClickHandler = null;
+        }
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
