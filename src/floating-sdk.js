@@ -9,14 +9,7 @@ import {
 import Ff_fab_nopad from '../public/Ff_fab_nopad.lottie';
 import { applyCanvasObjectFit } from './utils/floatingSdkUtils';
 import { resolveLeadDeviceType, resolveLeadTracking } from './utils/leadTracking.mjs';
-import { findCustomButton } from './utils/customButton.mjs';
-
-if (!window.__GentooCustomButtonClickCapture) {
-    window.__GentooCustomButtonClickCapture = (e) => {
-        if (findCustomButton(e.target)) window.__GentooPendingCustomButtonClick = true;
-    };
-    document.addEventListener("click", window.__GentooCustomButtonClickCapture, true);
-}
+import { routeCustomButtonClick } from './utils/customButton.mjs';
 
 
 class FloatingButton {
@@ -254,21 +247,6 @@ class FloatingButton {
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false, parentClassName = '', emergeThreshold = { isTimeBased: false, isScrollBased: false, timeThreshold: 0, scrollThreshold: 0 } } = params;
         const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document.body;
-        if (isCustomButton && !this.customButtonClickHandler) {
-            this.customButtonClickHandler = (e) => {
-                const customButton = findCustomButton(e.target);
-                if (!customButton) return;
-
-                this.customButton = customButton;
-                window.__GentooPendingCustomButtonClick = false;
-                if (!this.customButtonReadyHandler) {
-                    this.pendingCustomButtonClick = true;
-                    return;
-                }
-                this.customButtonReadyHandler(e);
-            };
-            document.addEventListener("click", this.customButtonClickHandler, true);
-        }
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -1028,10 +1006,6 @@ class FloatingButton {
         // Remove event listeners
         window.removeEventListener("resize", this.handleResize);
         this.removeLeadTrackingListeners();
-        if (this.customButtonClickHandler) {
-            document.removeEventListener("click", this.customButtonClickHandler, true);
-            this.customButtonClickHandler = null;
-        }
         this.customButtonReadyHandler = null;
         this.pendingCustomButtonClick = false;
         if (this.button) {
@@ -1404,6 +1378,16 @@ window.FloatingButton = FloatingButton;
 
     var fb; // Keep fb in closure scope
 
+    if (!w.__GentooCustomButtonClickCapture) {
+        w.__GentooCustomButtonClickCapture = (e) => {
+            const result = routeCustomButtonClick(e.target, fb, e);
+            if (result !== 'ignored') {
+                w.__GentooPendingCustomButtonClick = result === 'queued';
+            }
+        };
+        document.addEventListener("click", w.__GentooCustomButtonClickCapture, true);
+    }
+
     // Create a persistent queue processor
     function createQueueProcessor() {
         var ge = function () {
@@ -1434,8 +1418,13 @@ window.FloatingButton = FloatingButton;
             // Handle boot separately
             if (method === "boot") {
                 params.utm = utm;
+                if (fb && !fb.isDestroyed) {
+                    console.warn("GentooIO boot called twice, keeping the active instance.");
+                    return;
+                }
                 try {
-                    fb = new FloatingButton(params);
+                    const nextFb = new FloatingButton(params);
+                    if (nextFb.bootPromise) fb = nextFb;
                 } catch (error) {
                     console.error("Failed to create FloatingButton instance:", error);
                 }
