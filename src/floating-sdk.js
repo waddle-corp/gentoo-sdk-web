@@ -249,6 +249,20 @@ class FloatingButton {
         window.__GentooInited = 'init';
         const { position, showGentooButton = true, isCustomButton = false, parentClassName = '', emergeThreshold = { isTimeBased: false, isScrollBased: false, timeThreshold: 0, scrollThreshold: 0 } } = params;
         const parentElem = parentClassName.length > 0 ? document.getElementsByClassName(parentClassName)[0] : document.body;
+        if (isCustomButton && !this.customButtonClickHandler) {
+            this.customButtonClickHandler = (e) => {
+                const customButton = findCustomButton(e.target);
+                if (!customButton) return;
+
+                this.customButton = customButton;
+                if (!this.customButtonReadyHandler) {
+                    this.pendingCustomButtonClick = true;
+                    return;
+                }
+                this.customButtonReadyHandler(e);
+            };
+            document.addEventListener("click", this.customButtonClickHandler, true);
+        }
         try {
             // Wait for boot process to complete
             await this.bootPromise;
@@ -772,15 +786,14 @@ class FloatingButton {
         this.closeActionArea?.addEventListener("click", buttonClickHandler);
         this.closeActionArea?.addEventListener("click", (e) => this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'closeActionArea', currentPage: window?.location?.href }));
         if (isCustomButton) {
-            this.customButtonClickHandler = (e) => {
-                const customButton = findCustomButton(e.target);
-                if (!customButton) return;
-
-                this.customButton = customButton;
+            this.customButtonReadyHandler = (e) => {
                 buttonClickHandler(e);
                 this.sendPostMessageHandler({ buttonClickState: true, clickedElement: 'floatingContainer', currentPage: window?.location?.href });
             };
-            document.addEventListener("click", this.customButtonClickHandler, true);
+            if (this.pendingCustomButtonClick) {
+                this.pendingCustomButtonClick = false;
+                this.customButtonReadyHandler({ stopPropagation() { }, preventDefault() { } });
+            }
         }
 
         // scroll event listener
@@ -1014,6 +1027,8 @@ class FloatingButton {
             document.removeEventListener("click", this.customButtonClickHandler, true);
             this.customButtonClickHandler = null;
         }
+        this.customButtonReadyHandler = null;
+        this.pendingCustomButtonClick = false;
         if (this.button) {
             this.button.removeEventListener("click", this.buttonClickHandler);
         }
