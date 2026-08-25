@@ -105,7 +105,7 @@ class FloatingButton {
         this.floatingMessage;
         this.iframeHeightState;
         this.viewportInjected = false;
-        this.originalViewport = null;
+        this.injectedViewport = null;
         this.isInteractingWithSend = false;
         this.pageList = [];
         this.eventCallback = {
