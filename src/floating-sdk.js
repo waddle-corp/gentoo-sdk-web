@@ -703,7 +703,8 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
+                // productType 값은 시나리오 키('office' 등), 세일즈포스의 한글 라벨이 아니다.
+                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer, productType: e.data.scenarioKey };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
                 }
