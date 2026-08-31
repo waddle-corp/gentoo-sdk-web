@@ -707,7 +707,7 @@ class FloatingButton {
                 window.location.href = e.data.redirectUrl;
             }
             if (e.data.formSubmittedState) {
-                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer };
+                const params = { p1: e.data.firstAnswer, p2: e.data.secondAnswer, scenarioKey: e.data.scenarioKey };
                 if (this.eventCallback.formSubmitted !== null) {
                     this.eventCallback?.formSubmitted(params);
                 }
