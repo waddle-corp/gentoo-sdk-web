@@ -1,3 +1,8 @@
+// Capture the script host before deferred boot clears document.currentScript.
+const shopifyTestSdkIsDev = document.currentScript?.src
+    ? new URL(document.currentScript.src).hostname === 'dev-sdk.gentooai.com'
+    : false;
+
 class FloatingButton {
     constructor(props) {
         this.FLOATING_MESSAGE_INTERVAL_MS = 30000;
@@ -94,6 +99,7 @@ class FloatingButton {
 
         // 🧪 Shopify 테스트용 환경 설정
         if (
+            shopifyTestSdkIsDev ||
             window.location.hostname === "dailyshot.co" ||
             window.location.hostname === "dev-demo.gentooai.com" ||
             window.location.hostname === "127.0.0.1" ||
