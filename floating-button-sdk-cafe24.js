@@ -1,3 +1,8 @@
+// Capture the script origin before deferred boot clears document.currentScript.
+const cafe24SdkIsDev = document.currentScript?.src
+    ? new URL(document.currentScript.src).origin === 'https://dev-sdk.gentooai.com'
+    : false;
+
 class FloatingButton {
     constructor(props) {
         // 기본적으로 iframe 내에서 실행 방지, 다음은 허용된 도메인 목록
@@ -91,7 +96,7 @@ class FloatingButton {
             /* // cafe24 Gentoo-prod App
             this.cafe24ClientId = 'QfNlFJBPD6mXVWkE8MybWD';
             this.cafe24Version = '2024-09-01'; */
-        } else if (window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company') || window.location.hostname.includes('jintaebaek')) {
+        } else if (cafe24SdkIsDev || window.location.hostname === 'dev-demo.gentooai.com' || window.location.hostname.includes('kickthefence') || window.location.hostname.includes('y6company') || window.location.hostname.includes('jintaebaek')) {
             this.hostSrc = 'https://dev-demo.gentooai.com';
             this.domains = {
                 auth: 'https://dev-api.gentooai.com/chat/api/v1/user',
