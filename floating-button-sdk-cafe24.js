@@ -451,7 +451,7 @@ class FloatingButton {
                 // Use requestAnimationFrame to ensure layout is calculated before applying canvas styles
                 requestAnimationFrame(() => {
                     // Apply object-fit: cover to canvas in shadow-root
-                    applyCanvasObjectFit(this.dotLottiePlayer);
+                    this.applyCanvasObjectFit(this.dotLottiePlayer);
                 });
             } else {
                 this.floatingContainer.appendChild(this.button);

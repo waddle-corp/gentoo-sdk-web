@@ -9,6 +9,53 @@ const devOrigin = 'https://dev-sdk.gentooai.com';
 const prodOrigin = 'https://sdk.gentooai.com';
 const qaHostname = 'waddlelab.cafe24.com';
 
+test('Cafe24 avatar callback invokes the instance canvas fitter', (t) => {
+    const frames = [];
+    const createElement = () => ({
+        style: {},
+        setAttribute() {},
+        appendChild(child) { child.parentNode = this; },
+    });
+    const document = {
+        currentScript: { src: `${devOrigin}${scriptPath}` },
+        querySelector: () => null,
+        createElement,
+        createTextNode: () => ({}),
+        head: createElement(),
+        body: createElement(),
+    };
+    const window = {};
+    window.top = window;
+    const context = createContext({
+        window, document, URL,
+        requestAnimationFrame: (callback) => frames.push(callback),
+        setTimeout() {},
+    });
+    runInContext(source, context);
+    const instance = Object.create(window.FloatingButton.prototype);
+    Object.assign(instance, {
+        chatUrl: `${devOrigin}/synthetic-chat`,
+        chatbotData: { position: {}, mobilePosition: {} },
+        bootConfig: { floating: { button: { imageUrl: 'qa-avatar.lottie' } } },
+        gentooSessionData: {},
+        logEvent() {},
+        logEventLegacy() {},
+        updateFloatingContainerPosition() {},
+        setupEventListeners() {},
+        applyCanvasObjectFit: t.mock.fn(function (player) {
+            assert.equal(this, instance);
+            assert.equal(player, instance.dotLottiePlayer);
+        }),
+    });
+
+    instance.createUIElements({}, true);
+    assert.equal(instance.iframeContainer.parentNode, document.body);
+    assert.equal(instance.dotLottiePlayer.parentNode, instance.floatingContainer);
+    assert.equal(instance.applyCanvasObjectFit.mock.callCount(), 0);
+    frames.forEach((callback) => callback());
+    assert.equal(instance.applyCanvasObjectFit.mock.callCount(), 1);
+});
+
 for (const [name, scriptOrigin, hostname, expected, laterOrigin] of [
     ['dev CDN survives deferred boot on waddlelab', devOrigin, qaHostname, 'dev-'],
     ['dev CDN survives another current script', devOrigin, qaHostname, 'dev-', prodOrigin],
