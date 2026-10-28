@@ -1,6 +1,10 @@
 (
     function (global, document) {
         var w = global;
+        // Capture the wrapper origin before deferred loading clears currentScript.
+        var sdkOrigin = document.currentScript?.src
+            && new URL(document.currentScript.src).origin === 'https://dev-sdk.gentooai.com'
+            ? 'https://dev-sdk.gentooai.com' : 'https://sdk.gentooai.com';
         if (w.GentooIO) { 
             return w.console.error("GentooIO script included twice"); 
         }; 
@@ -21,8 +25,8 @@
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 601;
             var source = '';
             source = isMobile 
-                ? `https://sdk.gentooai.com/dist/godomall-modal/floating-godomall-modal.js` 
-                : 'https://sdk.gentooai.com/dist/godomall/floating-godomall.js';
+                ? `${sdkOrigin}/dist/godomall-modal/floating-godomall-modal.js`
+                : `${sdkOrigin}/dist/godomall/floating-godomall.js`;
             s.src = source;
             s.onload = () => { 
                 w.addEventListener("message", ()=>{})
