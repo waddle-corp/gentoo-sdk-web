@@ -235,11 +235,11 @@ export function applyCanvasObjectFit(dotLottiePlayer) {
                 canvas.style.height = '100%';
             } else {
                 // Canvas might not be ready yet, retry
-                setTimeout(() => tryApplyStyle(retries - 1), 50);
+                setTimeout(() => tryApplyStyle(dotLottiePlayer, retries - 1), 50);
             }
         } else {
             // ShadowRoot not ready yet, retry
-            setTimeout(() => tryApplyStyle(retries - 1), 50);
+            setTimeout(() => tryApplyStyle(dotLottiePlayer, retries - 1), 50);
         }
     };
 
