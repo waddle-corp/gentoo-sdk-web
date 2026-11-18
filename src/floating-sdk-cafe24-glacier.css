@@ -100,13 +100,6 @@
     margin-right: 24px;
 }
 
-.button-image-shrink {
-    width: 40px;
-    height: 40px;
-    margin: 5px;
-    background-image: url('https://assets.gentooai.com/sdk/floating-gentoo-shrink.png');
-}
-
 .expanded-button {
     position: fixed;
     bottom: 110px;
