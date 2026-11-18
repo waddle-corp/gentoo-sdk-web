@@ -26,8 +26,8 @@
                     : "./dist/imweb/floating-imweb.js";
             } else {
                 s.src = isMobile
-                    ? "https://sdk.gentooai.com/dist/imweb-modal/floating-imweb-modal.js"
-                    : "https://sdk.gentooai.com/dist/imweb/floating-imweb.js";
+                    ? "https://dev-sdk.gentooai.com/dist/imweb-modal/floating-imweb-modal.js"
+                    : "https://dev-sdk.gentooai.com/dist/imweb/floating-imweb.js";
             }
             s.onload = () => {
                 w.addEventListener("message", () => { })

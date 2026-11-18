@@ -28,18 +28,33 @@
     <title>Document</title>
 </head>
 <body>
+    <!-- Test-only: simulate page paths via ?path=/shared-office before SDK loads.
+         Customers do NOT do this; SDK reads window.location.pathname directly. -->
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const testPath = params.get('path');
+            // Capture original testpage href BEFORE replaceState so the switcher can navigate back
+            window.__testpageOriginalHref = window.location.pathname;
+            if (testPath) {
+                history.replaceState({}, '', testPath);
+            }
+        })();
+    </script>
+
     <!-- <script src="./dist/gentoo-sdk.js"></script> -->
     <script src="./sdk.js"></script>
-    
+
     <!-- <script src="./sdk-shopifyTest.js"></script> -->
     <script>
         // Initialize GentooIO parameters
+        // entry는 SDK가 window.location.pathname을 읽어 자동 매핑하므로 여기서 넘기지 않음
         GentooIO('boot', {
             udid: 'test-udid', // optional, only for dlst
             authCode: '1231231322',
-            partnerId: '68f6d753165ff8db3d070faf', // product team test dev
+            // partnerId: '68f6d753165ff8db3d070faf', // product team test dev
             // partnerId: '67615284c5ff44110dbc6613', // fastfive prod
-            // partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
+            partnerId: '67516ecf103e7e29c75a621e', // fastfive dev
             // partnerId: '69310e7775aff78bb3569681', // sanc dev
             itemId: '', // optional, only @PRODUCT_DETAIL page
             displayLocation: 'HOME', // 'HOME' | 'PRODUCT_DETAIL' | 'PRODUCT_LIST'
@@ -98,6 +113,30 @@
     <div>
         <div>
             <div style="display: flex; flex-direction: column; align-items: stretch; height: 100%;">
+                <div id="path-switcher" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px; background: #f6f6f6; border-bottom: 1px solid #ddd; font-family: -apple-system, sans-serif; font-size: 13px;">
+                    <span style="font-weight: 600;">pagePath:</span>
+                    <span id="path-current" style="padding: 2px 8px; background: #222; color: #fff; border-radius: 4px;"></span>
+                    <span style="margin-left: 8px; color: #666;">switch →</span>
+                    <button data-path="" style="padding: 6px 10px;">home (default)</button>
+                    <button data-path="/shared-office" style="padding: 6px 10px;">/shared-office → office</button>
+                    <button data-path="/office-interior" style="padding: 6px 10px;">/office-interior → interior</button>
+                    <button data-path="/office-solution" style="padding: 6px 10px;">/office-solution → building</button>
+                    <button data-path="/individual-office" style="padding: 6px 10px;">/individual-office → private</button>
+                    <button data-path="/lounge-membership" style="padding: 6px 10px;">/lounge-membership → lounge</button>
+                </div>
+                <script>
+                    (function () {
+                        // After replaceState, window.location.pathname reflects the mocked path
+                        document.getElementById('path-current').textContent = window.location.pathname;
+                        const baseHref = window.__testpageOriginalHref || window.location.pathname;
+                        document.getElementById('path-switcher').addEventListener('click', function (e) {
+                            const target = e.target.closest('button[data-path]');
+                            if (!target) return;
+                            const next = target.getAttribute('data-path');
+                            window.location.href = next ? baseHref + '?path=' + encodeURIComponent(next) : baseHref;
+                        });
+                    })();
+                </script>
                 <div style="width: 100%; height: 400px; background: skyblue;">
                     box1
                 </div>

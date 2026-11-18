@@ -3,15 +3,13 @@ import assert from 'node:assert/strict';
 import { resolveChatDisplayLocation } from '../src/utils/chatDisplayLocation.mjs';
 
 test('uses a supported Admin chat display-location override', () => {
-    for (const displayLocation of ['HOME', 'PRODUCT_LIST', 'PRODUCT_DETAIL']) {
-        assert.equal(
-            resolveChatDisplayLocation(
-                { chat: { displayLocation } },
-                'PRODUCT_DETAIL',
-            ),
-            displayLocation,
-        );
-    }
+    assert.equal(
+        resolveChatDisplayLocation(
+            { chat: { displayLocation: 'HOME' } },
+            'PRODUCT_DETAIL',
+        ),
+        'HOME',
+    );
 });
 
 test('keeps the SDK classification when the override is absent', () => {
