@@ -37,7 +37,6 @@ jobs:
           echo "CAFE24_CLIENTID=${{ secrets.CAFE24_CLIENTID }}" >> $FILENAME
           echo "CAFE24_VERSION=${{ secrets.CAFE24_VERSION }}" >> $FILENAME
           echo "GODOMALL_SYSTEMKEY=${{ secrets.GODOMALL_SYSTEMKEY }}" >> $FILENAME
-      - run: cat $FILENAME
       - run: npm run build:${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
       - uses: actions/upload-artifact@v4
         with:  
@@ -48,6 +47,7 @@ jobs:
             !.git/**
             !.github/**
             !node_modules/**
+            !.env*
             !**/*.pem
             !**/*.key
           retention-days: 1
