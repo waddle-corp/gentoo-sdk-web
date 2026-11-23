@@ -1,0 +1,21 @@
+name: Verify production SDK deploy identity
+
+on:
+  push:
+    branches: [audit/sdk-prod-caller-20261123]
+
+permissions: {}
+
+jobs:
+  identity:
+    if: github.event.created
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Identify the production SDK deployment principal
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          AWS_REGION: ap-northeast-2
+          AWS_EC2_METADATA_DISABLED: 'true'
+        run: aws sts get-caller-identity --query '{Account:Account,Arn:Arn}' --output json --no-cli-pager
