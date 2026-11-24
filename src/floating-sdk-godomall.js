@@ -425,13 +425,6 @@ class FloatingButton {
             },
         });
 
-        postChatEventLogLegacy({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
-
         // Create floating button
         if (showGentooButton) {
             this.floatingContainer = document.createElement("div");
