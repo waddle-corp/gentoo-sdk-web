@@ -1,4 +1,4 @@
-import { postChatEventLog, postChatEventLogLegacy } from "../apis/chatConfig";
+import { postChatEventLog } from "../apis/chatConfig";
 import '../floating-sdk-modal.css';
 import { setupEventListenersModal } from "./setupEventListenersModal";
 import {
@@ -76,12 +76,6 @@ const logFloatingRendered = (context) => {
         },
     });
 
-    postChatEventLogLegacy({
-        eventCategory: "SDKFloatingRendered",
-        partnerId: context.partnerId,
-        chatUserId: context.chatUserId,
-        products: [],
-    }, context.isMobileDevice);
     window?.GentooLogListener?.log({ type: 'floatingEvent', event: 'floatingButtonRendered' });
 };
 

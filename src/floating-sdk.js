@@ -421,13 +421,6 @@ class FloatingButton {
             },
         });
 
-        postChatEventLogLegacy({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        }, this.isMobileDevice);
-
         // Create floating button
         if (showGentooButton) {
             // bootconfig floating imageurl OR floatingavatar floatingasset 중 하나
