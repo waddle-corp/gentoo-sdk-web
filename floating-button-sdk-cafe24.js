@@ -401,13 +401,6 @@ class FloatingButton {
         document.body.appendChild(this.iframeContainer);
         requestAnimationFrame(() => this.updateIframeHeightByFooter());
 
-        this.logEventLegacy({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        });
-
         this.logEvent({
             partnerId: this.partnerId,
             variantId: this.variant,
