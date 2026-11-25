@@ -485,13 +485,6 @@ class FloatingButton {
         document.body.appendChild(this.dimmedBackground);
         document.body.appendChild(this.iframeContainer);
 
-        this.logEventLegacy({
-            eventCategory: "SDKFloatingRendered",
-            partnerId: this.partnerId,
-            chatUserId: this.chatUserId,
-            products: [],
-        });
-
         this.logEvent({
             partnerId: this.partnerId,
             variantId: this.variant,
